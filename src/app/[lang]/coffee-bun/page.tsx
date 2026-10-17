@@ -9,10 +9,11 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
-  RiCodeSSlashLine,
+  RiCheckLine,
   RiDownload2Line,
   RiExternalLinkLine,
   RiGithubFill,
+  RiTerminalBoxLine,
 } from "react-icons/ri";
 
 const PageWrapper = styled.div`
@@ -54,13 +55,13 @@ const BackNav = styled.div`
 
 const HeroSection = styled.section`
   position: relative;
-  padding: 3.5rem 0 4rem;
+  padding: 3rem 0 3.5rem;
   text-align: center;
   z-index: 1;
   border-bottom: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 768px) {
-    padding: 2.5rem 0 3rem;
+    padding: 2rem 0 2.5rem;
   }
 `;
 
@@ -98,70 +99,88 @@ const Title = styled.h1`
   padding: 0;
 
   @media (max-width: 768px) {
-    font-size: 2.6rem;
+    font-size: 2.5rem;
   }
 `;
 
-const Subtitle = styled.p`
-  font-size: 1.3rem;
+const Tagline = styled.p`
+  font-size: 1.25rem;
   font-weight: 400;
-  max-width: 800px;
-  margin: 0 auto 1.25rem;
   color: ${({ theme }) => theme.text};
-  line-height: 1.5;
+  opacity: 0.85;
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 `;
 
 const Description = styled.p`
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   color: ${({ theme }) => theme.text};
-  opacity: 0.75;
-  max-width: 780px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.65;
+  opacity: 0.65;
+  max-width: 720px;
+  margin: 0 auto 2.25rem;
+  line-height: 1.7;
+
+  @media (max-width: 768px) {
+    font-size: 0.92rem;
+  }
 `;
 
-const QuickInstallBox = styled.div`
-  max-width: 780px;
-  margin: 0 auto 2.25rem;
+const StoryCard = styled.div`
+  max-width: 860px;
+  margin: 0 auto 2.5rem;
+  padding: 1.75rem 2rem;
   background-color: var(--code-block-bg);
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  padding: 0.85rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  text-align: left;
 
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: stretch;
+  @media (max-width: 768px) {
+    padding: 1.25rem;
   }
 
-  .cmd-wrapper {
+  .story-header {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    overflow-x: auto;
-    font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.88rem;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: ${({ theme }) => theme.text};
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+  }
 
-    .prompt-symbol {
-      opacity: 0.5;
-    }
-    code {
-      background: none;
-      padding: 0;
-      white-space: nowrap;
+  .story-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: ${({ theme }) => theme.text};
+    margin: 0 0 0.85rem;
+    line-height: 1.4;
+  }
+
+  .story-body {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    strong {
+      color: ${({ theme }) => theme.text};
+      font-weight: 600;
     }
   }
 `;
 
-const ButtonGroup = styled.div`
+const ActionRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,54 +188,44 @@ const ButtonGroup = styled.div`
   flex-wrap: wrap;
 `;
 
-const PrimaryButton = styled.a`
-  background-color: ${({ theme }) => theme.text};
-  color: ${({ theme }) => theme.body};
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.95rem;
+const ActionBtn = styled.a<{ primary?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.85;
-  }
-`;
-
-const SecondaryButton = styled.a`
-  background-color: transparent;
-  color: ${({ theme }) => theme.text};
-  border: 1px solid ${({ theme }) => theme.border};
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.6rem;
   border-radius: 6px;
+  font-size: 0.92rem;
   font-weight: 500;
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   text-decoration: none;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: pointer;
 
-  &:hover {
-    background-color: ${({ theme }) => theme.background};
-    border-color: ${({ theme }) => theme.text};
-  }
+  ${({ primary, theme }) =>
+    primary
+      ? `
+    background-color: ${theme.text};
+    color: ${theme.body};
+    border: 1px solid ${theme.text};
+    &:hover {
+      opacity: 0.88;
+    }
+  `
+      : `
+    background-color: transparent;
+    color: ${theme.text};
+    border: 1px solid ${theme.border};
+    &:hover {
+      background-color: ${theme.border};
+    }
+  `}
 `;
 
 const Section = styled.section`
   padding: 4.5rem 0;
-  width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.border};
-  position: relative;
-  z-index: 1;
 
   &:last-of-type {
     border-bottom: none;
-    padding-bottom: 6rem;
   }
 
   @media (max-width: 768px) {
@@ -225,128 +234,119 @@ const Section = styled.section`
 `;
 
 const SectionHeader = styled.div`
+  margin-bottom: 2.75rem;
   text-align: center;
-  margin-bottom: 3rem;
 
   h2 {
     font-size: 2rem;
-    font-weight: 600;
-    margin: 0 0 0.6rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
+    margin: 0 0 0.65rem;
+    color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: ${({ theme }) => theme.text};
-    opacity: 0.7;
-    max-width: 680px;
+    opacity: 0.65;
     margin: 0 auto;
+    max-width: 680px;
     line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
+    h2 {
+      font-size: 1.65rem;
+    }
+    p {
+      font-size: 0.92rem;
+    }
   }
 `;
 
-const FeaturesGrid = styled.div`
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  width: 100%;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const FeatureCard = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
   padding: 1.75rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.border};
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 
   &:hover {
     border-color: ${({ theme }) => theme.text};
     transform: translateY(-2px);
   }
 
-  .feature-num {
-    font-size: 0.75rem;
-    font-family: var(--font-roboto-mono), monospace;
-    opacity: 0.5;
-    margin-bottom: 0.75rem;
-  }
-
   h3 {
     font-size: 1.15rem;
     font-weight: 600;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.65rem;
+    color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
+    line-height: 1.35;
   }
 
   p {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
     color: ${({ theme }) => theme.text};
-    opacity: 0.75;
-    line-height: 1.6;
+    opacity: 0.7;
     margin: 0;
   }
 `;
 
-const SpecCard = styled.div`
-  background-color: var(--code-block-bg);
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
-  overflow: hidden;
-  width: 100%;
-
-  .spec-header {
-    background-color: var(--color-background);
-    padding: 0.75rem 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--color-border-weak);
-    font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.82rem;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.8;
-  }
-
-  pre {
-    margin: 0;
-    padding: 1.5rem;
-    font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: var(--code-block-fg);
-    overflow-x: auto;
-  }
-`;
-
-const EcosystemGrid = styled.div`
+const StackGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const EcosystemCard = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
+const StackCard = styled.div`
   padding: 1.75rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
 
   h3 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
+    color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
-  .eco-desc {
+  .stack-desc {
     font-size: 0.88rem;
     color: ${({ theme }) => theme.text};
     opacity: 0.7;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.55;
   }
 
   .tag-container {
@@ -355,268 +355,248 @@ const EcosystemCard = styled.div`
     gap: 0.45rem;
   }
 
-  .eco-tag {
+  .stack-tag {
     font-size: 0.75rem;
     font-family: var(--font-roboto-mono), monospace;
-    background-color: ${({ theme }) => theme.body};
-    border: 1px solid ${({ theme }) => theme.border};
-    padding: 0.25rem 0.55rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 4px;
+    border: 1px solid ${({ theme }) => theme.border};
     color: ${({ theme }) => theme.text};
     opacity: 0.85;
+    background-color: var(--color-background);
+  }
+`;
+
+const TableContainer = styled.div`
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+
+    th,
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid ${({ theme }) => theme.border};
+    }
+
+    th {
+      font-weight: 600;
+      color: ${({ theme }) => theme.text};
+      background-color: var(--color-background);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      color: ${({ theme }) => theme.text};
+      opacity: 0.85;
+      line-height: 1.55;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: var(--color-border-weak);
+    }
   }
 `;
 
 const InstallList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  width: 100%;
+  gap: 1.75rem;
 `;
 
 const InstallItem = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
+  padding: 1.75rem;
   border-radius: 8px;
-  padding: 1.75rem 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1.25rem 1.5rem;
-  }
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: transparent;
 
   h3 {
     font-size: 1.15rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
+    color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: ${({ theme }) => theme.text};
-    opacity: 0.75;
+    opacity: 0.7;
     margin: 0 0 1rem;
     line-height: 1.6;
   }
 `;
 
-const TableContainer = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
-  overflow: hidden;
-  width: 100%;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
-  }
-
-  th {
-    padding: 1rem 1.25rem;
-    text-align: left;
-    background-color: ${({ theme }) => theme.body};
-    font-weight: 600;
-    border-bottom: 1px solid ${({ theme }) => theme.border};
-  }
-
-  td {
-    padding: 1rem 1.25rem;
-    border-top: 1px solid ${({ theme }) => theme.border};
-    line-height: 1.6;
-  }
-`;
-
-export default function CoffeeBunPage() {
-  const { t } = useTranslation();
+export default function CoffeeBunDetailPage() {
   const params = useParams();
-  const urlLang = typeof params?.lang === "string" ? params.lang : "en";
-  const lang = urlLang.startsWith("ko") ? "ko" : "en";
-  const isKo = lang === "ko";
+  const lang = (params?.lang as string) || "en";
+  const { t, i18n } = useTranslation();
+  const isKo = i18n.language.startsWith("ko") || lang === "ko";
 
+  const repoUrl = "https://github.com/KennethanCeyer/bundle";
   const installCmd =
-    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/bundle/master/install.sh | bash";
-
-  const sampleBundleYaml = `# bundle.yml - macOS Development Environment Specification
-platform: macos
-version: "0.0.1"
-
-# 1. Programming Languages & Runtimes
-languages:
-  - golang
-  - python:
-      package_manager: pip
-  - node:
-      package_manager: npm
-  - rust:
-      package_manager: cargo
-
-# 2. Shell & Terminal Preferences
-shell:
-  framework: oh-my-zsh
-  theme: powerlevel10k
-
-terminal:
-  emulator: iterm2
-  vim: vimrc
-
-# 3. Toolchains & CLI Utilities
-toolchains:
-  - git
-  - zoxide
-  - fzf
-  - htop
-  - ripgrep
-  - eza
-  - cloc
-
-# 4. Linters & Build Engines
-devtools:
-  linters: [eslint, flake8]
-  build_tools: [gradle, webpack]
-
-# 5. Developer Applications & Casks
-applications:
-  - visual-studio-code
-  - docker
-  - google-chrome`;
+    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/bundle/main/install.sh | bash";
 
   const features = [
     {
-      num: "01",
-      title: t("coffee_bun.f1_title", "Declarative bundle.yml"),
-      desc: t("coffee_bun.f1_desc"),
+      title: t(
+        "coffee_bun.f1_title",
+        "Interactive Tree UI & Focusable Action Bar"
+      ),
+      desc: t(
+        "coffee_bun.f1_desc",
+        "Organize packages into foldable categories. Cycle focus between the tree and action buttons with Tab/Arrow keys without terminal traps."
+      ),
     },
     {
-      num: "02",
-      title: t("coffee_bun.f2_title", "Interactive CLI Selection"),
-      desc: t("coffee_bun.f2_desc"),
+      title: t(
+        "coffee_bun.f2_title",
+        "Goroutine Concurrency & Live Stream Output"
+      ),
+      desc: t(
+        "coffee_bun.f2_desc",
+        "Independent git clones, font downloads, and Homebrew formulae execute concurrently with real-time faint gray stdout streaming."
+      ),
     },
     {
-      num: "03",
-      title: t("coffee_bun.f3_title", "Environment Freeze"),
-      desc: t("coffee_bun.f3_desc"),
+      title: t(
+        "coffee_bun.f3_title",
+        "Sudo & Prerequisite Blocker Watcher"
+      ),
+      desc: t(
+        "coffee_bun.f3_desc",
+        "Displays copyable snippets for root permissions and polls every 2-3s in background to resume automatically without restarting bun."
+      ),
     },
     {
-      num: "04",
-      title: t("coffee_bun.f4_title", "Versioned Updates"),
-      desc: t("coffee_bun.f4_desc"),
+      title: t("coffee_bun.f4_title", "System Diagnostics (`bun doctor`)"),
+      desc: t(
+        "coffee_bun.f4_desc",
+        "Thoroughly validates macOS version, Homebrew PATH, .zshrc theme, zoxide shell hooks, and VS Code CLI symlink integrity."
+      ),
     },
     {
-      num: "05",
-      title: t("coffee_bun.f5_title", "Polyglot Language Support"),
-      desc: t("coffee_bun.f5_desc"),
+      title: t("coffee_bun.f5_title", "One-Stop Upgrader (`bun update`)"),
+      desc: t(
+        "coffee_bun.f5_desc",
+        "Simultaneously upgrades Homebrew formulae and casks while pulling latest commits for Oh My Zsh, Powerlevel10k, and Vim runtime."
+      ),
     },
     {
-      num: "06",
-      title: t("coffee_bun.f6_title", "Full-Stack Toolchains & Apps"),
-      desc: t("coffee_bun.f6_desc"),
+      title: t(
+        "coffee_bun.f6_title",
+        "Automated Non-Interactive Provisioning"
+      ),
+      desc: t(
+        "coffee_bun.f6_desc",
+        "bun install all or domain flags allow headless provisioning inside dotfiles and setup automation scripts."
+      ),
     },
   ];
 
-  const ecosystemCategories = [
+  const workstationCategories = [
     {
-      title: isKo ? "프로그래밍 언어 & 런타임" : "Programming Languages & Runtimes",
+      title: isKo
+        ? "터미널 & 쉘 (Terminal & Shell)"
+        : "Terminal & Shell Ecosystem",
       desc: isKo
-        ? "다양한 개발 환경을 위한 언어 엔진 및 패키지 매니저"
-        : "Language runtimes with package manager integrations",
+        ? "iTerm2 터미널 에뮬레이터, MesloLGS NF 아이콘 폰트, 고대비 Brogrammer 컬러 테마, Oh My Zsh 프레임워크 및 Powerlevel10k 테마, 자동완성/구문강조 플러그인을 자동으로 구성합니다."
+        : "Automates iTerm2, MesloLGS NF font installation (~/Library/Fonts), Brogrammer plist configuration, Oh My Zsh, Powerlevel10k, and autosuggestion plugins.",
       tags: [
-        "Golang",
-        "Python (PIP/Conda)",
-        "Node.js (npm)",
-        "Rust (Cargo)",
-        "Java (JDK)",
-        "Scala",
-        "Kotlin",
-        "Ruby (gem/bundler)",
-        "C / C++ (gcc/gdb)",
-        "C# .NET Core",
-        "PHP",
-        "Haskell",
-        "Clojure",
-      ],
-    },
-    {
-      title: isKo ? "쉘, Vim & 터미널 환경" : "Shell, Vim & Terminal Environment",
-      desc: isKo
-        ? "생산성을 극대화하는 프롬프트 및 테마 세팅"
-        : "Productive prompt, theme, and terminal configurations",
-      tags: [
-        "Oh My ZSH",
-        "Powerlevel 9k / 10k",
-        "vimrc + themes",
         "iTerm2",
-        "brogrammer theme",
+        "MesloLGS NF Font",
+        "Brogrammer Theme",
+        "Oh My Zsh",
+        "Powerlevel10k",
+        "zsh-autosuggestions",
+        "zsh-syntax-highlighting",
       ],
     },
     {
-      title: isKo ? "개발 툴체인 & CLI 유틸리티" : "Developer Toolchains & CLI Utilities",
+      title: isKo
+        ? "에디터 & 런타임 (Editors & Vim)"
+        : "Editors & Vim Runtime",
       desc: isKo
-        ? "신속한 파일 탐색 및 시스템 모니터링 필수 도구"
-        : "High-speed navigation, search, and system monitoring",
+        ? "궁극의 Vim 설정(amix/vimrc), Visual Studio Code 에디터 설치, 그리고 터미널 어디서든 즉시 열 수 있도록 code CLI 명령어를 /usr/local/bin에 자동 심링크 연결합니다."
+        : "Ultimate Vim Runtime (amix/vimrc), Visual Studio Code, and automatic symlinking of the code CLI into PATH (/usr/local/bin/code).",
       tags: [
-        "git",
-        "zoxide",
-        "fzf",
-        "ripgrep",
-        "eza",
-        "htop",
-        "cloc",
-        "asciinema",
-        "curl / wget",
-        "ssh",
-      ],
-    },
-    {
-      title: isKo ? "린터 & 빌드 도구" : "Linters & Build Engines",
-      desc: isKo
-        ? "코드 품질 관리 및 빌드 파이프라인"
-        : "Code quality linters and build automation tools",
-      tags: [
-        "ESLint",
-        "TSLint",
-        "Pylint",
-        "Flake8",
-        "Scalastyle",
-        "Gradle",
-        "Webpack",
-        "Grunt",
-        "Rollup",
-        "Composer",
-      ],
-    },
-    {
-      title: isKo ? "웹 & 백엔드 프레임워크" : "Frameworks Ecosystem",
-      desc: isKo
-        ? "주요 웹 프레임워크 및 개발 스택 연동"
-        : "Standard frameworks for rapid project bootstrapping",
-      tags: [
-        "Gin (Go)",
-        "Django / Flask",
-        "Spring / Spring Boot",
-        "Rails",
-        "Express",
-        "Laravel",
-        ".NET MVC",
-        "Rocket (Rust)",
-      ],
-    },
-    {
-      title: isKo ? "IDE, 개발 앱 & 브라우저" : "IDEs, Developer Apps & Browsers",
-      desc: isKo
-        ? "공식 GUI 도구 및 개발 전용 데스크톱 애플리케이션"
-        : "Desktop applications and development browsers",
-      tags: [
+        "Ultimate Vim Runtime",
+        "amix/vimrc",
         "Visual Studio Code",
-        "Sublime Text",
-        "Docker Desktop",
+        "VS Code CLI (code)",
+        "PATH Auto-Linking",
+      ],
+    },
+    {
+      title: isKo
+        ? "컴파일러 & 언어 (Compilers & Languages)"
+        : "Compilers & Language Runtimes",
+      desc: isKo
+        ? "Go 언어 런타임, Python 3 및 pip, macOS JVM 환경 연동이 완료된 OpenJDK (Java), GCC/Clang 컴파일러, Node.js 및 npm을 일괄 설치합니다."
+        : "Go 1.22+, Python 3 with pip, Java OpenJDK with macOS JVM linking (/Library/Java), GCC/Clang tools, and Node.js with npm.",
+      tags: [
+        "Go (Golang)",
+        "Python 3 (pip)",
+        "Java (OpenJDK)",
+        "GCC / Clang",
+        "Node.js (npm)",
+      ],
+    },
+    {
+      title: isKo
+        ? "클라우드 & 데브옵스 (Cloud & DevOps CLIs)"
+        : "Cloud & DevOps CLIs",
+      desc: isKo
+        ? "클라우드 인프라 관리를 위한 AWS CLI, Google Cloud SDK (gcloud), Azure CLI (az)를 누락 없이 표준 설정으로 설치합니다."
+        : "Unified command-line interfaces for major clouds: AWS CLI, Google Cloud SDK (gcloud), and Azure CLI (az).",
+      tags: [
+        "AWS CLI",
+        "Google Cloud SDK (gcloud)",
+        "Azure CLI (az)",
+      ],
+    },
+    {
+      title: isKo
+        ? "모던 CLI 스위트 (Modern CLI Tools)"
+        : "Modern Rust & CLI Suite",
+      desc: isKo
+        ? "스마트한 디렉토리 이동 zoxide, 초고속 검색 ripgrep, 대화형 퍼지 파인더 fzf, 현대적 파일 목록 eza, syntax highlighter bat, htop, tree, jq를 즉시 세팅합니다."
+        : "Productivity CLI utilities: zoxide (smart cd), ripgrep (rg), fzf (fuzzy finder), eza (modern ls), bat (syntax cat), htop, tree, and jq.",
+      tags: [
+        "zoxide",
+        "ripgrep (rg)",
+        "fzf",
+        "eza",
+        "bat",
+        "htop",
+        "tree",
+        "jq",
+      ],
+    },
+    {
+      title: isKo
+        ? "필수 앱 & 시스템 설정 (Apps & Settings)"
+        : "Essential Desktop Apps & Settings",
+      desc: isKo
+        ? "Google Chrome 브라우저 설치 및 macOS 기본 웹 브라우저 자동 지정, 필수 개발자 데스크톱 앱을 원스톱으로 구성합니다."
+        : "Installs Google Chrome and automatically configures it as the default system browser on macOS.",
+      tags: [
         "Google Chrome",
-        "Mozilla Firefox",
-        "Insomnia",
-        "VirtualBox",
-        "KeyCastr",
+        "Default Browser Automation",
+        "Visual Studio Code",
       ],
     },
   ];
@@ -626,35 +606,35 @@ applications:
       cmd: "bun",
       action: t(
         "coffee_bun.cmd_bun_desc",
-        "Launch interactive terminal interface to select and configure packages"
+        "Launch interactive Tree TUI with foldable categories and focusable action bar"
       ),
     },
     {
-      cmd: "bun install",
+      cmd: "bun check",
       action: t(
-        "coffee_bun.cmd_install_desc",
-        "Install all packages declared in bundle.yml"
+        "coffee_bun.cmd_check_desc",
+        "Inspect installed packages and report current versions vs missing tools"
       ),
     },
     {
-      cmd: "bun install <package>",
+      cmd: "bun install all",
       action: t(
-        "coffee_bun.cmd_pkg_desc",
-        "Install a specific package or toolchain (e.g. `bun install golang`)"
+        "coffee_bun.cmd_install_all_desc",
+        "Non-interactive parallel installation of all missing tools and configurations"
       ),
     },
     {
-      cmd: "bun freeze",
+      cmd: "bun doctor",
       action: t(
-        "coffee_bun.cmd_freeze_desc",
-        "Snapshot currently installed environment and versions into bundle.yml"
+        "coffee_bun.cmd_doctor_desc",
+        "Validate environment integrity, PATH, ~/.zshrc hooks, and VS Code CLI symlink"
       ),
     },
     {
       cmd: "bun update",
       action: t(
         "coffee_bun.cmd_update_desc",
-        "Update packages and shell themes to latest or specified versions"
+        "One-stop concurrent upgrade of Homebrew packages, casks, and git repos (OMZ, p10k, vimrc)"
       ),
     },
   ];
@@ -665,119 +645,126 @@ applications:
         <BackNav>
           <Link href={`/${lang}`}>
             <RiArrowLeftLine />
-            <span>{t("coffee_bun.back_to_projects", "Projects")}</span>
+            {t("coffee_bun.back_to_projects", "Developer Hub")}
           </Link>
         </BackNav>
 
         {/* Hero Section */}
         <HeroSection>
           <BadgeRow>
-            <Badge>{t("coffee_bun.badge_status", "v0.0.1 (WIP)")}</Badge>
             <Badge>{t("coffee_bun.badge_platform", "macOS")}</Badge>
+            <Badge>{t("coffee_bun.badge_lang", "Go 1.22+")}</Badge>
             <Badge>{t("coffee_bun.badge_cmd", "CLI: bun")}</Badge>
-            <Badge>{t("coffee_bun.badge_config", "Config: bundle.yml")}</Badge>
+            <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
           </BadgeRow>
 
           <Title>{t("coffee_bun.title", "coffee-bun")}</Title>
-          <Subtitle>{t("coffee_bun.tagline")}</Subtitle>
-          <Description>{t("coffee_bun.description")}</Description>
+          <Tagline>
+            {t(
+              "coffee_bun.tagline",
+              "A friendly, automated macOS MacBook setup and maintenance tool written in Go"
+            )}
+          </Tagline>
+          <Description>
+            {t(
+              "coffee_bun.description",
+              "Takes every essential developer tool, compiler, shell configuration, and desktop app, and bundles them into an automated setup workflow."
+            )}
+          </Description>
 
-          <QuickInstallBox>
-            <div className="cmd-wrapper">
-              <span className="prompt-symbol">$</span>
-              <code>{installCmd}</code>
+          {/* The Story Behind the Name */}
+          <StoryCard>
+            <div className="story-header">
+              <RiTerminalBoxLine />
+              <span>{t("coffee_bun.story_badge", "The Story Behind the Name")}</span>
             </div>
-            <CopyButton text={installCmd} label="Copy" />
-          </QuickInstallBox>
+            <h3 className="story-title">
+              {t(
+                "coffee_bun.story_title",
+                "Coffee and a warm bun while your Mac sets up"
+              )}
+            </h3>
+            <div className="story-body">
+              <p>{t("coffee_bun.story_p1")}</p>
+              <p>
+                <strong>{t("coffee_bun.story_p2")}</strong>
+              </p>
+              <p>{t("coffee_bun.story_p3")}</p>
+            </div>
+          </StoryCard>
 
-          <ButtonGroup>
-            <PrimaryButton href="#install">
+          <ActionRow>
+            <ActionBtn primary href="#install">
               <RiDownload2Line />
-              <span>{t("coffee_bun.action_install", "Get Started")}</span>
-            </PrimaryButton>
-            <SecondaryButton
-              href="https://github.com/KennethanCeyer/bundle"
+              {t("coffee_bun.action_install", "Installation")}
+            </ActionBtn>
+            <ActionBtn
+              href={repoUrl}
               target="_blank"
               rel="noopener noreferrer"
             >
               <RiGithubFill />
-              <span>{t("coffee_bun.action_github", "GitHub")}</span>
-              <RiExternalLinkLine style={{ opacity: 0.5 }} />
-            </SecondaryButton>
-            <SecondaryButton href="#spec">
-              <RiCodeSSlashLine />
-              <span>{t("coffee_bun.action_spec", "bundle.yml Spec")}</span>
-            </SecondaryButton>
-          </ButtonGroup>
+              {t("coffee_bun.action_github", "GitHub Repository")}
+              <RiExternalLinkLine size={13} style={{ opacity: 0.6 }} />
+            </ActionBtn>
+          </ActionRow>
         </HeroSection>
 
-        {/* Terminal Simulator */}
-        <Section id="tui">
+        {/* Interactive CLI Simulator */}
+        <Section id="simulator">
           <SectionHeader>
-            <h2>{t("coffee_bun.tui_title", "CLI Workflow Preview (`bun`)")}</h2>
+            <h2>{t("coffee_bun.tui_title", "Interactive CLI Simulation (`bun`)")}</h2>
             <p>{t("coffee_bun.tui_subtitle")}</p>
           </SectionHeader>
           <TerminalSimulator />
         </Section>
 
-        {/* Core Capabilities */}
+        {/* Core Architecture Capabilities */}
         <Section id="features">
           <SectionHeader>
-            <h2>{t("coffee_bun.features_title", "Core Capabilities")}</h2>
+            <h2>
+              {t("coffee_bun.features_title", "Core Architecture & Capabilities")}
+            </h2>
             <p>{t("coffee_bun.features_subtitle")}</p>
           </SectionHeader>
 
-          <FeaturesGrid>
+          <Grid>
             {features.map((feat, idx) => (
               <FeatureCard key={idx}>
-                <div className="feature-num">{feat.num}</div>
                 <h3>{feat.title}</h3>
                 <p>{feat.desc}</p>
               </FeatureCard>
             ))}
-          </FeaturesGrid>
+          </Grid>
         </Section>
 
-        {/* Declarative Manifest Preview (bundle.yml) */}
-        <Section id="spec">
+        {/* Complete Workstation Stack Grid */}
+        <Section id="stack">
           <SectionHeader>
-            <h2>{t("coffee_bun.spec_title", "Declarative Manifest Preview (`bundle.yml`)")}</h2>
-            <p>{t("coffee_bun.spec_subtitle")}</p>
-          </SectionHeader>
-
-          <SpecCard>
-            <div className="spec-header">
-              <span>bundle.yml</span>
-              <span>YAML Manifest</span>
-            </div>
-            <pre>
-              <code>{sampleBundleYaml}</code>
-            </pre>
-          </SpecCard>
-        </Section>
-
-        {/* Supported Ecosystem & Roadmap */}
-        <Section id="ecosystem">
-          <SectionHeader>
-            <h2>{t("coffee_bun.eco_title", "Supported Ecosystem & Roadmap")}</h2>
+            <h2>
+              {t(
+                "coffee_bun.eco_title",
+                "Complete macOS Developer Workstation Stack"
+              )}
+            </h2>
             <p>{t("coffee_bun.eco_subtitle")}</p>
           </SectionHeader>
 
-          <EcosystemGrid>
-            {ecosystemCategories.map((cat, idx) => (
-              <EcosystemCard key={idx}>
+          <StackGrid>
+            {workstationCategories.map((cat, idx) => (
+              <StackCard key={idx}>
                 <h3>{cat.title}</h3>
-                <div className="eco-desc">{cat.desc}</div>
+                <div className="stack-desc">{cat.desc}</div>
                 <div className="tag-container">
                   {cat.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="eco-tag">
+                    <span key={tIdx} className="stack-tag">
                       {tag}
                     </span>
                   ))}
                 </div>
-              </EcosystemCard>
+              </StackCard>
             ))}
-          </EcosystemGrid>
+          </StackGrid>
         </Section>
 
         {/* CLI Command Reference (bun) */}
@@ -793,10 +780,10 @@ applications:
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: "32%" }}>
+                  <th style={{ width: "30%" }}>
                     {t("coffee_bun.th_command", "Command")}
                   </th>
-                  <th>{t("coffee_bun.th_action", "Action")}</th>
+                  <th>{t("coffee_bun.th_action", "Action & Behavior")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -823,7 +810,7 @@ applications:
           <InstallList>
             <InstallItem>
               <h3>
-                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap")}
+                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap (Recommended)")}
               </h3>
               <p>{t("coffee_bun.install_desc_curl")}</p>
               <CodeBlock rawCode={installCmd}>
@@ -834,7 +821,7 @@ applications:
             </InstallItem>
 
             <InstallItem>
-              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew Tap")}</h3>
+              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew")}</h3>
               <p>{t("coffee_bun.install_desc_brew")}</p>
               <CodeBlock rawCode="brew install KennethanCeyer/bundle/bun">
                 <pre style={{ margin: 0, padding: "0.85rem" }}>

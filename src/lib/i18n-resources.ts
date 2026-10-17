@@ -15,70 +15,79 @@ export const resources = {
       coffee_bun: {
         title: "coffee-bun",
         cmd: "bun",
-        tagline: "Initial environment automated management tool for macOS",
+        tagline:
+          "A friendly, automated macOS MacBook setup and maintenance tool written in Go",
         description:
-          "Declaratively provision and synchronize your entire development environment—programming languages, toolchains, linters, shells, and applications—using a unified bundle.yml manifest or interactive CLI.",
-        action_install: "Get Started",
-        action_spec: "bundle.yml Spec",
-        action_github: "GitHub",
-        back_to_projects: "Projects",
-        badge_status: "v0.0.1 (WIP)",
-        badge_platform: "macOS",
+          "Takes every essential developer tool, compiler, shell configuration, and desktop app, and bundles them into an automated, concurrent setup workflow.",
+        story_badge: "The Story Behind the Name",
+        story_title: "Coffee and a warm bun while your Mac sets up",
+        story_p1:
+          "Every developer knows the mixed feelings of opening a brand-new MacBook: the hardware is gorgeous, but the setup ahead is daunting. Hunting down Nerd Fonts, tuning terminal schemes, symlinking the VS Code CLI, installing multiple language toolchains, configuring .zshrc, and fixing PATH issues can eat up half a day.",
+        story_p2:
+          "The command name bun comes directly from bundle—taking every essential tool, runtime, and shell configuration and bundling them together into a single automated step.",
+        story_p3:
+          "So why coffee-bun? Setting up your workstation shouldn't feel like troubleshooting a broken build. It should be a moment where you step away from the keyboard, brew a fresh cup of hot coffee, grab a warm coffee bun, and relax. While you take your break, coffee-bun handles the heavy lifting in the background.",
+        action_install: "Installation",
+        action_github: "GitHub Repository",
+        back_to_projects: "Developer Hub",
+        badge_platform: "macOS (Apple Silicon & Intel)",
+        badge_lang: "Go 1.22+",
         badge_cmd: "CLI: bun",
-        badge_config: "Config: bundle.yml",
-        features_title: "Core Capabilities",
+        badge_license: "MIT License",
+        features_title: "Core Architecture & Capabilities",
         features_subtitle:
-          "Automated, declarative environment synchronization powered by bundle.yml and the bun CLI.",
-        f1_title: "Declarative bundle.yml",
+          "Engineered in Go for concurrency, safety, and zero-friction developer experience.",
+        f1_title: "Interactive Tree UI & Focusable Action Bar",
         f1_desc:
-          "Define languages, toolchains, linters, and applications in a portable YAML specification.",
-        f2_title: "Interactive CLI Selection",
+          "Organize packages into foldable categories (`[-]`/`[+]`). Cycle focus between the tree and action buttons (`[< Exit]`, `[Start Install]`) with Tab/Arrow keys without cryptic terminal traps.",
+        f2_title: "Goroutine Concurrency & Live Stream",
         f2_desc:
-          "Run `bun` to interactively choose components from structured categories with ease.",
-        f3_title: "Environment Freeze",
+          "Independent git clones, font downloads, and Homebrew formulae execute concurrently. A faint gray live stream dynamically shows the latest stdout line underneath each running task.",
+        f3_title: "Sudo & Prerequisite Blocker Watcher",
         f3_desc:
-          "Snapshot installed packages, runtimes, and exact versions directly into bundle.yml via `bun freeze`.",
-        f4_title: "Versioned Updates",
+          "When root permissions or system triggers (`xcode-select`, OpenJDK JVM symlink) are needed, coffee-bun displays copyable snippets and polls every 2-3s to resume automatically without restarting bun.",
+        f4_title: "System Diagnostics (`bun doctor`)",
         f4_desc:
-          "Update individual packages or the entire environment declared in your configuration via `bun update`.",
-        f5_title: "Polyglot Language Support",
+          "Thoroughly validates macOS version, Homebrew PATH, .zshrc theme, zoxide shell hooks, and VS Code CLI symlink integrity.",
+        f5_title: "One-Stop Upgrader (`bun update`)",
         f5_desc:
-          "Built-in support for Go, Python, Java, Rust, Ruby, Node.js, C/C++, PHP, Haskell, and Clojure.",
-        f6_title: "Full-Stack Toolchains & Apps",
+          "Simultaneously upgrades Homebrew formulae and casks while pulling the latest git commits for Oh My Zsh, Powerlevel10k, zsh plugins, and the Ultimate Vim Runtime.",
+        f6_title: "Automated Non-Interactive Provisioning",
         f6_desc:
-          "Automate Oh My Zsh, Powerlevel themes, vimrc, iTerm2, VS Code, Docker, and developer browsers.",
-        spec_title: "Declarative Manifest Preview (`bundle.yml`)",
-        spec_subtitle:
-          "Sample configuration showcasing how easily a complete Mac dev environment is declared.",
-        tui_title: "CLI Workflow Preview (`bun`)",
+          "`bun install all` or domain-specific flags (`bun install terminal`, `languages`, `cli`) allow headless provisioning inside dotfiles and setup automation scripts.",
+        tui_title: "Interactive CLI Simulation (`bun`)",
         tui_subtitle:
-          "Interactive terminal experience simulating declarative installation, selection, and freezing.",
-        eco_title: "Supported Ecosystem & Roadmap",
+          "Try out the authentic interactive tree navigation, live installation stream, doctor diagnostics, and one-stop updater.",
+        eco_title: "Complete macOS Developer Workstation Stack",
         eco_subtitle:
-          "Curated categories and tools supported in the v0.0.1 specification.",
+          "Every essential toolchain, runtime, and shell configuration bundled and verified out of the box.",
         commands_title: "CLI Command Reference (`bun`)",
         commands_subtitle:
-          "Standard command interface for environment management.",
+          "Standard commands for workstation initialization, diagnostics, and routine maintenance.",
         th_command: "Command",
-        th_action: "Action",
+        th_action: "Action & Behavior",
         cmd_bun_desc:
-          "Launch interactive terminal interface to select and configure packages",
-        cmd_install_desc: "Install all packages declared in bundle.yml",
-        cmd_pkg_desc:
-          "Install a specific package or toolchain (e.g. `bun install golang`)",
-        cmd_freeze_desc:
-          "Snapshot currently installed environment and versions into bundle.yml",
+          "Launch interactive Tree TUI with foldable categories and focusable action bar",
+        cmd_check_desc:
+          "Inspect installed packages and report current versions vs missing tools",
+        cmd_install_all_desc:
+          "Non-interactive parallel installation of all missing tools and configurations",
+        cmd_doctor_desc:
+          "Validate environment integrity, PATH, ~/.zshrc hooks, and VS Code CLI symlink",
         cmd_update_desc:
-          "Update packages and shell themes to latest or specified versions",
+          "One-stop concurrent upgrade of Homebrew packages, casks, and git repos (OMZ, p10k, vimrc)",
         install_heading: "Installation & Getting Started",
         install_subheading:
-          "Install via bootstrap script, Homebrew tap, or build from source.",
-        install_method_curl: "One-Line Bootstrap",
-        install_method_brew: "Homebrew Tap",
+          "Bootstrap your workstation via a single curl command, Homebrew tap, or build from source.",
+        install_method_curl: "One-Line Bootstrap (Recommended)",
+        install_method_brew: "Homebrew",
         install_method_source: "Build from Source",
-        install_desc_curl: "Run the bootstrap script directly in your terminal:",
-        install_desc_brew: "Install via KennethanCeyer Homebrew tap:",
-        install_desc_source: "Clone and build from the official GitHub repository:",
+        install_desc_curl:
+          "Run the automated bootstrap installer directly in your terminal (verifies macOS, installs bun to ~/.local/bin):",
+        install_desc_brew:
+          "Install via KennethanCeyer Homebrew tap:",
+        install_desc_source:
+          "Clone the repository and build directly using the Go compiler and Makefile:",
       },
       hub: {
         projects_title: "Projects",
@@ -107,70 +116,79 @@ export const resources = {
       coffee_bun: {
         title: "coffee-bun",
         cmd: "bun",
-        tagline: "macOS 초기 개발 환경 자동화 관리 도구",
+        tagline:
+          "Go 언어로 구현된 친절한 macOS 맥북 개발 환경 자동화 및 유지보수 도구",
         description:
-          "단일 bundle.yml 매니페스트 파일과 대화형 CLI를 통해 프로그래밍 언어, 개발 툴체인, 린터, 쉘, 애플리케이션을 선언적으로 자동 구성하고 동기화합니다.",
+          "새 맥북에 필요한 모든 필수 개발 도구, 컴파일러, 쉘 테마, 데스크톱 앱을 하나의 동시성 자동화 흐름으로 번들링하여 완벽하게 구성합니다.",
+        story_badge: "이름에 담긴 이야기",
+        story_title: "커피 한 잔과 따뜻한 번의 여유 — 맥북 세팅은 bun에게",
+        story_p1:
+          "새 맥북을 개봉했을 때의 설렘도 잠시, 개발자라면 누구나 몇 시간씩 걸리는 번거로운 터미널 환경 설정과 씨름해 본 경험이 있습니다. Homebrew 설치부터 Nerd 폰트 탐색, 터미널 컬러 프리셋, VS Code CLI 심링크 연결, 복수의 프로그래밍 언어 런타임과 .zshrc 환경 변수 트러블슈팅까지 끝없는 작업이 이어집니다.",
+        story_p2:
+          "bun이라는 명령어는 'bundle'에서 유래했습니다. 맥북 개발에 필요한 모든 필수 툴체인, 언어 런타임, 쉘 구성을 하나의 일괄 자동화 과정으로 번들링(묶음 처리)합니다.",
+        story_p3:
+          "왜 coffee-bun일까요? 개발 환경을 구축하는 과정이 스트레스 가득한 디버깅이 되어서는 안 됩니다. 키보드에서 잠시 손을 떼고, 따뜻한 커피 한 잔과 갓 구운 커피번을 즐기며 여유를 누려보세요. 당신이 티타임을 즐기는 동안, coffee-bun이 백그라운드에서 모든 환경 세팅을 완벽히 마쳐놓습니다.",
         action_install: "설치 안내",
-        action_spec: "bundle.yml 명세",
-        action_github: "GitHub",
-        back_to_projects: "프로젝트 목록",
-        badge_status: "v0.0.1 (WIP)",
-        badge_platform: "macOS",
+        action_github: "GitHub 저장소",
+        back_to_projects: "Developer Hub",
+        badge_platform: "macOS (Apple Silicon & Intel)",
+        badge_lang: "Go 1.22+",
         badge_cmd: "CLI: bun",
-        badge_config: "Config: bundle.yml",
-        features_title: "핵심 아키텍처",
+        badge_license: "MIT License",
+        features_title: "핵심 아키텍처 및 엔지니어링 역량",
         features_subtitle:
-          "bundle.yml 선언적 매니페스트와 bun CLI를 기반으로 한 일관된 환경 자동화.",
-        f1_title: "선언적 bundle.yml",
+          "반복 없는 안전하고 신속한 맥 워크스테이션 구축을 위해 Go 언어로 최적화되었습니다.",
+        f1_title: "대화형 트리 UI & 포커스 액션 바",
         f1_desc:
-          "프로그래밍 언어, 툴체인, 린터, 앱을 단일 YAML 파일로 정의하여 이식성을 극대화합니다.",
-        f2_title: "대화형 CLI 선택기",
+          "패키지를 카테고리별로 접고 펼칠 수 있는 접이식 트리(`[-]`/`[+]`)를 제공합니다. Tab/화살표 키로 트리와 하단 버튼(`[< Exit]`, `[Start Install]`) 간 포커스를 매끄럽게 전환하며 터미널 트랩 없이 직관적으로 조작할 수 있습니다.",
+        f2_title: "고루틴 동시성 & 실시간 표준출력 스트림",
         f2_desc:
-          "`bun` 명령어로 카테고리별 필요한 개발 도구와 언어를 터미널에서 손쉽게 대화형으로 선택합니다.",
-        f3_title: "환경 스냅샷 (Freeze)",
+          "독립된 Git 클론, 폰트 다운로드, Homebrew 설치가 고루틴을 통해 백그라운드에서 병렬로 실행됩니다. 각 실행 항목 바로 아래에 흐린 회색으로 실시간 stdout 한 줄 스트림이 표시되어 진행 상황을 투명하게 확인합니다.",
+        f3_title: "Sudo & 사전 요구조건 블로커 와처",
         f3_desc:
-          "`bun freeze` 명령어로 현재 맥북에 설치된 도구와 버전을 bundle.yml 파일로 즉시 스냅샷합니다.",
-        f4_title: "버전 관리 및 일괄 업데이트",
+          "관리자 권한이나 시스템 트리거(`xcode-select`, OpenJDK JVM 심링크 등)가 필요한 경우, 복사 가능한 터미널 명령어를 안내하고 백그라운드에서 2-3초 간격으로 폴링하여 문제가 해결되는 즉시 재실행 없이 자동으로 설치를 재개합니다.",
+        f4_title: "시스템 정밀 진단 (`bun doctor`)",
         f4_desc:
-          "`bun update`를 통해 매니페스트에 선언된 특정 패키지나 전체 환경을 안전하게 최신화합니다.",
-        f5_title: "다양한 개발 언어 지원",
+          "macOS 환경, Homebrew PATH, .zshrc 테마, zoxide 쉘 통합, VS Code CLI (`code`) 심링크 연결 상태를 꼼꼼하게 점검하여 환경 무결성을 검증합니다.",
+        f5_title: "원스톱 통합 업그레이더 (`bun update`)",
         f5_desc:
-          "Go, Python, Java, Rust, Ruby, Node.js, C/C++, PHP, Haskell 등 폭넓은 언어 런타임을 지원합니다.",
-        f6_title: "툴체인, 쉘, 데스크톱 앱",
+          "Homebrew 패키지와 Cask를 최신화함과 동시에 Oh My Zsh, Powerlevel10k, 플러그인, Ultimate Vim Runtime의 최신 Git 커밋을 일괄 동기화합니다.",
+        f6_title: "비대화형 완전 자동화 (`bun install all`)",
         f6_desc:
-          "Oh My Zsh, Powerlevel 테마, vimrc, iTerm2부터 VS Code, Docker, Chrome까지 일괄 관리합니다.",
-        spec_title: "선언적 매니페스트 명세 (`bundle.yml`)",
-        spec_subtitle:
-          "맥북 전체 개발 환경을 선언적으로 손쉽게 표현하는 bundle.yml 예시입니다.",
-        tui_title: "CLI 워크플로우 미리보기 (`bun`)",
+          "`bun install all` 또는 도메인별 명령(`bun install terminal`, `languages`, `cli`)을 통해 닷파일 스크립트나 새 머신 프로비저닝 시 사용자 입력 없이 원샷으로 환경을 완성합니다.",
+        tui_title: "대화형 CLI 시뮬레이션 (`bun`)",
         tui_subtitle:
-          "bundle.yml 설치, 대화형 선택, 환경 프리징 등 실제 CLI 실행 과정을 시뮬레이션해보세요.",
-        eco_title: "지원 개발 생태계 및 로드맵",
+          "실제 터미널과 동일한 접이식 트리 인터페이스, 병렬 설치 실시간 스트리밍, 닥터 진단, 통합 업데이트를 직접 체험해보세요.",
+        eco_title: "제공되는 맥북 워크스테이션 패키지 구성",
         eco_subtitle:
-          "v0.0.1 명세에 포함된 주요 카테고리별 지원 도구 목록입니다.",
-        commands_title: "CLI 명령어 레퍼런스 (`bun`)",
+          "개발에 필수적인 터미널, 에디터, 컴파일러, 클라우드 CLI, 모던 툴이 완벽하게 세팅됩니다.",
+        commands_title: "CLI 명령어 가이드 (`bun`)",
         commands_subtitle:
-          "환경 구성을 위한 표준 명령어 인터페이스입니다.",
+          "맥북 세팅, 상태 진단, 일상적 유지보수를 위한 CLI 명령어 인터페이스입니다.",
         th_command: "명령어",
         th_action: "동작 설명",
         cmd_bun_desc:
-          "대화형 터미널 인터페이스를 실행하여 패키지 선택 및 구성",
-        cmd_install_desc: "bundle.yml 파일에 선언된 모든 도구 및 런타임 일괄 설치",
-        cmd_pkg_desc:
-          "특정 패키지 또는 언어 단독 설치 (예: `bun install golang`)",
-        cmd_freeze_desc:
-          "현재 설치된 환경 및 패키지 버전을 bundle.yml 파일로 스냅샷",
+          "접이식 카테고리와 포커스 액션 바를 갖춘 대화형 트리 터미널 UI 실행",
+        cmd_check_desc:
+          "현재 시스템에 설치된 도구 및 버전 점검 리포트 출력",
+        cmd_install_all_desc:
+          "누락된 모든 도구, 쉘 테마, 에디터 런타임 비대화형 병렬 자동 설치",
+        cmd_doctor_desc:
+          "환경 무결성, PATH, ~/.zshrc 훅, VS Code CLI 심링크 상태 정밀 진단",
         cmd_update_desc:
-          "지정된 패키지 및 쉘 테마를 최신 버전으로 일괄 업데이트",
+          "Homebrew 패키지, Cask, Git 저장소(OMZ, p10k, vimrc) 일괄 통합 업그레이드",
         install_heading: "설치 및 시작하기",
         install_subheading:
-          "부트스트랩 스크립트, Homebrew 탭, 또는 소스 코드를 통해 빌드할 수 있습니다.",
+          "원라인 부트스트랩 스크립트, Homebrew, 또는 소스 코드를 통해 간편하게 설치할 수 있습니다.",
         install_method_curl: "원라인 부트스트랩 (추천)",
         install_method_brew: "Homebrew",
         install_method_source: "소스 빌드",
-        install_desc_curl: "터미널에서 부트스트랩 스크립트를 직접 실행합니다:",
-        install_desc_brew: "KennethanCeyer 공식 Homebrew 탭을 통해 설치합니다:",
-        install_desc_source: "공식 GitHub 저장소를 복제한 뒤 직접 빌드합니다:",
+        install_desc_curl:
+          "터미널에서 원라인 부트스트랩 스크립트를 직접 실행합니다 (macOS 점검 후 bun을 ~/.local/bin에 자동 설치):",
+        install_desc_brew:
+          "KennethanCeyer 공식 Homebrew 탭을 통해 설치합니다:",
+        install_desc_source:
+          "저장소를 복제한 뒤 Go 컴파일러와 Makefile을 통해 직접 빌드합니다:",
       },
       hub: {
         projects_title: "프로젝트",

@@ -2,20 +2,15 @@ export const resources = {
   en: {
     translation: {
       nav: {
-        dev_home: "Dev Portal",
+        dev_home: "Developer Hub",
         projects: "Projects",
-        principles: "Principles",
         github: "GitHub",
-        blog: "Blog",
-        profile: "sungmin.me",
       },
       hero: {
         badge: "Developer Infrastructure & Open Source",
         title: "Developer Hub",
         subtitle:
           "Open-source tools, CLI utilities, and developer infrastructure crafted with zero-friction automation.",
-        view_projects: "Explore Projects",
-        explore_bun: "View coffee-bun",
       },
       coffee_bun: {
         title: "coffee-bun",
@@ -67,22 +62,9 @@ export const resources = {
         docs_subtitle: "Complete repository README and technical specifications.",
       },
       hub: {
-        projects_title: "Projects & Tools",
-        projects_subtitle: "Production-grade tools, engines, and libraries for engineers.",
+        projects_title: "Projects",
+        projects_subtitle: "Developer tools and open-source software.",
         all: "All",
-        filter_cli: "CLI",
-        filter_engine: "Engine",
-        filter_go: "Go",
-        filter_mlops: "MLOps",
-        principles_title: "Engineering Principles",
-        p1_title: "Zero Friction",
-        p1_desc: "Eliminates repetitive setup steps and boilerplate through intelligent automation.",
-        p2_title: "Concurrency First",
-        p2_desc: "Leverages parallel pipelines and Go goroutines for maximum throughput.",
-        p3_title: "Resilient & Idempotent",
-        p3_desc: "Safe operations with automatic backups, state checks, and non-destructive execution.",
-        p4_title: "Minimalist Curation",
-        p4_desc: "Focuses on the most effective tools rather than overwhelming with unvetted choices.",
       },
       footer: {
         copyright: "Sungmin Han. All rights reserved.",
@@ -92,20 +74,15 @@ export const resources = {
   ko: {
     translation: {
       nav: {
-        dev_home: "개발 포털",
+        dev_home: "Developer Hub",
         projects: "프로젝트",
-        principles: "원칙",
         github: "깃허브",
-        blog: "블로그",
-        profile: "sungmin.me",
       },
       hero: {
         badge: "개발자 인프라 & 오픈소스 생태계",
         title: "Developer Hub",
         subtitle:
           "반복 작업을 없애고 개발 생산성을 극대화하는 오픈소스 도구와 CLI 인프라를 제공합니다.",
-        view_projects: "프로젝트 둘러보기",
-        explore_bun: "coffee-bun 보기",
       },
       coffee_bun: {
         title: "coffee-bun",
@@ -157,22 +134,9 @@ export const resources = {
         docs_subtitle: "프로젝트 공식 README와 기술 명세를 확인하세요.",
       },
       hub: {
-        projects_title: "프로젝트 & 도구 갤러리",
-        projects_subtitle: "개발자의 생산성과 효율을 높이기 위해 만든 오픈소스 프로젝트들입니다.",
+        projects_title: "프로젝트",
+        projects_subtitle: "개발자 도구 및 오픈소스 소프트웨어.",
         all: "전체",
-        filter_cli: "CLI",
-        filter_engine: "엔진",
-        filter_go: "Go",
-        filter_mlops: "MLOps",
-        principles_title: "엔지니어링 원칙",
-        p1_title: "Zero Friction",
-        p1_desc: "반복적인 세팅과 불필요한 설정 과정을 자동화하여 마찰을 최소화합니다.",
-        p2_title: "Concurrency First",
-        p2_desc: "Go의 동시성 모델을 활용한 병렬 파이프라인으로 최고의 처리 속도를 달성합니다.",
-        p3_title: "Resilient & Idempotent",
-        p3_desc: "자동 백업과 상태 검증을 통해 여러 번 실행해도 안전하고 일관된 결과를 보장합니다.",
-        p4_title: "Minimalist Curation",
-        p4_desc: "많은 도구를 나열하기보다 실제로 가장 가치 있는 정예 도구를 엄선합니다.",
       },
       footer: {
         copyright: "Sungmin Han. All rights reserved.",

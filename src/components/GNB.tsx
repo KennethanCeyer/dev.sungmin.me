@@ -36,7 +36,7 @@ const linkStyles = (theme: Theme) => css`
 const Nav = styled.nav`
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 32px;
 
   @media (max-width: 768px) {
     display: none;
@@ -69,34 +69,15 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
   const { t } = useTranslation();
   const pathname = usePathname();
 
-  const links: {
-    href: string;
-    label: string;
-    isExternal?: boolean;
-    isActiveMatch?: string;
-  }[] = [
+  const links = [
     {
       href: `/${lang}#projects`,
       label: t("nav.projects", "Projects"),
-      isActiveMatch: `/${lang}#projects`,
-    },
-    {
-      href: `/${lang}#principles`,
-      label: t("nav.principles", "Principles"),
-    },
-    {
-      href: "https://blog.sungmin.me",
-      label: "Blog",
-      isExternal: true,
+      isExternal: false,
     },
     {
       href: "https://github.com/KennethanCeyer",
-      label: "GitHub",
-      isExternal: true,
-    },
-    {
-      href: "https://sungmin.me",
-      label: "Profile",
+      label: t("nav.github", "GitHub"),
       isExternal: true,
     },
   ];
@@ -117,9 +98,7 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
           <NavLink
             key={link.href}
             href={link.href}
-            data-active={
-              link.isActiveMatch ? pathname === link.isActiveMatch : false
-            }
+            data-active={pathname === `/${lang}`}
           >
             {link.label}
           </NavLink>

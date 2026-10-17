@@ -105,20 +105,9 @@ export default function MobileMenu({
 
   const links = [
     { href: `/${lang}#projects`, label: t("nav.projects", "Projects") },
-    { href: `/${lang}#principles`, label: t("nav.principles", "Principles") },
-    {
-      href: "https://blog.sungmin.me",
-      label: "Blog",
-      isExternal: true,
-    },
     {
       href: "https://github.com/KennethanCeyer",
-      label: "GitHub",
-      isExternal: true,
-    },
-    {
-      href: "https://sungmin.me",
-      label: "Profile",
+      label: t("nav.github", "GitHub"),
       isExternal: true,
     },
   ];
@@ -128,7 +117,7 @@ export default function MobileMenu({
       <Overlay isOpen={isOpen} onClick={onClose} />
       <MenuDrawer isOpen={isOpen}>
         <DrawerHeader>
-          <DrawerTitle>dev.sungmin.me</DrawerTitle>
+          <DrawerTitle>Developer Hub</DrawerTitle>
           <CloseButton onClick={onClose} aria-label="Close menu">
             <RiCloseLine />
           </CloseButton>

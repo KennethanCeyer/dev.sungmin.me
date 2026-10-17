@@ -1,14 +1,14 @@
 "use client";
 
-import InteractiveGrid from "@/components/InteractiveGrid";
+import DevBackground from "@/components/DevBackground";
 import { useTheme } from "@/contexts/ThemeContext";
 import { projectsData } from "@/data/projects";
 import { generatePattern } from "@/lib/pattern";
 import styled from "@emotion/styled";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { RiArrowRightLine, RiExternalLinkLine } from "react-icons/ri";
+import { RiArrowRightLine } from "react-icons/ri";
 
 const PageContainer = styled.div`
   position: relative;
@@ -17,7 +17,7 @@ const PageContainer = styled.div`
 
 const HeroSection = styled.section`
   position: relative;
-  padding: 5rem 1.5rem 3rem;
+  padding: 5.5rem 1.5rem 3rem;
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
@@ -45,7 +45,7 @@ const Badge = styled.div`
 `;
 
 const MainTitle = styled.h1`
-  font-size: 3.2rem;
+  font-size: 3.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   margin: 0 0 1rem;
@@ -55,7 +55,7 @@ const MainTitle = styled.h1`
   padding: 0;
 
   @media (max-width: 768px) {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
   }
 `;
 
@@ -73,57 +73,41 @@ const Subtitle = styled.p`
 `;
 
 const Section = styled.section`
-  padding: 3rem 1.5rem 5rem;
-  max-width: 1200px;
+  padding: 2rem 1.5rem 5rem;
+  max-width: 900px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 
   @media (max-width: 768px) {
-    padding: 2rem 1rem 3.5rem;
+    padding: 1.5rem 1rem 3.5rem;
   }
 `;
 
-const TagsFilterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-bottom: 3rem;
-`;
+const SectionHeader = styled.div`
+  margin-bottom: 2rem;
 
-const TagButton = styled.button<{ active: boolean }>`
-  background-color: ${({ theme, active }) =>
-    active ? theme.text : "transparent"};
-  color: ${({ theme, active }) => (active ? theme.body : theme.text)};
-  border: 1px solid
-    ${({ theme, active }) => (active ? theme.text : theme.border)};
-  padding: 0.45rem 1.1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.02em;
+    border: none;
+    padding: 0;
+  }
 
-  &:hover {
-    ${({ active, theme }) =>
-      !active &&
-      `
-      background-color: ${theme.border};
-      border-color: ${theme.text};
-    `}
+  p {
+    font-size: 0.95rem;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.7;
+    margin: 0;
   }
 `;
 
 const GalleryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
 `;
 
 const Card = styled.div`
@@ -144,7 +128,7 @@ const Card = styled.div`
 `;
 
 const Thumbnail = styled.div<{ "data-pattern": string }>`
-  height: 160px;
+  height: 180px;
   background-color: ${({ theme }) => theme.body};
   background-image: ${({ "data-pattern": pattern }) => pattern};
   background-size: 28px 28px;
@@ -168,7 +152,7 @@ const CardHeader = styled.div`
 `;
 
 const CardTitle = styled.h3`
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 600;
   margin: 0;
   color: ${({ theme }) => theme.text};
@@ -177,7 +161,7 @@ const CardTitle = styled.h3`
 `;
 
 const CardBadge = styled.span`
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-family: var(--font-roboto-mono), monospace;
   opacity: 0.7;
   color: ${({ theme }) => theme.text};
@@ -185,7 +169,7 @@ const CardBadge = styled.span`
 `;
 
 const CardDescription = styled.p`
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.6;
   color: ${({ theme }) => theme.text};
   opacity: 0.75;
@@ -219,7 +203,7 @@ const Tag = styled.span`
 `;
 
 const CardLink = styled.span`
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: ${({ theme }) => theme.text};
   display: inline-flex;
@@ -234,96 +218,19 @@ const CardLink = styled.span`
   }
 `;
 
-const SectionHeader = styled.div`
-  text-align: center;
-  margin-bottom: 2.5rem;
-
-  h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.02em;
-    border: none;
-    padding: 0;
-  }
-
-  p {
-    font-size: 0.98rem;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.7;
-    max-width: 550px;
-    margin: 0 auto;
-  }
-`;
-
-const PrinciplesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-`;
-
-const PrincipleCard = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 10px;
-  padding: 1.5rem;
-
-  .num {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.5;
-    margin-bottom: 0.5rem;
-    font-family: var(--font-roboto-mono), monospace;
-  }
-
-  h4 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin: 0 0 0.4rem;
-    border: none;
-    padding: 0;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.7;
-    line-height: 1.55;
-    margin: 0;
-  }
-`;
-
 export default function HomePage() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const lang = i18n.language.startsWith("ko") ? "ko" : "en";
 
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    projectsData.forEach((project) => {
-      project.tags.forEach((tag) => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, []);
-
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-
-  const filteredProjects = useMemo(() => {
-    if (activeTag === null) {
-      return projectsData;
-    }
-    return projectsData.filter((project) => project.tags.includes(activeTag));
-  }, [activeTag]);
-
   const patterns = useMemo(
-    () => filteredProjects.map((project) => generatePattern(theme, project.id)),
-    [filteredProjects, theme]
+    () => projectsData.map((project) => generatePattern(theme, project.id)),
+    [theme]
   );
 
   return (
     <PageContainer>
-      <InteractiveGrid />
+      <DevBackground />
 
       {/* Hero */}
       <HeroSection>
@@ -332,43 +239,24 @@ export default function HomePage() {
         <Subtitle>{t("hero.subtitle")}</Subtitle>
       </HeroSection>
 
-      {/* Projects Gallery */}
+      {/* Projects Gallery (Only coffee-bun) */}
       <Section id="projects">
-        <TagsFilterContainer>
-          <TagButton
-            active={activeTag === null}
-            onClick={() => setActiveTag(null)}
-          >
-            {t("hub.all", "All")}
-          </TagButton>
-          {allTags.map((tag) => (
-            <TagButton
-              key={tag}
-              active={activeTag === tag}
-              onClick={() => setActiveTag(tag)}
-            >
-              {tag}
-            </TagButton>
-          ))}
-        </TagsFilterContainer>
+        <SectionHeader>
+          <h2>{t("hub.projects_title", "Projects")}</h2>
+          <p>{t("hub.projects_subtitle", "Developer tools and open-source software.")}</p>
+        </SectionHeader>
 
         <GalleryGrid>
-          {filteredProjects.map((project, index) => {
+          {projectsData.map((project, index) => {
             const data = project[lang] || project.en;
-            const isInternal = !project.isExternal;
-            const targetHref = isInternal ? `/${lang}${project.href}` : project.href;
-
-            const CardWrapper = isInternal ? Link : "a";
-            const linkProps = isInternal
-              ? { href: targetHref }
-              : {
-                  href: targetHref,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                };
+            const targetHref = `/${lang}${project.href}`;
 
             return (
-              <CardWrapper key={project.id} {...(linkProps as any)} style={{ textDecoration: "none" }}>
+              <Link
+                key={project.id}
+                href={targetHref}
+                style={{ textDecoration: "none" }}
+              >
                 <Card>
                   <Thumbnail data-pattern={patterns[index]} />
                   <CardContent>
@@ -384,51 +272,16 @@ export default function HomePage() {
                         ))}
                       </TagsContainer>
                       <CardLink>
-                        <span>{isInternal ? "Explore" : "View"}</span>
-                        {isInternal ? (
-                          <RiArrowRightLine />
-                        ) : (
-                          <RiExternalLinkLine style={{ opacity: 0.6 }} />
-                        )}
+                        <span>Explore</span>
+                        <RiArrowRightLine />
                       </CardLink>
                     </CardFooter>
                   </CardContent>
                 </Card>
-              </CardWrapper>
+              </Link>
             );
           })}
         </GalleryGrid>
-      </Section>
-
-      {/* Engineering Principles */}
-      <Section id="principles">
-        <SectionHeader>
-          <h2>{t("hub.principles_title", "Engineering Principles")}</h2>
-          <p>{t("hub.projects_subtitle")}</p>
-        </SectionHeader>
-
-        <PrinciplesGrid>
-          <PrincipleCard>
-            <div className="num">01</div>
-            <h4>{t("hub.p1_title", "Zero Friction")}</h4>
-            <p>{t("hub.p1_desc")}</p>
-          </PrincipleCard>
-          <PrincipleCard>
-            <div className="num">02</div>
-            <h4>{t("hub.p2_title", "Concurrency First")}</h4>
-            <p>{t("hub.p2_desc")}</p>
-          </PrincipleCard>
-          <PrincipleCard>
-            <div className="num">03</div>
-            <h4>{t("hub.p3_title", "Resilient & Idempotent")}</h4>
-            <p>{t("hub.p3_desc")}</p>
-          </PrincipleCard>
-          <PrincipleCard>
-            <div className="num">04</div>
-            <h4>{t("hub.p4_title", "Minimalist Curation")}</h4>
-            <p>{t("hub.p4_desc")}</p>
-          </PrincipleCard>
-        </PrinciplesGrid>
       </Section>
     </PageContainer>
   );

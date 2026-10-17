@@ -24,11 +24,11 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dev.sungmin.me"),
   title: {
-    default: "Developer Tools & Open Source | Sungmin Han",
-    template: "%s | Dev Sungmin",
+    default: "Developer Hub | Sungmin Han",
+    template: "%s | Developer Hub",
   },
   description:
-    "Engineering tools, CLI utilities, and open-source infrastructure created by Sungmin Han (KennethanCeyer). Home of bundle and developer utilities.",
+    "Engineering tools, CLI utilities, and open-source infrastructure created by Sungmin Han (KennethanCeyer).",
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -43,16 +43,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://dev.sungmin.me",
-    siteName: "Dev Sungmin | Developer Tools & Open Source",
-    title: "Dev Sungmin — Building High-Performance Tools for Developers",
+    siteName: "Developer Hub | Sungmin Han",
+    title: "Developer Hub | Sungmin Han",
     description:
-      "Automated macOS Setup (bundle), Developer Infrastructure, and Open Source Projects by Sungmin Han.",
+      "Engineering tools, CLI utilities, and open-source infrastructure created by Sungmin Han.",
     images: [
       {
         url: "/ogimg.png",
         width: 1200,
         height: 630,
-        alt: "Dev Sungmin",
+        alt: "Developer Hub",
       },
     ],
   },

@@ -52,10 +52,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     setTheme(newTheme);
     window.localStorage.setItem("theme", newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
-    document.body.style.setProperty(
-      "--color-body",
-      newTheme === "dark" ? "#000000" : "#ffffff"
-    );
   };
 
   const currentTheme: ThemeType = useMemo(

@@ -18,17 +18,17 @@ export interface ProjectItem {
 export const projectsData: ProjectItem[] = [
   {
     id: "coffee-bun",
-    tags: ["CLI", "macOS", "Go", "Automation", "Workstation"],
+    tags: ["CLI", "macOS", "Go", "Homebrew", "Zsh"],
     en: {
       title: "coffee-bun",
       description:
-        "A friendly, automated macOS MacBook setup and maintenance tool written in Go. Interactive tree TUI, concurrent goroutine streaming, and one-stop workstation configuration.",
+        "macOS development environment setup and maintenance CLI written in Go. Provides an interactive tree TUI, concurrent package installation, environment diagnostics, and repository updates.",
       badge: "CLI: bun",
     },
     ko: {
       title: "coffee-bun",
       description:
-        "Go 언어로 제작된 친절한 macOS 맥북 개발 환경 자동화 및 유지보수 도구. 대화형 인터랙티브 트리 TUI, 고루틴 동시성 실시간 스트리밍, 원스톱 맥 워크스테이션 구성을 제공합니다.",
+        "Go 기반 macOS 개발 환경 구성 및 유지보수 CLI 도구. 인터랙티브 트리 TUI, 병렬 패키지 설치, 환경 상태 진단(doctor), 패키지 및 Git 저장소 업데이트를 지원합니다.",
       badge: "CLI: bun",
     },
     href: "/coffee-bun",

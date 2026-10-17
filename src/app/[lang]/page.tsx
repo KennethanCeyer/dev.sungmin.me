@@ -142,13 +142,46 @@ const Card = styled.div`
 `;
 
 const Thumbnail = styled.div<{ "data-pattern": string }>`
-  height: 180px;
+  height: 190px;
   background-color: ${({ theme }) => theme.body};
   background-image: ${({ "data-pattern": pattern }) => pattern};
   background-size: 28px 28px;
   border-bottom: 1px solid ${({ theme }) => theme.border};
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow: hidden;
 `;
+
+const ThumbnailAscii = styled.pre`
+  margin: 0;
+  padding: 0.75rem 1.15rem;
+  font-family: var(--font-roboto-mono), Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+  font-size: 0.72rem;
+  line-height: 1.15;
+  color: ${({ theme }) => theme.text};
+  background-color: ${({ theme }) => theme.body};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 6px;
+  user-select: none;
+
+  @media (max-width: 768px) {
+    font-size: 0.52rem;
+    padding: 0.55rem 0.75rem;
+  }
+`;
+
+const COFFEE_BUN_ASCII = [
+  "      ▄▄██████▄▄         ▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
+  "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      █    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
+  "  ██▀ ▄▄██████▄▄ ▀██     ▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
+  " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    █▀▀▄ █  █ █▄ █",
+  "▄██▄▄████████████▄▄██▄   █▀▀▄ █  █ █ ▀█",
+  " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ▀▀▀   ▀▀  ▀  ▀",
+].join("\n");
 
 const CardContent = styled.div`
   padding: 1.75rem;
@@ -275,7 +308,13 @@ export default function HomePage() {
                 style={{ textDecoration: "none" }}
               >
                 <Card>
-                  <Thumbnail data-pattern={patterns[index]} />
+                  <Thumbnail data-pattern={patterns[index]}>
+                    {project.id === "coffee-bun" && (
+                      <ThumbnailAscii aria-hidden="true">
+                        {COFFEE_BUN_ASCII}
+                      </ThumbnailAscii>
+                    )}
+                  </Thumbnail>
                   <CardContent>
                     <CardHeader>
                       <CardTitle>{data.title}</CardTitle>

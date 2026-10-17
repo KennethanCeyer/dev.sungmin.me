@@ -9,12 +9,20 @@ import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
   RiCheckLine,
-  RiDownload2Line,
   RiExternalLinkLine,
   RiGithubFill,
   RiPlayCircleLine,
-  RiTerminalBoxLine,
+  RiSubtractLine,
 } from "react-icons/ri";
+
+export const COFFEE_BUN_ASCII = [
+  "      ▄▄██████▄▄         ▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
+  "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      █    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
+  "  ██▀ ▄▄██████▄▄ ▀██     ▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
+  " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    █▀▀▄ █  █ █▄ █",
+  "▄██▄▄████████████▄▄██▄   █▀▀▄ █  █ █ ▀█",
+  " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ▀▀▀   ▀▀  ▀  ▀",
+].join("\n");
 
 const PageWrapper = styled.div`
   position: relative;
@@ -71,7 +79,7 @@ const BadgeRow = styled.div`
   justify-content: center;
   gap: 0.6rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 `;
 
 const Badge = styled.span`
@@ -88,53 +96,77 @@ const Badge = styled.span`
   opacity: 0.85;
 `;
 
+const AsciiLogoPre = styled.pre`
+  display: inline-block;
+  margin: 0 auto 1.5rem;
+  padding: 1.15rem 1.5rem;
+  font-family: var(--font-roboto-mono), Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-align: left;
+  color: ${({ theme }) => theme.text};
+  background-color: var(--code-block-bg);
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  overflow-x: auto;
+  max-width: 100%;
+  user-select: none;
+
+  @media (max-width: 768px) {
+    font-size: 0.56rem;
+    padding: 0.85rem 1rem;
+  }
+`;
+
 const Title = styled.h1`
-  font-size: 3.6rem;
+  font-size: 2.6rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin: 0 0 1rem;
+  margin: 0 0 0.75rem;
   line-height: 1.15;
   color: ${({ theme }) => theme.text};
   border: none;
   padding: 0;
 
   @media (max-width: 768px) {
-    font-size: 2.4rem;
+    font-size: 2rem;
   }
 `;
 
 const Tagline = styled.p`
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: ${({ theme }) => theme.text};
   opacity: 0.9;
-  max-width: 820px;
-  margin: 0 auto 1rem;
+  max-width: 780px;
+  margin: 0 auto 0.75rem;
   line-height: 1.5;
 
   @media (max-width: 768px) {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 `;
 
 const Description = styled.p`
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   color: ${({ theme }) => theme.text};
   opacity: 0.65;
-  max-width: 760px;
-  margin: 0 auto 2.25rem;
+  max-width: 740px;
+  margin: 0 auto 2rem;
   line-height: 1.65;
 
   @media (max-width: 768px) {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 `;
 
-/* Full-width One-Line Install Command Banner */
+/* Full-width One-Line Install Command Banner (Theme-aware monotone) */
 const FullWidthInstallBanner = styled.div`
   width: 100%;
   margin: 0 auto 2.25rem;
-  background-color: #06090e;
+  background-color: var(--code-block-bg);
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   display: flex;
@@ -144,7 +176,7 @@ const FullWidthInstallBanner = styled.div`
   gap: 1rem;
   box-sizing: border-box;
   text-align: left;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.25s ease;
 
   &:hover {
     border-color: ${({ theme }) => theme.text};
@@ -169,13 +201,14 @@ const FullWidthInstallBanner = styled.div`
       height: 4px;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
+      background: var(--color-border);
       border-radius: 2px;
     }
   }
 
   .prompt-symbol {
-    color: #58a6ff;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.6;
     font-family: var(--font-roboto-mono), monospace;
     font-weight: 700;
     user-select: none;
@@ -184,7 +217,9 @@ const FullWidthInstallBanner = styled.div`
 
   .command-text {
     font-family: var(--font-roboto-mono), monospace;
-    color: #f0f6fc;
+    color: var(--code-block-fg);
+    background: transparent;
+    padding: 0;
     font-size: 0.88rem;
     white-space: nowrap;
     line-height: 1.5;
@@ -249,94 +284,84 @@ const Section = styled.section`
 `;
 
 const SectionHeader = styled.div`
-  margin-bottom: 2.5rem;
-  text-align: center;
+  margin-bottom: 2.25rem;
+  text-align: left;
 
   h2 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 0 0 0.65rem;
+    margin: 0 0 0.5rem;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: ${({ theme }) => theme.text};
     opacity: 0.65;
-    margin: 0 auto;
-    max-width: 720px;
+    margin: 0;
     line-height: 1.6;
   }
 
   @media (max-width: 768px) {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
     h2 {
-      font-size: 1.65rem;
+      font-size: 1.45rem;
     }
     p {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
   }
 `;
 
-/* 3-Column Outcomes Grid */
-const OutcomesGrid = styled.div`
+const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1.25rem;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
 `;
 
-const OutcomeCard = styled.div`
-  padding: 2rem;
+const FeatureCard = styled.div`
+  padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.border};
   background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.border};
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.2s ease;
 
   &:hover {
     border-color: ${({ theme }) => theme.text};
-    transform: translateY(-2px);
-  }
-
-  .metric-badge {
-    font-size: 0.78rem;
-    font-family: var(--font-roboto-mono), monospace;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.5;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 
   h3 {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.55rem;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
-    line-height: 1.35;
   }
 
   p {
-    font-size: 0.92rem;
-    line-height: 1.7;
+    font-size: 0.88rem;
+    line-height: 1.65;
     color: ${({ theme }) => theme.text};
     opacity: 0.7;
     margin: 0;
   }
 `;
 
-/* Full-width Inventory Table */
+/* Merged-Row Matrix Table */
 const TableWrapper = styled.div`
   width: 100%;
   overflow-x: auto;
@@ -347,80 +372,118 @@ const TableWrapper = styled.div`
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
 
     th,
     td {
-      padding: 1.1rem 1.35rem;
+      padding: 0.75rem 1.1rem;
       border-bottom: 1px solid ${({ theme }) => theme.border};
-      vertical-align: top;
+      vertical-align: middle;
     }
 
     th {
       font-weight: 600;
       color: ${({ theme }) => theme.text};
       background-color: var(--color-background);
-      font-size: 0.84rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     td {
       color: ${({ theme }) => theme.text};
-      opacity: 0.85;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     tr:last-child td {
       border-bottom: none;
     }
 
-    tr:hover td {
+    tbody tr:hover td:not(.section-cell) {
       background-color: var(--color-border-weak);
     }
-  }
 
-  .badge-tag {
-    font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.78rem;
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid ${({ theme }) => theme.border};
-    margin: 0.2rem 0.25rem 0.2rem 0;
-    background-color: var(--color-background);
+    td.section-cell {
+      font-weight: 600;
+      background-color: var(--color-background);
+      border-right: 1px solid ${({ theme }) => theme.border};
+      vertical-align: top;
+      padding-top: 0.95rem;
+      white-space: nowrap;
+    }
+
+    td.pkg-cell {
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    td.target-cell {
+      font-family: var(--font-roboto-mono), monospace;
+      font-size: 0.8rem;
+      opacity: 0.65;
+    }
+
+    th.check-col,
+    td.check-cell {
+      text-align: center;
+      width: 110px;
+      border-left: 1px solid var(--color-border-weak);
+    }
   }
+`;
+
+const CheckIconWrapper = styled.span<{ active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  color: ${({ theme }) => theme.text};
+  opacity: ${({ active }) => (active ? 0.95 : 0.25)};
 `;
 
 const InstallSectionBlock = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
 `;
 
 const InstallBox = styled.div`
-  padding: 1.75rem;
+  padding: 1.5rem;
   border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.border};
   background-color: transparent;
 
   h3 {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.4rem;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: ${({ theme }) => theme.text};
     opacity: 0.7;
-    margin: 0 0 1rem;
-    line-height: 1.6;
+    margin: 0 0 0.9rem;
+    line-height: 1.55;
   }
 `;
+
+interface MatrixToolItem {
+  name: string;
+  target: string;
+  install: boolean;
+  config: boolean;
+  doctor: boolean;
+  update: boolean;
+}
+
+interface MatrixSectionGroup {
+  section: string;
+  items: MatrixToolItem[];
+}
 
 export default function CoffeeBunDetailPage() {
   const params = useParams();
@@ -432,113 +495,314 @@ export default function CoffeeBunDetailPage() {
   const installCmd =
     "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/master/install.sh | bash";
 
-  const outcomes = [
+  const features = [
     {
-      num: "01",
-      title: t("coffee_bun.outcome1_title", "4 Hours → 30 Seconds"),
-      desc: t(
-        "coffee_bun.outcome1_desc",
-        "Automate Homebrew, Nerd Fonts, iTerm2 themes, Vim runtime, VS Code CLI linking, and language compilers concurrently in under 30 seconds."
-      ),
+      title: t("coffee_bun.f1_title", "Foldable Tree TUI"),
+      desc: t("coffee_bun.f1_desc"),
     },
     {
-      num: "02",
-      title: t("coffee_bun.outcome2_title", "Zero Configuration Errors"),
-      desc: t(
-        "coffee_bun.outcome2_desc",
-        "Pre-verified configurations eliminate broken PATHs, missing iTerm2 font plists, and unlinked macOS JVM directories."
+      title: t(
+        "coffee_bun.f2_title",
+        "Goroutine Worker Pool & Stdout Pipe"
       ),
+      desc: t("coffee_bun.f2_desc"),
     },
     {
-      num: "03",
-      title: t("coffee_bun.outcome3_title", "Continuous Maintenance"),
-      desc: t(
-        "coffee_bun.outcome3_desc",
-        "Not just for day one. Use bun doctor for ongoing environment health checks and bun update for one-stop upgrades of packages and git repos."
+      title: t("coffee_bun.f3_title", "Prerequisite & Sudo Polling"),
+      desc: t("coffee_bun.f3_desc"),
+    },
+    {
+      title: t("coffee_bun.f4_title", "Environment Diagnostics (`bun doctor`)"),
+      desc: t("coffee_bun.f4_desc"),
+    },
+    {
+      title: t(
+        "coffee_bun.f5_title",
+        "Repository & Package Sync (`bun update`)"
       ),
+      desc: t("coffee_bun.f5_desc"),
+    },
+    {
+      title: t("coffee_bun.f6_title", "Non-Interactive CLI Execution"),
+      desc: t("coffee_bun.f6_desc"),
     },
   ];
 
-  const inventory = [
+  const matrixGroups: MatrixSectionGroup[] = [
     {
-      domain: isKo ? "시스템 & 툴체인" : "System & Toolchains",
-      packages: ["Xcode Command Line Tools", "Homebrew", "Git"],
-      automation: isKo
-        ? "Xcode CLT 비대화형 라이선스 승인, Homebrew 자동 설치, arm64 / Intel 쉘 환경변수(PATH) 자동 연동"
-        : "Xcode CLT unattended bootstrap, Homebrew installer, and shellenv PATH configuration for Apple Silicon / Intel",
-    },
-    {
-      domain: isKo ? "터미널 & 쉘" : "Terminal & Shell",
-      packages: [
-        "iTerm2",
-        "MesloLGS NF Font",
-        "Brogrammer Theme",
-        "Oh My Zsh",
-        "Powerlevel10k",
-        "zsh-autosuggestions",
-        "zsh-syntax-highlighting",
+      section: isKo ? "시스템 & 툴체인" : "System & Toolchains",
+      items: [
+        {
+          name: "Xcode Command Line Tools",
+          target: "xcode-select --install",
+          install: true,
+          config: true,
+          doctor: true,
+          update: false,
+        },
+        {
+          name: "Homebrew",
+          target: "/opt/homebrew/bin/brew",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Git",
+          target: "brew (git)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
       ],
-      automation: isKo
-        ? "~/Library/Fonts에 MesloLGS NF 4종 설치, iTerm2 Plist에 16pt 폰트 및 고대비 Brogrammer 컬러 프리셋 주입, ~/.zshrc 프레임워크 및 플러그인 로드"
-        : "Installs 4 MesloLGS NF font files to ~/Library/Fonts, injects 16pt font & Brogrammer preset to iTerm2 plist, and configures ~/.zshrc",
     },
     {
-      domain: isKo ? "에디터 & 런타임" : "Editors & Vim Runtime",
-      packages: [
-        "Ultimate Vim Runtime (amix/vimrc)",
-        "Visual Studio Code",
-        "VS Code CLI (code)",
+      section: isKo ? "터미널 & 쉘" : "Terminal & Shell",
+      items: [
+        {
+          name: "iTerm2",
+          target: "brew --cask (iterm2)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "MesloLGS NF Font",
+          target: "~/Library/Fonts/*.ttf",
+          install: true,
+          config: true,
+          doctor: true,
+          update: false,
+        },
+        {
+          name: "Brogrammer Theme",
+          target: "iTerm2 Plist Preset",
+          install: true,
+          config: true,
+          doctor: true,
+          update: false,
+        },
+        {
+          name: "Oh My Zsh",
+          target: "~/.oh-my-zsh (git)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Powerlevel10k",
+          target: "custom/themes/powerlevel10k (git)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "zsh-autosuggestions",
+          target: "custom/plugins (git)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "zsh-syntax-highlighting",
+          target: "custom/plugins (git)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
       ],
-      automation: isKo
-        ? "Awesome vimrc 설정 클론 및 플러그인 동기화, VS Code 설치 후 /usr/local/bin/code 실행 파일 심링크 자동 연결"
-        : "Clones and syncs amix/vimrc, installs VS Code, and automatically symlinks /usr/local/bin/code into PATH",
     },
     {
-      domain: isKo ? "컴파일러 & 언어" : "Compilers & Languages",
-      packages: [
-        "Go (Golang 1.22+)",
-        "Python 3 (pip)",
-        "Java (OpenJDK 21)",
-        "GCC / Clang",
-        "Node.js (npm)",
+      section: isKo ? "에디터 & Vim" : "Editors & Vim",
+      items: [
+        {
+          name: "Ultimate Vim Runtime",
+          target: "~/.vim_runtime (amix/vimrc)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Visual Studio Code",
+          target: "brew --cask (visual-studio-code)",
+          install: true,
+          config: false,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "VS Code CLI (code)",
+          target: "/usr/local/bin/code (symlink)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: false,
+        },
       ],
-      automation: isKo
-        ? "OpenJDK를 /Library/Java/JavaVirtualMachines에 심링크하여 macOS JVM 인식 완결, pip 및 npm 환경 동기화"
-        : "Symlinks OpenJDK to /Library/Java/JavaVirtualMachines for macOS JVM compatibility, bootstraps pip & npm",
     },
     {
-      domain: isKo ? "클라우드 & 데브옵스" : "Cloud & DevOps CLIs",
-      packages: [
-        "AWS CLI v2",
-        "Google Cloud SDK (gcloud)",
-        "Azure CLI (az)",
+      section: isKo ? "컴파일러 & 언어" : "Languages & Compilers",
+      items: [
+        {
+          name: "Go",
+          target: "brew (go)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Python 3 (pip)",
+          target: "brew (python3)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Java (OpenJDK 21)",
+          target: "/Library/Java/JavaVirtualMachines",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "GCC / Clang",
+          target: "brew (gcc) / Apple CLT",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Node.js (npm)",
+          target: "brew (node)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
       ],
-      automation: isKo
-        ? "글로벌 3대 클라우드 공식 CLI 도구군 일괄 설치 및 터미널 자동완성/PATH 표준 구성"
-        : "Installs official CLI suites for AWS, Google Cloud, and Azure with shell completions and PATH registration",
     },
     {
-      domain: isKo ? "모던 CLI 스위트" : "Modern CLI Suite",
-      packages: [
-        "zoxide",
-        "htop",
-        "fzf",
-        "ripgrep (rg)",
-        "eza",
-        "tree",
-        "jq",
-        "bat",
+      section: isKo ? "클라우드 CLI" : "Cloud CLIs",
+      items: [
+        {
+          name: "AWS CLI v2",
+          target: "brew (awscli)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Google Cloud SDK (gcloud)",
+          target: "brew --cask (google-cloud-sdk)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "Azure CLI (az)",
+          target: "brew (azure-cli)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
       ],
-      automation: isKo
-        ? "Rust 기반 초고속 터미널 유틸리티 일괄 설치 및 스마트 cd(zoxide), 퍼지 파인더(fzf) 단축키 연동"
-        : "Installs high-performance modern CLI utilities and configures shell keybindings for zoxide jumping and fzf fuzzy searching",
     },
     {
-      domain: isKo ? "데스크톱 앱 & 설정" : "Desktop Apps & Settings",
-      packages: ["Google Chrome", "Default Browser Automation"],
-      automation: isKo
-        ? "Google Chrome 브라우저 설치 및 macOS 기본 웹 브라우저로 자동 설정"
-        : "Installs Google Chrome and automatically designates Chrome as the default system browser on macOS",
+      section: isKo ? "모던 CLI 유틸리티" : "Modern CLI Utilities",
+      items: [
+        {
+          name: "zoxide",
+          target: "brew (zoxide) + .zshrc init",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "fzf",
+          target: "brew (fzf)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "ripgrep (rg)",
+          target: "brew (ripgrep)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "bat",
+          target: "brew (bat)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "eza",
+          target: "brew (eza)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "htop",
+          target: "brew (htop)",
+          install: true,
+          config: false,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "jq",
+          target: "brew (jq)",
+          install: true,
+          config: false,
+          doctor: true,
+          update: true,
+        },
+        {
+          name: "tree",
+          target: "brew (tree)",
+          install: true,
+          config: false,
+          doctor: true,
+          update: true,
+        },
+      ],
+    },
+    {
+      section: isKo ? "데스크톱 앱" : "Desktop Apps",
+      items: [
+        {
+          name: "Google Chrome",
+          target: "brew --cask (google-chrome)",
+          install: true,
+          config: true,
+          doctor: true,
+          update: true,
+        },
+      ],
     },
   ];
 
@@ -547,38 +811,49 @@ export default function CoffeeBunDetailPage() {
       cmd: "bun",
       action: t(
         "coffee_bun.cmd_bun_desc",
-        "Launch interactive Tree TUI with foldable categories and focusable action bar"
+        "Launch the interactive Tree TUI to select and install packages by category"
       ),
     },
     {
       cmd: "bun check",
       action: t(
         "coffee_bun.cmd_check_desc",
-        "Inspect installed packages and report current versions vs missing tools"
+        "List all managed packages with their detected version and installation status"
       ),
     },
     {
       cmd: "bun install all",
       action: t(
         "coffee_bun.cmd_install_all_desc",
-        "Non-interactive parallel installation of all missing tools and configurations"
+        "Install and configure all missing packages non-interactively"
       ),
     },
     {
       cmd: "bun doctor",
       action: t(
         "coffee_bun.cmd_doctor_desc",
-        "Validate environment integrity, PATH, ~/.zshrc hooks, and VS Code CLI symlink"
+        "Verify PATH entries, shell configuration hooks, font files, and binary symlinks"
       ),
     },
     {
       cmd: "bun update",
       action: t(
         "coffee_bun.cmd_update_desc",
-        "One-stop concurrent upgrade of Homebrew packages, casks, and git repos (OMZ, p10k, vimrc)"
+        "Upgrade Homebrew formulae/casks and pull latest commits for managed Git repositories"
       ),
     },
   ];
+
+  const renderCheckCell = (supported: boolean) => (
+    <td className="check-cell">
+      <CheckIconWrapper
+        active={supported}
+        aria-label={supported ? "Supported" : "Not applicable"}
+      >
+        {supported ? <RiCheckLine /> : <RiSubtractLine />}
+      </CheckIconWrapper>
+    </td>
+  );
 
   return (
     <PageWrapper>
@@ -599,17 +874,21 @@ export default function CoffeeBunDetailPage() {
             <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
           </BadgeRow>
 
+          <AsciiLogoPre aria-label="Coffee Bun ASCII Logo">
+            {COFFEE_BUN_ASCII}
+          </AsciiLogoPre>
+
           <Title>{t("coffee_bun.title", "coffee-bun")}</Title>
           <Tagline>
             {t(
               "coffee_bun.tagline",
-              "Bootstrap and maintain your complete macOS MacBook workstation in 30 seconds."
+              "macOS development environment setup and maintenance CLI written in Go."
             )}
           </Tagline>
           <Description>
             {t(
               "coffee_bun.description",
-              "Unifies every essential developer tool, compiler, shell configuration, and desktop app into a single, concurrent Go automation workflow."
+              "Installs and configures system toolchains, shell frameworks, editors, language runtimes, and CLI utilities via Homebrew and Git."
             )}
           </Description>
 
@@ -627,7 +906,7 @@ export default function CoffeeBunDetailPage() {
           <ActionRow>
             <ActionBtn primary href="#demo">
               <RiPlayCircleLine />
-              {t("coffee_bun.action_demo", "Watch Recording")}
+              {t("coffee_bun.action_demo", "Interactive TUI")}
             </ActionBtn>
             <ActionBtn
               href={repoUrl}
@@ -641,51 +920,23 @@ export default function CoffeeBunDetailPage() {
           </ActionRow>
         </HeroSection>
 
-        {/* Animated Terminal Recording Section */}
+        {/* Interactive CLI & Subcommand Simulation Section */}
         <Section id="demo">
           <SectionHeader>
-            <h2>
-              {t(
-                "coffee_bun.tui_title",
-                "Terminal Session Recording (`bun` & Subcommands)"
-              )}
-            </h2>
+            <h2>{t("coffee_bun.tui_title", "CLI & TUI Simulation (`bun`)")}</h2>
             <p>{t("coffee_bun.tui_subtitle")}</p>
           </SectionHeader>
 
           <TerminalSimulator />
         </Section>
 
-        {/* What You Get: 3 Core Outcomes */}
-        <Section id="outcomes">
-          <SectionHeader>
-            <h2>
-              {t(
-                "coffee_bun.outcomes_title",
-                "What You Get (3 Core Outcomes)"
-              )}
-            </h2>
-            <p>{t("coffee_bun.outcomes_subtitle")}</p>
-          </SectionHeader>
-
-          <OutcomesGrid>
-            {outcomes.map((item, idx) => (
-              <OutcomeCard key={idx}>
-                <div className="metric-badge">OUTCOME {item.num}</div>
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-              </OutcomeCard>
-            ))}
-          </OutcomesGrid>
-        </Section>
-
-        {/* Supported Workstation Stack Inventory Matrix */}
+        {/* Supported Packages & Feature Matrix (Merged Rows + Remix Icon Checks) */}
         <Section id="inventory">
           <SectionHeader>
             <h2>
               {t(
                 "coffee_bun.inventory_title",
-                "Supported Workstation Stack Inventory"
+                "Supported Packages & Feature Matrix"
               )}
             </h2>
             <p>{t("coffee_bun.inventory_subtitle")}</p>
@@ -695,42 +946,76 @@ export default function CoffeeBunDetailPage() {
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: "22%" }}>
-                    {t("coffee_bun.th_domain", "Domain")}
+                  <th style={{ width: "18%" }}>
+                    {t("coffee_bun.th_section", "Section")}
                   </th>
-                  <th style={{ width: "38%" }}>
-                    {t("coffee_bun.th_packages", "Installed Tools & Packages")}
+                  <th style={{ width: "24%" }}>
+                    {t("coffee_bun.th_package", "Package / Tool")}
                   </th>
-                  <th>
-                    {t("coffee_bun.th_automation", "What bun Automates")}
+                  <th>{t("coffee_bun.th_target", "Source / Target")}</th>
+                  <th className="check-col">
+                    {t("coffee_bun.th_install", "Install")}
+                  </th>
+                  <th className="check-col">
+                    {t("coffee_bun.th_config", "Config / PATH")}
+                  </th>
+                  <th className="check-col">
+                    {t("coffee_bun.th_doctor", "Check / Doctor")}
+                  </th>
+                  <th className="check-col">
+                    {t("coffee_bun.th_update", "Update")}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {inventory.map((row, idx) => (
-                  <tr key={idx}>
-                    <td style={{ fontWeight: 600 }}>{row.domain}</td>
-                    <td>
-                      {row.packages.map((pkg, pIdx) => (
-                        <span key={pIdx} className="badge-tag">
-                          {pkg}
-                        </span>
-                      ))}
-                    </td>
-                    <td>{row.automation}</td>
-                  </tr>
-                ))}
+                {matrixGroups.map((group) =>
+                  group.items.map((item, itemIdx) => (
+                    <tr key={`${group.section}-${item.name}`}>
+                      {itemIdx === 0 && (
+                        <td
+                          className="section-cell"
+                          rowSpan={group.items.length}
+                        >
+                          {group.section}
+                        </td>
+                      )}
+                      <td className="pkg-cell">{item.name}</td>
+                      <td className="target-cell">{item.target}</td>
+                      {renderCheckCell(item.install)}
+                      {renderCheckCell(item.config)}
+                      {renderCheckCell(item.doctor)}
+                      {renderCheckCell(item.update)}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </TableWrapper>
         </Section>
 
-        {/* Standard CLI Command Reference Table */}
-        <Section id="commands">
+        {/* Architecture & Implementation */}
+        <Section id="features">
           <SectionHeader>
             <h2>
-              {t("coffee_bun.commands_title", "CLI Command Reference (`bun`)")}
+              {t("coffee_bun.features_title", "Architecture & Implementation")}
             </h2>
+            <p>{t("coffee_bun.features_subtitle")}</p>
+          </SectionHeader>
+
+          <FeaturesGrid>
+            {features.map((feat, idx) => (
+              <FeatureCard key={idx}>
+                <h3>{feat.title}</h3>
+                <p>{feat.desc}</p>
+              </FeatureCard>
+            ))}
+          </FeaturesGrid>
+        </Section>
+
+        {/* CLI Command Reference Table */}
+        <Section id="commands">
+          <SectionHeader>
+            <h2>{t("coffee_bun.commands_title", "CLI Command Reference")}</h2>
             <p>{t("coffee_bun.commands_subtitle")}</p>
           </SectionHeader>
 
@@ -738,10 +1023,10 @@ export default function CoffeeBunDetailPage() {
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: "28%" }}>
+                  <th style={{ width: "26%" }}>
                     {t("coffee_bun.th_command", "Command")}
                   </th>
-                  <th>{t("coffee_bun.th_action", "Action & Behavior")}</th>
+                  <th>{t("coffee_bun.th_action", "Description")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -758,18 +1043,16 @@ export default function CoffeeBunDetailPage() {
           </TableWrapper>
         </Section>
 
-        {/* Installation & Getting Started */}
+        {/* Installation */}
         <Section id="install">
           <SectionHeader>
-            <h2>{t("coffee_bun.install_heading", "Installation & Getting Started")}</h2>
+            <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
             <p>{t("coffee_bun.install_subheading")}</p>
           </SectionHeader>
 
           <InstallSectionBlock>
             <InstallBox>
-              <h3>
-                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap (Recommended)")}
-              </h3>
+              <h3>1. {t("coffee_bun.install_method_curl", "Shell Script")}</h3>
               <p>{t("coffee_bun.install_desc_curl")}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
@@ -788,7 +1071,9 @@ export default function CoffeeBunDetailPage() {
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
-                  <code className="command-text">brew install KennethanCeyer/bundle/bun</code>
+                  <code className="command-text">
+                    brew install KennethanCeyer/bundle/bun
+                  </code>
                 </div>
                 <div className="copy-btn-wrapper">
                   <CopyButton
@@ -807,7 +1092,10 @@ export default function CoffeeBunDetailPage() {
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
-                  <code className="command-text">git clone https://github.com/KennethanCeyer/bundle.git &amp;&amp; cd bundle &amp;&amp; make install</code>
+                  <code className="command-text">
+                    git clone https://github.com/KennethanCeyer/bundle.git
+                    &amp;&amp; cd bundle &amp;&amp; make install
+                  </code>
                 </div>
                 <div className="copy-btn-wrapper">
                   <CopyButton

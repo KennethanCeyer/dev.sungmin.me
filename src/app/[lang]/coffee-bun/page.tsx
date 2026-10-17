@@ -2,10 +2,12 @@
 
 import CopyButton from "@/components/CopyButton";
 import PagePreviewCard from "@/components/PagePreviewCard";
+import TableOfContents, { Heading } from "@/components/TableOfContents";
 import TerminalSimulator from "@/components/TerminalSimulator";
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
@@ -57,6 +59,18 @@ const MainContainer = styled.div`
 
   @media (max-width: 768px) {
     padding: 0 20px;
+  }
+`;
+
+const TocWrapper = styled.div`
+  position: fixed;
+  top: 120px;
+  right: 2em;
+  width: 220px;
+  z-index: 10;
+
+  @media (max-width: 1700px) {
+    display: none;
   }
 `;
 
@@ -172,11 +186,40 @@ const Tagline = styled.p`
   color: ${({ theme }) => theme.text};
   opacity: 0.8;
   max-width: 720px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
   line-height: 1.6;
 
   @media (max-width: 768px) {
     font-size: 0.98rem;
+  }
+`;
+
+const OsTabSwitchRow = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: var(--color-background);
+`;
+
+const OsTabBtn = styled.button<{ isActive: boolean }>`
+  font-family: var(--font-roboto-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
+  padding: 0.32rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.text : "transparent"};
+  color: ${({ isActive, theme }) => (isActive ? theme.body : theme.text)};
+  opacity: ${({ isActive }) => (isActive ? 1 : 0.7)};
+  transition: all 0.15s ease;
+
+  &:hover {
+    opacity: 1;
   }
 `;
 
@@ -441,13 +484,32 @@ const InstallBox = styled.div`
   border: 1px solid ${({ theme }) => theme.border};
   background-color: transparent;
 
+  .box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+
   h3 {
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     font-weight: 600;
-    margin: 0 0 0.4rem;
+    margin: 0;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
+  }
+
+  .os-badge {
+    font-family: var(--font-roboto-mono), monospace;
+    font-size: 0.74rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    border: 1px solid ${({ theme }) => theme.border};
+    color: ${({ theme }) => theme.text};
+    opacity: 0.75;
   }
 
   p {
@@ -489,10 +551,78 @@ export default function CoffeeBunDetailPage() {
   const lang = (params?.lang as string) || "en";
   const { t, i18n } = useTranslation();
   const isKo = i18n.language.startsWith("ko") || lang === "ko";
+  const [heroOsTab, setHeroOsTab] = useState<"unix" | "windows">("unix");
 
   const repoUrl = "https://github.com/KennethanCeyer/bundle";
-  const installCmd =
-    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/master/install.sh | bash";
+  const unixInstallCmd =
+    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/main/install.sh | bash";
+  const winInstallCmd =
+    "irm https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/main/install.ps1 | iex";
+  const brewInstallCmd = "brew install KennethanCeyer/coffee-bun/coffee-bun";
+  const sourceInstallCmd =
+    "git clone https://github.com/KennethanCeyer/coffee-bun.git && cd coffee-bun && make install";
+
+  const activeHeroCmd = heroOsTab === "unix" ? unixInstallCmd : winInstallCmd;
+  const activeHeroPrompt = heroOsTab === "unix" ? "$" : "PS>";
+
+  const tocHeadings: Heading[] = useMemo(
+    () => [
+      {
+        level: 2,
+        text: t("coffee_bun.tui_title", "CLI & TUI Simulation"),
+        slug: "demo-heading",
+      },
+      {
+        level: 2,
+        text: t(
+          "coffee_bun.inventory_title",
+          "Supported Packages & Feature Matrix"
+        ),
+        slug: "inventory-heading",
+      },
+      {
+        level: 2,
+        text: t("coffee_bun.features_title", "Architecture & Implementation"),
+        slug: "features-heading",
+      },
+      {
+        level: 2,
+        text: t("coffee_bun.commands_title", "CLI Command Reference"),
+        slug: "commands-heading",
+      },
+      {
+        level: 2,
+        text: t("coffee_bun.install_heading", "Installation"),
+        slug: "install-heading",
+      },
+      {
+        level: 3,
+        text: "macOS (Bootstrap)",
+        slug: "install-macos-script",
+      },
+      {
+        level: 3,
+        text: "macOS (Homebrew)",
+        slug: "install-macos-brew",
+      },
+      {
+        level: 3,
+        text: "Linux (apt / dnf / apk)",
+        slug: "install-linux-script",
+      },
+      {
+        level: 3,
+        text: "Windows (PowerShell)",
+        slug: "install-windows-ps",
+      },
+      {
+        level: 3,
+        text: isKo ? "소스 빌드" : "Build from Source",
+        slug: "install-source",
+      },
+    ],
+    [t, isKo]
+  );
 
   const features = [
     {
@@ -527,7 +657,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "Xcode Command Line Tools",
-          target: "xcode-select --install",
+          target: "xcode-select --install (macOS)",
           install: true,
           config: true,
           doctor: true,
@@ -535,7 +665,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Homebrew",
-          target: "/opt/homebrew/bin/brew",
+          target: "brew (macOS / Linuxbrew)",
           install: true,
           config: true,
           doctor: true,
@@ -543,7 +673,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Git",
-          target: "brew (git)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -556,7 +686,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "iTerm2",
-          target: "brew --cask (iterm2)",
+          target: "brew --cask (macOS)",
           install: true,
           config: true,
           doctor: true,
@@ -564,7 +694,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "MesloLGS NF Font",
-          target: "~/Library/Fonts/*.ttf",
+          target: "User Fonts (macOS / Linux / Win)",
           install: true,
           config: true,
           doctor: true,
@@ -572,7 +702,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Brogrammer Theme",
-          target: "iTerm2 Plist Preset",
+          target: "iTerm2 Plist Preset (macOS)",
           install: true,
           config: true,
           doctor: true,
@@ -580,7 +710,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Oh My Zsh",
-          target: "~/.oh-my-zsh (git)",
+          target: "~/.oh-my-zsh (macOS / Linux)",
           install: true,
           config: true,
           doctor: true,
@@ -625,7 +755,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Visual Studio Code",
-          target: "brew --cask (visual-studio-code)",
+          target: "brew --cask / apt / winget / choco",
           install: true,
           config: false,
           doctor: true,
@@ -633,7 +763,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "VS Code CLI (code)",
-          target: "/usr/local/bin/code (symlink)",
+          target: "PATH symlink (macOS / Linux / Win)",
           install: true,
           config: true,
           doctor: true,
@@ -646,7 +776,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "Go",
-          target: "brew (go)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -654,7 +784,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Python 3 (pip)",
-          target: "brew (python3)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -662,7 +792,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Java (OpenJDK 21)",
-          target: "/Library/Java/JavaVirtualMachines",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -670,7 +800,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "GCC / Clang",
-          target: "brew (gcc) / Apple CLT",
+          target: "brew / build-essential / mingw",
           install: true,
           config: true,
           doctor: true,
@@ -678,7 +808,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Node.js (npm)",
-          target: "brew (node)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -691,7 +821,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "AWS CLI v2",
-          target: "brew (awscli)",
+          target: "brew / apt / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -699,7 +829,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Google Cloud SDK (gcloud)",
-          target: "brew --cask (google-cloud-sdk)",
+          target: "brew --cask / apt / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -707,7 +837,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "Azure CLI (az)",
-          target: "brew (azure-cli)",
+          target: "brew / apt / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -720,7 +850,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "zoxide",
-          target: "brew (zoxide) + .zshrc init",
+          target: "brew / apt / winget + shell init",
           install: true,
           config: true,
           doctor: true,
@@ -728,7 +858,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "fzf",
-          target: "brew (fzf)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -736,7 +866,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "ripgrep (rg)",
-          target: "brew (ripgrep)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -744,7 +874,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "bat",
-          target: "brew (bat)",
+          target: "brew / apt (batcat) / winget",
           install: true,
           config: true,
           doctor: true,
@@ -752,7 +882,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "eza",
-          target: "brew (eza)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -760,7 +890,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "htop",
-          target: "brew (htop)",
+          target: "brew / apt / dnf / apk",
           install: true,
           config: false,
           doctor: true,
@@ -768,7 +898,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "jq",
-          target: "brew (jq)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: false,
           doctor: true,
@@ -776,7 +906,7 @@ export default function CoffeeBunDetailPage() {
         },
         {
           name: "tree",
-          target: "brew (tree)",
+          target: "brew / apt / dnf / winget / choco",
           install: true,
           config: false,
           doctor: true,
@@ -789,7 +919,7 @@ export default function CoffeeBunDetailPage() {
       items: [
         {
           name: "Google Chrome",
-          target: "brew --cask (google-chrome)",
+          target: "brew --cask / winget / choco",
           install: true,
           config: true,
           doctor: true,
@@ -825,14 +955,14 @@ export default function CoffeeBunDetailPage() {
       cmd: "bun doctor",
       action: t(
         "coffee_bun.cmd_doctor_desc",
-        "Verify PATH entries, shell configuration hooks, font files, and binary symlinks"
+        "Verify PATH entries, native package managers, shell hooks, font files, and binary symlinks"
       ),
     },
     {
       cmd: "bun update",
       action: t(
         "coffee_bun.cmd_update_desc",
-        "Upgrade Homebrew formulae/casks and pull latest commits for managed Git repositories"
+        "Upgrade installed packages and pull latest commits for managed Git repositories"
       ),
     },
   ];
@@ -861,8 +991,8 @@ export default function CoffeeBunDetailPage() {
         {/* Hero Section */}
         <HeroSection>
           <BadgeRow>
-            <Badge>{t("coffee_bun.badge_platform", "macOS")}</Badge>
-            <Badge>{t("coffee_bun.badge_lang", "Go 1.22+")}</Badge>
+            <Badge>{t("coffee_bun.badge_platform", "macOS · Linux · Windows")}</Badge>
+            <Badge>{t("coffee_bun.badge_lang", "Go 1.24+")}</Badge>
             <Badge>{t("coffee_bun.badge_cmd", "CLI: bun")}</Badge>
             <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
           </BadgeRow>
@@ -880,18 +1010,39 @@ export default function CoffeeBunDetailPage() {
           <Tagline>
             {t(
               "coffee_bun.tagline",
-              "macOS development environment setup and maintenance CLI written in Go."
+              "Cross-platform workstation setup and maintenance CLI written in Go (macOS, Linux, Windows)."
             )}
           </Tagline>
+
+          {/* OS Tab Switcher for Quick One-Line Install */}
+          <OsTabSwitchRow>
+            <OsTabBtn
+              type="button"
+              isActive={heroOsTab === "unix"}
+              onClick={() => setHeroOsTab("unix")}
+            >
+              {t("coffee_bun.install_tab_unix", "macOS / Linux")}
+            </OsTabBtn>
+            <OsTabBtn
+              type="button"
+              isActive={heroOsTab === "windows"}
+              onClick={() => setHeroOsTab("windows")}
+            >
+              {t("coffee_bun.install_tab_win", "Windows (PowerShell)")}
+            </OsTabBtn>
+          </OsTabSwitchRow>
 
           {/* Full-width One-Line Install Command Box */}
           <FullWidthInstallBanner>
             <div className="command-wrapper">
-              <span className="prompt-symbol">$</span>
-              <code className="command-text">{installCmd}</code>
+              <span className="prompt-symbol">{activeHeroPrompt}</span>
+              <code className="command-text">{activeHeroCmd}</code>
             </div>
             <div className="copy-btn-wrapper">
-              <CopyButton text={installCmd} label={isKo ? "복사" : "Copy"} />
+              <CopyButton
+                text={activeHeroCmd}
+                label={isKo ? "복사" : "Copy"}
+              />
             </div>
           </FullWidthInstallBanner>
 
@@ -900,7 +1051,7 @@ export default function CoffeeBunDetailPage() {
               data={{
                 title: "KennethanCeyer/bundle (coffee-bun)",
                 description:
-                  "Automated macOS development environment setup and maintenance CLI written in Go (bun).",
+                  "Automated cross-platform workstation setup and maintenance CLI written in Go (macOS, Linux, Windows).",
                 url: repoUrl,
                 image: "https://avatars.githubusercontent.com/u/7090315?v=4",
                 type: "github",
@@ -912,7 +1063,7 @@ export default function CoffeeBunDetailPage() {
         {/* Interactive CLI & Subcommand Simulation Section */}
         <Section id="demo">
           <SectionHeader>
-            <h2>
+            <h2 id="demo-heading">
               {renderInlineCode(
                 t("coffee_bun.tui_title", "CLI & TUI Simulation")
               )}
@@ -925,7 +1076,7 @@ export default function CoffeeBunDetailPage() {
         {/* Supported Packages & Feature Matrix (Merged Rows + Remix Icon Checks) */}
         <Section id="inventory">
           <SectionHeader>
-            <h2>
+            <h2 id="inventory-heading">
               {t(
                 "coffee_bun.inventory_title",
                 "Supported Packages & Feature Matrix"
@@ -992,7 +1143,7 @@ export default function CoffeeBunDetailPage() {
         {/* Architecture & Implementation */}
         <Section id="features">
           <SectionHeader>
-            <h2>
+            <h2 id="features-heading">
               {t("coffee_bun.features_title", "Architecture & Implementation")}
             </h2>
           </SectionHeader>
@@ -1010,7 +1161,9 @@ export default function CoffeeBunDetailPage() {
         {/* CLI Command Reference Table */}
         <Section id="commands">
           <SectionHeader>
-            <h2>{t("coffee_bun.commands_title", "CLI Command Reference")}</h2>
+            <h2 id="commands-heading">
+              {t("coffee_bun.commands_title", "CLI Command Reference")}
+            </h2>
           </SectionHeader>
 
           <TableWrapper>
@@ -1037,62 +1190,145 @@ export default function CoffeeBunDetailPage() {
           </TableWrapper>
         </Section>
 
-        {/* Installation */}
+        {/* Granular Multi-Platform Installation Guide */}
         <Section id="install">
           <SectionHeader>
-            <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
+            <h2 id="install-heading">
+              {t("coffee_bun.install_heading", "Installation")}
+            </h2>
           </SectionHeader>
 
           <InstallSectionBlock>
+            {/* 1. macOS Bootstrap */}
             <InstallBox>
-              <h3>1. {t("coffee_bun.install_method_curl", "Shell Script")}</h3>
-              <p>{renderInlineCode(t("coffee_bun.install_desc_curl"))}</p>
+              <div className="box-header">
+                <h3 id="install-macos-script">
+                  {t(
+                    "coffee_bun.install_method_macos_script",
+                    "1. macOS — Bootstrap Script"
+                  )}
+                </h3>
+                <span className="os-badge">macOS (zsh / bash)</span>
+              </div>
+              <p>
+                {renderInlineCode(t("coffee_bun.install_desc_macos_script"))}
+              </p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
-                  <code className="command-text">{installCmd}</code>
-                </div>
-                <div className="copy-btn-wrapper">
-                  <CopyButton text={installCmd} label={isKo ? "복사" : "Copy"} />
-                </div>
-              </FullWidthInstallBanner>
-            </InstallBox>
-
-            <InstallBox>
-              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew")}</h3>
-              <p>{renderInlineCode(t("coffee_bun.install_desc_brew"))}</p>
-              <FullWidthInstallBanner style={{ margin: 0 }}>
-                <div className="command-wrapper">
-                  <span className="prompt-symbol">$</span>
-                  <code className="command-text">
-                    brew install KennethanCeyer/bundle/bun
-                  </code>
+                  <code className="command-text">{unixInstallCmd}</code>
                 </div>
                 <div className="copy-btn-wrapper">
                   <CopyButton
-                    text="brew install KennethanCeyer/bundle/bun"
+                    text={unixInstallCmd}
                     label={isKo ? "복사" : "Copy"}
                   />
                 </div>
               </FullWidthInstallBanner>
             </InstallBox>
 
+            {/* 2. macOS Homebrew */}
             <InstallBox>
-              <h3>
-                3. {t("coffee_bun.install_method_source", "Build from Source")}
-              </h3>
+              <div className="box-header">
+                <h3 id="install-macos-brew">
+                  {t(
+                    "coffee_bun.install_method_brew",
+                    "2. macOS — Homebrew Tap"
+                  )}
+                </h3>
+                <span className="os-badge">Homebrew / Linuxbrew</span>
+              </div>
+              <p>{renderInlineCode(t("coffee_bun.install_desc_brew"))}</p>
+              <FullWidthInstallBanner style={{ margin: 0 }}>
+                <div className="command-wrapper">
+                  <span className="prompt-symbol">$</span>
+                  <code className="command-text">{brewInstallCmd}</code>
+                </div>
+                <div className="copy-btn-wrapper">
+                  <CopyButton
+                    text={brewInstallCmd}
+                    label={isKo ? "복사" : "Copy"}
+                  />
+                </div>
+              </FullWidthInstallBanner>
+            </InstallBox>
+
+            {/* 3. Linux Bootstrap */}
+            <InstallBox>
+              <div className="box-header">
+                <h3 id="install-linux-script">
+                  {t(
+                    "coffee_bun.install_method_linux_script",
+                    "3. Linux — Bootstrap Script (apt / dnf / apk)"
+                  )}
+                </h3>
+                <span className="os-badge">Ubuntu · Debian · Fedora · Alpine</span>
+              </div>
+              <p>
+                {renderInlineCode(t("coffee_bun.install_desc_linux_script"))}
+              </p>
+              <FullWidthInstallBanner style={{ margin: 0 }}>
+                <div className="command-wrapper">
+                  <span className="prompt-symbol">$</span>
+                  <code className="command-text">{unixInstallCmd}</code>
+                </div>
+                <div className="copy-btn-wrapper">
+                  <CopyButton
+                    text={unixInstallCmd}
+                    label={isKo ? "복사" : "Copy"}
+                  />
+                </div>
+              </FullWidthInstallBanner>
+            </InstallBox>
+
+            {/* 4. Windows PowerShell */}
+            <InstallBox>
+              <div className="box-header">
+                <h3 id="install-windows-ps">
+                  {t(
+                    "coffee_bun.install_method_windows_ps",
+                    "4. Windows — PowerShell Bootstrap (winget / choco)"
+                  )}
+                </h3>
+                <span className="os-badge">Windows 10/11 (PowerShell)</span>
+              </div>
+              <p>
+                {renderInlineCode(t("coffee_bun.install_desc_windows_ps"))}
+              </p>
+              <FullWidthInstallBanner style={{ margin: 0 }}>
+                <div className="command-wrapper">
+                  <span className="prompt-symbol">PS&gt;</span>
+                  <code className="command-text">{winInstallCmd}</code>
+                </div>
+                <div className="copy-btn-wrapper">
+                  <CopyButton
+                    text={winInstallCmd}
+                    label={isKo ? "복사" : "Copy"}
+                  />
+                </div>
+              </FullWidthInstallBanner>
+            </InstallBox>
+
+            {/* 5. Build from Source */}
+            <InstallBox>
+              <div className="box-header">
+                <h3 id="install-source">
+                  {t(
+                    "coffee_bun.install_method_source",
+                    "5. Build from Source (All Platforms)"
+                  )}
+                </h3>
+                <span className="os-badge">Go 1.24+ &amp; Make</span>
+              </div>
               <p>{renderInlineCode(t("coffee_bun.install_desc_source"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
-                  <code className="command-text">
-                    git clone https://github.com/KennethanCeyer/bundle.git
-                    &amp;&amp; cd bundle &amp;&amp; make install
-                  </code>
+                  <code className="command-text">{sourceInstallCmd}</code>
                 </div>
                 <div className="copy-btn-wrapper">
                   <CopyButton
-                    text="git clone https://github.com/KennethanCeyer/bundle.git && cd bundle && make install"
+                    text={sourceInstallCmd}
                     label={isKo ? "복사" : "Copy"}
                   />
                 </div>
@@ -1100,7 +1336,13 @@ export default function CoffeeBunDetailPage() {
             </InstallBox>
           </InstallSectionBlock>
         </Section>
+
+        <div id="post-footer-container" />
       </MainContainer>
+
+      <TocWrapper>
+        <TableOfContents headings={tocHeadings} />
+      </TocWrapper>
     </PageWrapper>
   );
 }

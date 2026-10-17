@@ -179,6 +179,13 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
       "th_update",
       "commands_title",
       "install_heading",
+      "install_tab_unix",
+      "install_tab_win",
+      "install_method_macos_script",
+      "install_method_brew",
+      "install_method_linux_script",
+      "install_method_windows_ps",
+      "install_method_source",
     ];
 
     for (const key of requiredKeys) {
@@ -190,4 +197,40 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
       );
     }
   });
+
+  it("TableOfContents.tsx and coffee-bun/page.tsx support section scroll ToC and granular macOS/Linux/Windows installation methods", () => {
+    const tocContent = readProjectFile("src/components/TableOfContents.tsx");
+    assert.match(tocContent, /TableOfContents/);
+    assert.match(tocContent, /window\.scrollTo\(\{[\s\S]*?behavior:\s*"smooth"/);
+    assert.match(tocContent, /post-footer-container/);
+
+    const pageContent = readProjectFile("src/app/[lang]/coffee-bun/page.tsx");
+    assert.match(pageContent, /<TableOfContents headings=\{tocHeadings\} \/>/);
+    assert.match(pageContent, /id="demo-heading"/);
+    assert.match(pageContent, /id="inventory-heading"/);
+    assert.match(pageContent, /id="features-heading"/);
+    assert.match(pageContent, /id="commands-heading"/);
+    assert.match(pageContent, /id="install-heading"/);
+    assert.match(pageContent, /id="install-macos-script"/);
+    assert.match(pageContent, /id="install-macos-brew"/);
+    assert.match(pageContent, /id="install-linux-script"/);
+    assert.match(pageContent, /id="install-windows-ps"/);
+    assert.match(pageContent, /id="install-source"/);
+    assert.match(pageContent, /id="post-footer-container"/);
+
+    // Check granular OS commands
+    assert.match(
+      pageContent,
+      /curl -fsSL https:\/\/raw\.githubusercontent\.com\/KennethanCeyer\/coffee-bun\/main\/install\.sh \| bash/
+    );
+    assert.match(
+      pageContent,
+      /irm https:\/\/raw\.githubusercontent\.com\/KennethanCeyer\/coffee-bun\/main\/install\.ps1 \| iex/
+    );
+    assert.match(
+      pageContent,
+      /brew install KennethanCeyer\/coffee-bun\/coffee-bun/
+    );
+  });
 });
+

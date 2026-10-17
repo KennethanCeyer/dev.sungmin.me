@@ -27,7 +27,7 @@ export const resources = {
         badge_lang: "Go 1.22+",
         badge_cmd: "CLI: bun",
         badge_license: "MIT License",
-        tui_title: "CLI & TUI Simulation (`bun`)",
+        tui_title: "CLI & TUI Simulation",
         tui_subtitle:
           "Interactive tree view (`bun`) and output previews for `install`, `check`, `doctor`, and `update` subcommands.",
         features_title: "Architecture & Implementation",
@@ -126,7 +126,7 @@ export const resources = {
         badge_lang: "Go 1.22+",
         badge_cmd: "CLI: bun",
         badge_license: "MIT License",
-        tui_title: "CLI & TUI 시뮬레이션 (`bun`)",
+        tui_title: "CLI & TUI 시뮬레이션",
         tui_subtitle:
           "대화형 트리 UI(`bun`) 및 `install`, `check`, `doctor`, `update` 서브커맨드 실행 화면입니다.",
         features_title: "아키텍처 및 동작 구조",

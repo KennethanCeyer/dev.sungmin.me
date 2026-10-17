@@ -167,29 +167,16 @@ const Title = styled.h1`
 `;
 
 const Tagline = styled.p`
-  font-size: 1.15rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 400;
   color: ${({ theme }) => theme.text};
-  opacity: 0.9;
-  max-width: 780px;
-  margin: 0 auto 0.75rem;
-  line-height: 1.5;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-`;
-
-const Description = styled.p`
-  font-size: 0.95rem;
-  color: ${({ theme }) => theme.text};
-  opacity: 0.65;
-  max-width: 740px;
+  opacity: 0.8;
+  max-width: 720px;
   margin: 0 auto 2rem;
-  line-height: 1.65;
+  line-height: 1.6;
 
   @media (max-width: 768px) {
-    font-size: 0.9rem;
+    font-size: 0.98rem;
   }
 `;
 
@@ -280,34 +267,23 @@ const Section = styled.section`
 `;
 
 const SectionHeader = styled.div`
-  margin-bottom: 2.25rem;
+  margin-bottom: 1.75rem;
   text-align: left;
 
   h2 {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 0 0 0.5rem;
+    margin: 0;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
   }
 
-  p {
-    font-size: 0.95rem;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.65;
-    margin: 0;
-    line-height: 1.6;
-  }
-
   @media (max-width: 768px) {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     h2 {
-      font-size: 1.45rem;
-    }
-    p {
-      font-size: 0.9rem;
+      font-size: 1.4rem;
     }
   }
 `;
@@ -907,12 +883,6 @@ export default function CoffeeBunDetailPage() {
               "macOS development environment setup and maintenance CLI written in Go."
             )}
           </Tagline>
-          <Description>
-            {t(
-              "coffee_bun.description",
-              "Installs and configures system toolchains, shell frameworks, editors, language runtimes, and CLI utilities via Homebrew and Git."
-            )}
-          </Description>
 
           {/* Full-width One-Line Install Command Box */}
           <FullWidthInstallBanner>
@@ -944,10 +914,9 @@ export default function CoffeeBunDetailPage() {
           <SectionHeader>
             <h2>
               {renderInlineCode(
-                t("coffee_bun.tui_title", "CLI & TUI Simulation (`bun`)")
+                t("coffee_bun.tui_title", "CLI & TUI Simulation")
               )}
             </h2>
-            <p>{renderInlineCode(t("coffee_bun.tui_subtitle"))}</p>
           </SectionHeader>
 
           <TerminalSimulator />
@@ -962,7 +931,6 @@ export default function CoffeeBunDetailPage() {
                 "Supported Packages & Feature Matrix"
               )}
             </h2>
-            <p>{renderInlineCode(t("coffee_bun.inventory_subtitle"))}</p>
           </SectionHeader>
 
           <TableWrapper>
@@ -1027,7 +995,6 @@ export default function CoffeeBunDetailPage() {
             <h2>
               {t("coffee_bun.features_title", "Architecture & Implementation")}
             </h2>
-            <p>{renderInlineCode(t("coffee_bun.features_subtitle"))}</p>
           </SectionHeader>
 
           <FeaturesGrid>
@@ -1044,7 +1011,6 @@ export default function CoffeeBunDetailPage() {
         <Section id="commands">
           <SectionHeader>
             <h2>{t("coffee_bun.commands_title", "CLI Command Reference")}</h2>
-            <p>{renderInlineCode(t("coffee_bun.commands_subtitle"))}</p>
           </SectionHeader>
 
           <TableWrapper>
@@ -1075,7 +1041,6 @@ export default function CoffeeBunDetailPage() {
         <Section id="install">
           <SectionHeader>
             <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
-            <p>{renderInlineCode(t("coffee_bun.install_subheading"))}</p>
           </SectionHeader>
 
           <InstallSectionBlock>

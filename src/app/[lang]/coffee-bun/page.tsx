@@ -10,9 +10,14 @@ import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  RiAppleFill,
   RiArrowLeftLine,
+  RiBeerFill,
   RiCheckLine,
+  RiCodeSSlashLine,
   RiSubtractLine,
+  RiUbuntuFill,
+  RiWindowsFill,
 } from "react-icons/ri";
 
 export const COFFEE_BUN_ASCII_LINES = [
@@ -124,6 +129,7 @@ const Badge = styled.span`
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
+  gap: 0.35rem;
   background-color: transparent;
   color: ${({ theme }) => theme.text};
   border: 1px solid ${({ theme }) => theme.border};
@@ -197,29 +203,55 @@ const Tagline = styled.p`
 const OsTabSwitchRow = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-bottom: 0.75rem;
-  padding: 0.25rem;
-  border-radius: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.38rem;
+  border-radius: 10px;
   border: 1px solid ${({ theme }) => theme.border};
   background-color: var(--color-background);
 `;
 
 const OsTabBtn = styled.button<{ isActive: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
   font-family: var(--font-roboto-mono), monospace;
-  font-size: 0.78rem;
-  font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  padding: 0.32rem 0.85rem;
-  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
+  padding: 0.62rem 1.35rem;
+  border-radius: 7px;
   cursor: pointer;
   background-color: ${({ isActive, theme }) =>
     isActive ? theme.text : "transparent"};
   color: ${({ isActive, theme }) => (isActive ? theme.body : theme.text)};
-  opacity: ${({ isActive }) => (isActive ? 1 : 0.7)};
+  opacity: ${({ isActive }) => (isActive ? 1 : 0.75)};
   transition: all 0.15s ease;
+
+  .os-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .os-icon-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
 
   &:hover {
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    padding: 0.52rem 1rem;
+
+    .os-icon {
+      font-size: 1.08rem;
+    }
   }
 `;
 
@@ -494,22 +526,34 @@ const InstallBox = styled.div`
   }
 
   h3 {
-    font-size: 1.02rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
     font-weight: 600;
     margin: 0;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
+
+    .os-title-icon {
+      font-size: 1.18rem;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
   }
 
   .os-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.74rem;
-    padding: 0.15rem 0.55rem;
-    border-radius: 4px;
+    font-size: 0.78rem;
+    padding: 0.22rem 0.65rem;
+    border-radius: 5px;
     border: 1px solid ${({ theme }) => theme.border};
     color: ${({ theme }) => theme.text};
-    opacity: 0.75;
+    opacity: 0.8;
   }
 
   p {
@@ -991,7 +1035,12 @@ export default function CoffeeBunDetailPage() {
         {/* Hero Section */}
         <HeroSection>
           <BadgeRow>
-            <Badge>{t("coffee_bun.badge_platform", "macOS · Linux · Windows")}</Badge>
+            <Badge>
+              <RiAppleFill />
+              <RiUbuntuFill />
+              <RiWindowsFill />
+              {t("coffee_bun.badge_platform", "macOS · Linux · Windows")}
+            </Badge>
             <Badge>{t("coffee_bun.badge_lang", "Go 1.24+")}</Badge>
             <Badge>{t("coffee_bun.badge_cmd", "CLI: bun")}</Badge>
             <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
@@ -1021,14 +1070,21 @@ export default function CoffeeBunDetailPage() {
               isActive={heroOsTab === "unix"}
               onClick={() => setHeroOsTab("unix")}
             >
-              {t("coffee_bun.install_tab_unix", "macOS / Linux")}
+              <span className="os-icon-group">
+                <RiAppleFill className="os-icon" />
+                <RiUbuntuFill className="os-icon" />
+              </span>
+              <span>{t("coffee_bun.install_tab_unix", "macOS / Linux")}</span>
             </OsTabBtn>
             <OsTabBtn
               type="button"
               isActive={heroOsTab === "windows"}
               onClick={() => setHeroOsTab("windows")}
             >
-              {t("coffee_bun.install_tab_win", "Windows (PowerShell)")}
+              <RiWindowsFill className="os-icon" />
+              <span>
+                {t("coffee_bun.install_tab_win", "Windows (PowerShell)")}
+              </span>
             </OsTabBtn>
           </OsTabSwitchRow>
 
@@ -1203,12 +1259,17 @@ export default function CoffeeBunDetailPage() {
             <InstallBox>
               <div className="box-header">
                 <h3 id="install-macos-script">
-                  {t(
-                    "coffee_bun.install_method_macos_script",
-                    "1. macOS — Bootstrap Script"
-                  )}
+                  <RiAppleFill className="os-title-icon" />
+                  <span>
+                    {t(
+                      "coffee_bun.install_method_macos_script",
+                      "1. macOS — Bootstrap Script"
+                    )}
+                  </span>
                 </h3>
-                <span className="os-badge">macOS (zsh / bash)</span>
+                <span className="os-badge">
+                  <RiAppleFill /> macOS (zsh / bash)
+                </span>
               </div>
               <p>
                 {renderInlineCode(t("coffee_bun.install_desc_macos_script"))}
@@ -1231,12 +1292,17 @@ export default function CoffeeBunDetailPage() {
             <InstallBox>
               <div className="box-header">
                 <h3 id="install-macos-brew">
-                  {t(
-                    "coffee_bun.install_method_brew",
-                    "2. macOS — Homebrew Tap"
-                  )}
+                  <RiBeerFill className="os-title-icon" />
+                  <span>
+                    {t(
+                      "coffee_bun.install_method_brew",
+                      "2. macOS — Homebrew Tap"
+                    )}
+                  </span>
                 </h3>
-                <span className="os-badge">Homebrew / Linuxbrew</span>
+                <span className="os-badge">
+                  <RiAppleFill /> <RiUbuntuFill /> Homebrew / Linuxbrew
+                </span>
               </div>
               <p>{renderInlineCode(t("coffee_bun.install_desc_brew"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
@@ -1257,12 +1323,17 @@ export default function CoffeeBunDetailPage() {
             <InstallBox>
               <div className="box-header">
                 <h3 id="install-linux-script">
-                  {t(
-                    "coffee_bun.install_method_linux_script",
-                    "3. Linux — Bootstrap Script (apt / dnf / apk)"
-                  )}
+                  <RiUbuntuFill className="os-title-icon" />
+                  <span>
+                    {t(
+                      "coffee_bun.install_method_linux_script",
+                      "3. Linux — Bootstrap Script (apt / dnf / apk)"
+                    )}
+                  </span>
                 </h3>
-                <span className="os-badge">Ubuntu · Debian · Fedora · Alpine</span>
+                <span className="os-badge">
+                  <RiUbuntuFill /> Ubuntu · Debian · Fedora · Alpine
+                </span>
               </div>
               <p>
                 {renderInlineCode(t("coffee_bun.install_desc_linux_script"))}
@@ -1285,12 +1356,17 @@ export default function CoffeeBunDetailPage() {
             <InstallBox>
               <div className="box-header">
                 <h3 id="install-windows-ps">
-                  {t(
-                    "coffee_bun.install_method_windows_ps",
-                    "4. Windows — PowerShell Bootstrap (winget / choco)"
-                  )}
+                  <RiWindowsFill className="os-title-icon" />
+                  <span>
+                    {t(
+                      "coffee_bun.install_method_windows_ps",
+                      "4. Windows — PowerShell Bootstrap (winget / choco)"
+                    )}
+                  </span>
                 </h3>
-                <span className="os-badge">Windows 10/11 (PowerShell)</span>
+                <span className="os-badge">
+                  <RiWindowsFill /> Windows 10/11 (PowerShell)
+                </span>
               </div>
               <p>
                 {renderInlineCode(t("coffee_bun.install_desc_windows_ps"))}
@@ -1313,12 +1389,17 @@ export default function CoffeeBunDetailPage() {
             <InstallBox>
               <div className="box-header">
                 <h3 id="install-source">
-                  {t(
-                    "coffee_bun.install_method_source",
-                    "5. Build from Source (All Platforms)"
-                  )}
+                  <RiCodeSSlashLine className="os-title-icon" />
+                  <span>
+                    {t(
+                      "coffee_bun.install_method_source",
+                      "5. Build from Source (All Platforms)"
+                    )}
+                  </span>
                 </h3>
-                <span className="os-badge">Go 1.24+ &amp; Make</span>
+                <span className="os-badge">
+                  <RiCodeSSlashLine /> Go 1.24+ &amp; Make
+                </span>
               </div>
               <p>{renderInlineCode(t("coffee_bun.install_desc_source"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>

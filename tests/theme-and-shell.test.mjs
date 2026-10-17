@@ -231,6 +231,14 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
       pageContent,
       /brew install KennethanCeyer\/coffee-bun\/coffee-bun/
     );
+
+    // Check Remix OS icons and larger OS tab dimensions
+    assert.match(pageContent, /<RiAppleFill className="os-icon" \/>/);
+    assert.match(pageContent, /<RiUbuntuFill className="os-icon" \/>/);
+    assert.match(pageContent, /<RiWindowsFill className="os-icon" \/>/);
+    assert.match(pageContent, /font-size:\s*0\.95rem/);
+    assert.match(pageContent, /padding:\s*0\.62rem 1\.35rem/);
   });
 });
+
 

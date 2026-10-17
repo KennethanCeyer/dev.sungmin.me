@@ -158,10 +158,13 @@ const Thumbnail = styled.div<{ "data-pattern": string }>`
 const ThumbnailAscii = styled.pre`
   margin: 0;
   padding: 0.75rem 1.15rem;
-  font-family: var(--font-roboto-mono), Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: var(--font-roboto-mono), monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
   font-size: 0.72rem;
-  line-height: 1.15;
+  line-height: 1.18;
+  letter-spacing: 0;
+  white-space: pre;
   color: ${({ theme }) => theme.text};
   background-color: ${({ theme }) => theme.body};
   border: 1px solid ${({ theme }) => theme.border};

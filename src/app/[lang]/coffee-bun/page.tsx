@@ -100,12 +100,14 @@ const AsciiLogoPre = styled.pre`
   display: inline-block;
   margin: 0 auto 1.5rem;
   padding: 1.15rem 1.5rem;
-  font-family: var(--font-roboto-mono), Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-  font-size: 0.82rem;
-  line-height: 1.15;
+  font-family: var(--font-roboto-mono), monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-size: 0.85rem;
+  line-height: 1.18;
   letter-spacing: 0;
   text-align: left;
+  white-space: pre;
   color: ${({ theme }) => theme.text};
   background-color: var(--code-block-bg);
   border: 1px solid ${({ theme }) => theme.border};

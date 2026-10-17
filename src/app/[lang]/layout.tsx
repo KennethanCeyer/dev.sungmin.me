@@ -1,7 +1,7 @@
 import Providers from "@/components/Providers";
 import EmotionRegistry from "@/lib/emotion";
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Roboto_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -9,9 +9,12 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
 });
 
-const robotoMono = Roboto_Mono({
-  subsets: ["latin"],
+const robotoMono = localFont({
+  src: "../../fonts/RobotoMonoVariable.woff2",
+  weight: "100 700",
   variable: "--font-roboto-mono",
+  display: "swap",
+  adjustFontFallback: false,
 });
 
 const pretendard = localFont({

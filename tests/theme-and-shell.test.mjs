@@ -97,6 +97,23 @@ describe("Main Shell, ASCII Logo, Support Matrix & Theme Integrity", () => {
     assert.match(content, /<RiCheckLine\s*\/>/);
   });
 
+  it("loads RobotoMonoVariable.woff2 with block elements and adjustFontFallback: false so ASCII art never squishes", () => {
+    const layoutContent = readProjectFile("src/app/[lang]/layout.tsx");
+    assert.match(layoutContent, /RobotoMonoVariable\.woff2/);
+    assert.match(layoutContent, /adjustFontFallback:\s*false/);
+    assert.equal(
+      fs.existsSync(path.join(rootDir, "src/fonts/RobotoMonoVariable.woff2")),
+      true,
+      "src/fonts/RobotoMonoVariable.woff2 must exist"
+    );
+
+    const coffeeBunPage = readProjectFile("src/app/[lang]/coffee-bun/page.tsx");
+    assert.match(
+      coffeeBunPage,
+      /font-family:\s*var\(--font-roboto-mono\),\s*monospace/
+    );
+  });
+
   it("ThemeContext.tsx toggles data-theme on documentElement without polluting body inline style", () => {
     const content = readProjectFile("src/contexts/ThemeContext.tsx");
 

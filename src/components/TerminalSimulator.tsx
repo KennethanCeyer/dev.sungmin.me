@@ -208,10 +208,12 @@ const TreeHeader = styled.div`
   margin-bottom: 0.9rem;
   .ascii-banner {
     margin: 0 0 0.75rem;
-    font-family: var(--font-roboto-mono), Menlo, Monaco, Consolas, "Courier New",
-      monospace;
-    font-size: 0.68rem;
-    line-height: 1.15;
+    font-family: var(--font-roboto-mono), monospace;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    font-size: 0.72rem;
+    line-height: 1.18;
+    letter-spacing: 0;
     color: ${({ theme }) => theme.text};
     opacity: 0.9;
     white-space: pre;

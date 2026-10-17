@@ -36,19 +36,19 @@ export const resources = {
         f1_title: "Foldable Tree TUI",
         f1_desc:
           "Groups packages by category with collapsible nodes (`[-]`/`[+]`), multi-select toggles, and keyboard navigation between the tree view and action bar.",
-        f2_title: "Goroutine Worker Pool & Stdout Pipe",
+        f2_title: "Concurrent Workers & Stream",
         f2_desc:
           "Executes independent Homebrew installs, font downloads, and Git clones concurrently, piping the latest stdout line under each running task.",
         f3_title: "Prerequisite & Sudo Polling",
         f3_desc:
           "Detects steps requiring manual elevation (`xcode-select`, OpenJDK JVM symlink), displays the required command, and polls every 2–3s to resume execution automatically.",
-        f4_title: "Environment Diagnostics (`bun doctor`)",
+        f4_title: "Diagnostics (`bun doctor`)",
         f4_desc:
           "Checks macOS architecture, Homebrew PATH entries, `.zshrc` plugin hooks, installed font files, and the `/usr/local/bin/code` symlink.",
-        f5_title: "Repository & Package Sync (`bun update`)",
+        f5_title: "Package Sync (`bun update`)",
         f5_desc:
           "Runs `brew update`/`upgrade` alongside `git pull --ff-only` across Oh My Zsh, Powerlevel10k, Zsh plugins, and `~/.vim_runtime`.",
-        f6_title: "Non-Interactive CLI Execution",
+        f6_title: "Headless CLI Execution",
         f6_desc:
           "Supports headless provisioning via `bun install all` or category-scoped targets (`terminal`, `languages`, `cli`) for scripts and dotfiles.",
         inventory_title: "Supported Packages & Feature Matrix",
@@ -135,7 +135,7 @@ export const resources = {
         f1_title: "접이식 트리 TUI",
         f1_desc:
           "카테고리별 폴딩(`[-]`/`[+]`), 다중 선택 토글, 트리 영역과 하단 액션 버튼 간 포커스 이동을 지원합니다.",
-        f2_title: "Goroutine 병렬 실행 및 Stdout 파이프",
+        f2_title: "병렬 실행 및 Stdout 파이프",
         f2_desc:
           "의존성이 없는 Homebrew 설치, 폰트 다운로드, Git 클론 작업을 고루틴으로 병렬 처리하며 각 항목 하단에 실시간 표준출력을 표시합니다.",
         f3_title: "사전 요구사항 및 권한 폴링",
@@ -144,7 +144,7 @@ export const resources = {
         f4_title: "환경 상태 진단 (`bun doctor`)",
         f4_desc:
           "macOS 아키텍처, Homebrew PATH, `.zshrc` 테마 및 플러그인 구문, 폰트 파일 경로, `/usr/local/bin/code` 심링크 유효성을 검사합니다.",
-        f5_title: "패키지 및 Git 저장소 업데이트 (`bun update`)",
+        f5_title: "패키지 동기화 (`bun update`)",
         f5_desc:
           "`brew update`/`upgrade`와 함께 Oh My Zsh, Powerlevel10k, Zsh 플러그인, `~/.vim_runtime` 저장소의 최신 커밋을 동기화합니다.",
         f6_title: "비대화형 CLI 실행",

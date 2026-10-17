@@ -73,6 +73,12 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
       "Hero section should not have a redundant Interactive TUI (#demo) button"
     );
 
+    // Inline code backtick parser must be used for FeatureCard titles and descriptions, and FeatureCard h3 must be single-line
+    assert.match(content, /const renderInlineCode = \(text: string\) =>/);
+    assert.match(content, /<h3>\{renderInlineCode\(feat\.title\)\}<\/h3>/);
+    assert.match(content, /<p>\{renderInlineCode\(feat\.desc\)\}<\/p>/);
+    assert.match(content, /h3\s*\{[\s\S]*?white-space:\s*nowrap;/);
+
     // Merged-row matrix table with rowSpan, RiCheckLine, table-layout: fixed, and 4 identical col widths
     assert.match(content, /table-layout:\s*fixed/);
     assert.match(content, /rowSpan=\{group\.items\.length\}/);

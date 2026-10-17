@@ -333,6 +333,7 @@ const FeatureCard = styled.div`
   border: 1px solid ${({ theme }) => theme.border};
   display: flex;
   flex-direction: column;
+  min-width: 0;
   transition: border-color 0.2s ease;
 
   &:hover {
@@ -340,12 +341,15 @@ const FeatureCard = styled.div`
   }
 
   h3 {
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.55rem;
     color: ${({ theme }) => theme.text};
     border: none;
     padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   p {
@@ -493,6 +497,17 @@ interface MatrixSectionGroup {
   items: MatrixToolItem[];
 }
 
+const renderInlineCode = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(`[^`]+`)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
+      return <code key={idx}>{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+};
+
 export default function CoffeeBunDetailPage() {
   const params = useParams();
   const lang = (params?.lang as string) || "en";
@@ -509,10 +524,7 @@ export default function CoffeeBunDetailPage() {
       desc: t("coffee_bun.f1_desc"),
     },
     {
-      title: t(
-        "coffee_bun.f2_title",
-        "Goroutine Worker Pool & Stdout Pipe"
-      ),
+      title: t("coffee_bun.f2_title", "Concurrent Workers & Stream"),
       desc: t("coffee_bun.f2_desc"),
     },
     {
@@ -520,18 +532,15 @@ export default function CoffeeBunDetailPage() {
       desc: t("coffee_bun.f3_desc"),
     },
     {
-      title: t("coffee_bun.f4_title", "Environment Diagnostics (`bun doctor`)"),
+      title: t("coffee_bun.f4_title", "Diagnostics (`bun doctor`)"),
       desc: t("coffee_bun.f4_desc"),
     },
     {
-      title: t(
-        "coffee_bun.f5_title",
-        "Repository & Package Sync (`bun update`)"
-      ),
+      title: t("coffee_bun.f5_title", "Package Sync (`bun update`)"),
       desc: t("coffee_bun.f5_desc"),
     },
     {
-      title: t("coffee_bun.f6_title", "Non-Interactive CLI Execution"),
+      title: t("coffee_bun.f6_title", "Headless CLI Execution"),
       desc: t("coffee_bun.f6_desc"),
     },
   ];
@@ -921,7 +930,7 @@ export default function CoffeeBunDetailPage() {
               data={{
                 title: "KennethanCeyer/bundle (coffee-bun)",
                 description:
-                  "Automated macOS development environment setup and maintenance CLI written in Go (`bun`).",
+                  "Automated macOS development environment setup and maintenance CLI written in Go (bun).",
                 url: repoUrl,
                 image: "https://avatars.githubusercontent.com/u/7090315?v=4",
                 type: "github",
@@ -933,8 +942,12 @@ export default function CoffeeBunDetailPage() {
         {/* Interactive CLI & Subcommand Simulation Section */}
         <Section id="demo">
           <SectionHeader>
-            <h2>{t("coffee_bun.tui_title", "CLI & TUI Simulation (`bun`)")}</h2>
-            <p>{t("coffee_bun.tui_subtitle")}</p>
+            <h2>
+              {renderInlineCode(
+                t("coffee_bun.tui_title", "CLI & TUI Simulation (`bun`)")
+              )}
+            </h2>
+            <p>{renderInlineCode(t("coffee_bun.tui_subtitle"))}</p>
           </SectionHeader>
 
           <TerminalSimulator />
@@ -949,7 +962,7 @@ export default function CoffeeBunDetailPage() {
                 "Supported Packages & Feature Matrix"
               )}
             </h2>
-            <p>{t("coffee_bun.inventory_subtitle")}</p>
+            <p>{renderInlineCode(t("coffee_bun.inventory_subtitle"))}</p>
           </SectionHeader>
 
           <TableWrapper>
@@ -1014,14 +1027,14 @@ export default function CoffeeBunDetailPage() {
             <h2>
               {t("coffee_bun.features_title", "Architecture & Implementation")}
             </h2>
-            <p>{t("coffee_bun.features_subtitle")}</p>
+            <p>{renderInlineCode(t("coffee_bun.features_subtitle"))}</p>
           </SectionHeader>
 
           <FeaturesGrid>
             {features.map((feat, idx) => (
               <FeatureCard key={idx}>
-                <h3>{feat.title}</h3>
-                <p>{feat.desc}</p>
+                <h3>{renderInlineCode(feat.title)}</h3>
+                <p>{renderInlineCode(feat.desc)}</p>
               </FeatureCard>
             ))}
           </FeaturesGrid>
@@ -1031,7 +1044,7 @@ export default function CoffeeBunDetailPage() {
         <Section id="commands">
           <SectionHeader>
             <h2>{t("coffee_bun.commands_title", "CLI Command Reference")}</h2>
-            <p>{t("coffee_bun.commands_subtitle")}</p>
+            <p>{renderInlineCode(t("coffee_bun.commands_subtitle"))}</p>
           </SectionHeader>
 
           <TableWrapper>
@@ -1050,7 +1063,7 @@ export default function CoffeeBunDetailPage() {
                     <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
                       <code>{cmd.cmd}</code>
                     </td>
-                    <td>{cmd.action}</td>
+                    <td>{renderInlineCode(cmd.action)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1062,13 +1075,13 @@ export default function CoffeeBunDetailPage() {
         <Section id="install">
           <SectionHeader>
             <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
-            <p>{t("coffee_bun.install_subheading")}</p>
+            <p>{renderInlineCode(t("coffee_bun.install_subheading"))}</p>
           </SectionHeader>
 
           <InstallSectionBlock>
             <InstallBox>
               <h3>1. {t("coffee_bun.install_method_curl", "Shell Script")}</h3>
-              <p>{t("coffee_bun.install_desc_curl")}</p>
+              <p>{renderInlineCode(t("coffee_bun.install_desc_curl"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
@@ -1082,7 +1095,7 @@ export default function CoffeeBunDetailPage() {
 
             <InstallBox>
               <h3>2. {t("coffee_bun.install_method_brew", "Homebrew")}</h3>
-              <p>{t("coffee_bun.install_desc_brew")}</p>
+              <p>{renderInlineCode(t("coffee_bun.install_desc_brew"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>
@@ -1103,7 +1116,7 @@ export default function CoffeeBunDetailPage() {
               <h3>
                 3. {t("coffee_bun.install_method_source", "Build from Source")}
               </h3>
-              <p>{t("coffee_bun.install_desc_source")}</p>
+              <p>{renderInlineCode(t("coffee_bun.install_desc_source"))}</p>
               <FullWidthInstallBanner style={{ margin: 0 }}>
                 <div className="command-wrapper">
                   <span className="prompt-symbol">$</span>

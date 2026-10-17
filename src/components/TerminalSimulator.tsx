@@ -50,7 +50,7 @@ const TerminalBody = styled.div`
   padding: 1.75rem;
   color: var(--code-block-fg);
   font-size: 0.88rem;
-  line-height: 1.5;
+  line-height: 1.55;
 
   @media (max-width: 768px) {
     padding: 1.25rem;
@@ -65,8 +65,8 @@ const MenuHeader = styled.div`
   }
   .subtitle {
     color: ${({ theme }) => theme.text};
-    opacity: 0.6;
-    font-size: 0.8rem;
+    opacity: 0.65;
+    font-size: 0.82rem;
     margin-top: 0.2rem;
   }
 `;
@@ -118,7 +118,7 @@ const PresetItem = styled.div<{ isSelected: boolean }>`
   }
 
   .desc {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     opacity: 0.65;
     margin-top: 0.3rem;
     padding-left: 1.1rem;
@@ -194,7 +194,7 @@ const RunButton = styled.button`
 `;
 
 export default function TerminalSimulator() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isKo = i18n.language.startsWith("ko");
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -203,122 +203,123 @@ export default function TerminalSimulator() {
 
   const presets = [
     {
-      id: "quick",
+      id: "install",
       title: isKo
-        ? "1. 퀵 셋업 (누락된 필수 항목 전체)"
-        : "1. Quick Setup (All Missing Essentials)",
-      badge: isKo ? "3개 항목 대기" : "3 pending",
+        ? "1. bun install (bundle.yml 기반 일괄 설치)"
+        : "1. bun install (Provision via bundle.yml)",
+      badge: "bundle.yml",
       desc: isKo
-        ? "고루틴 병렬 처리로 누락된 개발 도구를 원샷으로 스캔하고 설치합니다."
-        : "Scan and install missing tools in one shot via parallel workers.",
+        ? "bundle.yml 매니페스트에 선언된 언어, 툴체인, 앱을 자동 감지하여 설치합니다."
+        : "Read bundle.yml manifest and provision all declared languages, tools, and apps.",
       steps: isKo
         ? [
-            "> bun install --all",
-            "[info] macOS 환경 스캔 중 (darwin/arm64)...",
-            "[worker-1] Oh My Zsh 및 Powerlevel10k 테마 다운로드...",
-            "[worker-2] Homebrew 패키지 설치: zoxide, fzf, ripgrep, eza...",
-            "[worker-3] code CLI 심링크 연결 -> /usr/local/bin/code...",
-            "[ok] ~/.zshrc 백업 생성 완료 (~/.zshrc.bun.bak)",
-            "[done] 3.8초 만에 전체 셋업이 완료되었습니다.",
+            "> bun install",
+            "[coffee-bun] 매니페스트 로드: bundle.yml",
+            "[coffee-bun] 운영체제: macOS (darwin/arm64)",
+            "[coffee-bun] 프로그래밍 언어 설치: Golang, Node.js (npm), Python 3 (pip)...",
+            "[coffee-bun] 툴체인 환경 구성: git, htop, zoxide, fzf, ripgrep...",
+            "[coffee-bun] 쉘 환경 설정: Oh My Zsh 및 Powerlevel10k 테마 적용...",
+            "[coffee-bun] 애플리케이션 설치: Visual Studio Code, Docker, Google Chrome...",
+            "[coffee-bun] ✨ bundle.yml 파일에 선언된 모든 환경이 정상적으로 동기화되었습니다.",
           ]
         : [
-            "> bun install --all",
-            "[info] Scanning macOS environment (darwin/arm64)...",
-            "[worker-1] Fetching Oh My Zsh and Powerlevel10k theme...",
-            "[worker-2] Installing formula: zoxide, fzf, ripgrep, eza...",
-            "[worker-3] Linking code CLI -> /usr/local/bin/code...",
-            "[ok] Backup created at ~/.zshrc.bun.bak",
-            "[done] Setup completed successfully in 3.8s.",
+            "> bun install",
+            "[coffee-bun] Loading manifest: bundle.yml",
+            "[coffee-bun] Platform: macOS (darwin/arm64)",
+            "[coffee-bun] Installing languages: Golang, Node.js (npm), Python 3 (pip)...",
+            "[coffee-bun] Provisioning toolchains: git, htop, zoxide, fzf, ripgrep...",
+            "[coffee-bun] Configuring shell: Oh My Zsh (Powerlevel10k theme)...",
+            "[coffee-bun] Installing applications: Visual Studio Code, Docker, Google Chrome...",
+            "[coffee-bun] ✨ Environment successfully synchronized from bundle.yml.",
           ],
     },
     {
-      id: "shell",
-      title: isKo ? "2. 쉘 환경 & CLI 도구" : "2. Shell & CLI Tools",
-      badge: isKo ? "1개 항목 대기" : "1 pending",
+      id: "select",
+      title: isKo
+        ? "2. bun (대화형 컴포넌트 다중 선택)"
+        : "2. bun (Interactive Package Selector)",
+      badge: "Interactive",
       desc: isKo
-        ? "Oh My Zsh, Powerlevel10k, zoxide, fzf, htop, ripgrep, eza, git 설정"
-        : "Oh My Zsh, Powerlevel10k, zoxide, fzf, htop, ripgrep, eza, git",
+        ? "터미널에서 언어, 린터, 쉘, 데스크톱 앱을 대화형 체크박스로 선택하여 구성합니다."
+        : "Select languages, linters, shells, and casks interactively from the terminal.",
       steps: isKo
         ? [
-            "> bun install shell",
-            "[ok] zsh 5.9 감지됨",
-            "[worker] zsh-autosuggestions 및 syntax-highlighting 플러그인 업데이트...",
-            "[done] 쉘 개발 환경 구성이 완료되었습니다.",
+            "> bun",
+            "? 설치할 개발 환경 컴포넌트를 선택하세요 (스페이스바로 다중 선택):",
+            "  [x] 프로그래밍 언어: Golang, Node.js, Python 3, Rust",
+            "  [x] 쉘 & 터미널: Oh My Zsh, Powerlevel 테마, iTerm2",
+            "  [x] 개발 툴체인: git, zoxide, fzf, htop, ripgrep",
+            "  [ ] 코드 린터: ESLint, Flake8, Pylint",
+            "  [x] 데스크톱 애플리케이션: VS Code, Docker Desktop",
+            "[coffee-bun] 선택된 항목을 기반으로 bundle.yml 생성 중...",
+            "[coffee-bun] ✨ 12개 컴포넌트 설치 및 환경 설정 완료.",
           ]
         : [
-            "> bun install shell",
-            "[ok] zsh 5.9 detected",
-            "[worker] Updating zsh-autosuggestions and syntax-highlighting...",
-            "[done] Shell environment configured.",
+            "> bun",
+            "? Select development components to install (Multi-choice):",
+            "  [x] Programming Languages: Golang, Node.js, Python 3, Rust",
+            "  [x] Shell & Terminal: Oh My Zsh, Powerlevel theme, iTerm2",
+            "  [x] Developer Toolchains: git, zoxide, fzf, htop, ripgrep",
+            "  [ ] Linters & Formatters: ESLint, Flake8, Pylint",
+            "  [x] Desktop Applications: VS Code, Docker Desktop",
+            "[coffee-bun] Generating declarative bundle.yml...",
+            "[coffee-bun] ✨ 12 components successfully installed and configured.",
           ],
     },
     {
-      id: "runtimes",
-      title: isKo ? "3. 개발 런타임 환경" : "3. Dev Runtimes",
-      badge: isKo ? "준비 완료" : "Ready",
+      id: "freeze",
+      title: isKo
+        ? "3. bun freeze (현재 Mac 환경 스냅샷 저장)"
+        : "3. bun freeze (Snapshot Active Environment)",
+      badge: "Freeze",
       desc: isKo
-        ? "Go 1.22+, Node.js(npm 포함), Python 3(pip 포함) 준비"
-        : "Go 1.22+, Node.js (with npm), Python 3 (with pip)",
+        ? "현재 맥북에 설치된 도구와 버전을 검사하여 bundle.yml 파일로 내보냅니다."
+        : "Inspect installed tools and serialize active setup into a portable bundle.yml.",
       steps: isKo
         ? [
-            "> bun check runtimes",
-            "[ok] go version go1.22+ darwin/arm64",
-            "[ok] node v20+ / npm 10+",
-            "[ok] python 3.11+ / pip",
-            "[done] 모든 컴파일러 및 런타임이 정상 작동합니다.",
+            "> bun freeze",
+            "[coffee-bun] 현재 시스템 환경 및 설치된 패키지 검사 중...",
+            "[coffee-bun] 감지된 항목:",
+            "  - languages: [go@1.22, node@20, python@3.11]",
+            "  - toolchains: [git, htop, zoxide, fzf, ripgrep]",
+            "  - applications: [visual-studio-code, docker, google-chrome]",
+            "[coffee-bun] bundle.yml 파일 생성 완료.",
+            "[coffee-bun] ✨ 현재 맥북 환경이 bundle.yml 파일에 저장되었습니다.",
           ]
         : [
-            "> bun check runtimes",
-            "[ok] go version go1.22+ darwin/arm64",
-            "[ok] node v20+ / npm 10+",
-            "[ok] python 3.11+ / pip",
-            "[done] All compilers and runtimes verified.",
+            "> bun freeze",
+            "[coffee-bun] Inspecting installed tools and environment versions...",
+            "[coffee-bun] Discovered active packages:",
+            "  - languages: [go@1.22, node@20, python@3.11]",
+            "  - toolchains: [git, htop, zoxide, fzf, ripgrep]",
+            "  - applications: [visual-studio-code, docker, google-chrome]",
+            "[coffee-bun] Serializing active setup to bundle.yml...",
+            "[coffee-bun] ✨ Environment state frozen to bundle.yml successfully.",
           ],
     },
     {
-      id: "apps",
-      title: isKo ? "4. 필수 앱 & CLI 심링크" : "4. Applications & CLI Links",
-      badge: isKo ? "준비 완료" : "Ready",
+      id: "update",
+      title: isKo
+        ? "4. bun update (선언된 패키지 최신화)"
+        : "4. bun update (Update Declared Packages)",
+      badge: "Update",
       desc: isKo
-        ? "VS Code (+ code 명령어 심링크 자동 연결) 및 Chrome 브라우저"
-        : "Visual Studio Code (+ code symlink) and Google Chrome",
+        ? "bundle.yml에 명시된 툴체인 및 Zsh 플러그인/테마를 일괄 업데이트합니다."
+        : "Upgrade toolchains, casks, and git themes declared in bundle.yml.",
       steps: isKo
         ? [
-            "> bun check apps",
-            "[ok] Visual Studio Code 설치 확인 (/Applications/Visual Studio Code.app)",
-            "[ok] CLI 심링크 연결 확인: which code -> ~/.local/bin/code",
-            "[ok] Google Chrome 설치 확인 (/Applications/Google Chrome.app)",
-            "[done] 필수 애플리케이션 및 CLI 링크 검증 완료.",
+            "> bun update",
+            "[coffee-bun] bundle.yml 종속성 최신 버전 확인 중...",
+            "[coffee-bun] 업데이트 항목: fzf (0.50 -> 0.52), zoxide (0.9 -> 0.9.4)...",
+            "[coffee-bun] Oh My Zsh 및 Powerlevel 테마 최신 변경 사항 풀(pull)...",
+            "[coffee-bun] ✨ 모든 패키지가 지정된 최신 버전으로 업데이트되었습니다.",
           ]
         : [
-            "> bun check apps",
-            "[ok] Visual Studio Code (/Applications/Visual Studio Code.app)",
-            "[ok] CLI symlink: which code -> ~/.local/bin/code",
-            "[ok] Google Chrome (/Applications/Google Chrome.app)",
-            "[done] Applications verified.",
-          ],
-    },
-    {
-      id: "doctor",
-      title: isKo ? "5. 환경 무결성 진단" : "5. Diagnostic Check",
-      badge: isKo ? "검증 완료" : "Passed",
-      desc: isKo
-        ? "PATH 환경변수, Homebrew 권한, 쉘 설정 무결성 검증"
-        : "Audit PATH, Homebrew permissions, shell configurations",
-      steps: isKo
-        ? [
-            "> bun doctor",
-            "[ok] 운영체제: macOS darwin/arm64",
-            "[ok] Homebrew: 정상 설치 및 PATH 등록 확인",
-            "[ok] 쉘 훅: ~/.zshrc 파일에 zoxide 및 테마 훅 등록 확인",
-            "[done] 진단 결과: 정상 (발견된 오류 0개).",
-          ]
-        : [
-            "> bun doctor",
-            "[ok] OS: macOS darwin/arm64",
-            "[ok] Homebrew: Installed and in PATH",
-            "[ok] Shell hooks: zoxide init registered in ~/.zshrc",
-            "[done] Diagnostic report: Clean (0 errors).",
+            "> bun update",
+            "[coffee-bun] Checking manifest dependencies in bundle.yml...",
+            "[coffee-bun] Updating formulae: fzf (0.50 -> 0.52), zoxide (0.9 -> 0.9.4)...",
+            "[coffee-bun] Pulling latest Oh My Zsh plugins and Powerlevel theme...",
+            "[coffee-bun] ✨ All components updated to specified versions.",
           ],
     },
   ];
@@ -349,7 +350,7 @@ export default function TerminalSimulator() {
         </WindowButtons>
         <TerminalTitle>
           <RiTerminalBoxLine />
-          <span>{isKo ? "bun — 터미널 인터페이스" : "bun — terminal interface"}</span>
+          <span>{isKo ? "bun — CLI 워크플로우 시뮬레이터" : "bun — CLI Workflow Simulator"}</span>
         </TerminalTitle>
         <div style={{ width: 36 }} />
       </TerminalTitleBar>
@@ -358,13 +359,13 @@ export default function TerminalSimulator() {
         <MenuHeader>
           <div className="brand">
             {isKo
-              ? "coffee-bun • macOS 맥북 자동 셋업 및 유지보수 도구"
-              : "coffee-bun • macOS Setup & Maintenance"}
+              ? "coffee-bun • macOS 초기 개발 환경 자동화 관리 도구"
+              : "coffee-bun • macOS Initial Environment Automated Management Tool"}
           </div>
           <div className="subtitle">
             {isKo
-              ? "엄선된 프리셋 선택 (실행 명령어: bun)"
-              : "Curated preset selection (command: bun)"}
+              ? "bundle.yml 선언적 매니페스트 및 CLI 명령어 시뮬레이션"
+              : "bundle.yml declarative manifest and CLI execution simulator"}
           </div>
         </MenuHeader>
 
@@ -405,7 +406,7 @@ export default function TerminalSimulator() {
                 style={{
                   color: msg.startsWith(">")
                     ? "var(--color-text)"
-                    : msg.startsWith("[ok]") || msg.startsWith("[done]")
+                    : msg.startsWith("[coffee-bun]")
                     ? "var(--color-text)"
                     : "inherit",
                   opacity: msg.startsWith(">") ? 1 : 0.85,
@@ -426,8 +427,8 @@ export default function TerminalSimulator() {
                 }}
               >
                 {isKo
-                  ? "... 백그라운드 고루틴 병렬 처리 실행 중"
-                  : "... executing goroutines in background"}
+                  ? "... CLI 프로세스 실행 중"
+                  : "... executing CLI process"}
               </div>
             )}
           </div>
@@ -436,8 +437,8 @@ export default function TerminalSimulator() {
         <TerminalFooter>
           <div>
             {isKo
-              ? "프리셋을 클릭하여 단계별 실행 절차를 시뮬레이션할 수 있습니다."
-              : "Click presets to inspect automated steps."}
+              ? "프리셋을 선택한 후 실행 버튼을 눌러 실제 bun 동작을 시뮬레이션해보세요."
+              : "Select a preset and click Run to simulate real bun execution."}
           </div>
           <ActionButtons>
             {progress.length > 0 && !simulating && (

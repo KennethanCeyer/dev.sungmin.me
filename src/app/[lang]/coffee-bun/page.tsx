@@ -2,18 +2,16 @@
 
 import CodeBlock from "@/components/CodeBlock";
 import CopyButton from "@/components/CopyButton";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TerminalSimulator from "@/components/TerminalSimulator";
-import { getCoffeeBunReadme } from "@/data/coffeeBunReadme";
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
+  RiCodeSSlashLine,
   RiDownload2Line,
   RiExternalLinkLine,
-  RiFileTextLine,
   RiGithubFill,
 } from "react-icons/ri";
 
@@ -251,7 +249,7 @@ const SectionHeader = styled.div`
 
 const FeaturesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   width: 100%;
 `;
@@ -276,7 +274,7 @@ const FeatureCard = styled.div`
   }
 
   h3 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
     border: none;
@@ -289,6 +287,83 @@ const FeatureCard = styled.div`
     opacity: 0.75;
     line-height: 1.6;
     margin: 0;
+  }
+`;
+
+const SpecCard = styled.div`
+  background-color: var(--code-block-bg);
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+
+  .spec-header {
+    background-color: var(--color-background);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border-weak);
+    font-family: var(--font-roboto-mono), monospace;
+    font-size: 0.82rem;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.8;
+  }
+
+  pre {
+    margin: 0;
+    padding: 1.5rem;
+    font-family: var(--font-roboto-mono), monospace;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--code-block-fg);
+    overflow-x: auto;
+  }
+`;
+
+const EcosystemGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+`;
+
+const EcosystemCard = styled.div`
+  background-color: ${({ theme }) => theme.background};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  padding: 1.75rem;
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    border: none;
+    padding: 0;
+  }
+
+  .eco-desc {
+    font-size: 0.88rem;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.7;
+    margin-bottom: 1.2rem;
+  }
+
+  .tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .eco-tag {
+    font-size: 0.75rem;
+    font-family: var(--font-roboto-mono), monospace;
+    background-color: ${({ theme }) => theme.body};
+    border: 1px solid ${({ theme }) => theme.border};
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.85;
   }
 `;
 
@@ -354,170 +429,194 @@ const TableContainer = styled.div`
   }
 `;
 
-const DocsCard = styled.div`
-  background-color: ${({ theme }) => theme.background};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
-  padding: 3rem 3.5rem;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 1.75rem 1.25rem;
-  }
-`;
-
 export default function CoffeeBunPage() {
   const { t } = useTranslation();
   const params = useParams();
   const urlLang = typeof params?.lang === "string" ? params.lang : "en";
   const lang = urlLang.startsWith("ko") ? "ko" : "en";
+  const isKo = lang === "ko";
 
   const installCmd =
-    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/master/install.sh | bash";
+    "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/bundle/master/install.sh | bash";
+
+  const sampleBundleYaml = `# bundle.yml - macOS Development Environment Specification
+platform: macos
+version: "0.0.1"
+
+# 1. Programming Languages & Runtimes
+languages:
+  - golang
+  - python:
+      package_manager: pip
+  - node:
+      package_manager: npm
+  - rust:
+      package_manager: cargo
+
+# 2. Shell & Terminal Preferences
+shell:
+  framework: oh-my-zsh
+  theme: powerlevel10k
+
+terminal:
+  emulator: iterm2
+  vim: vimrc
+
+# 3. Toolchains & CLI Utilities
+toolchains:
+  - git
+  - zoxide
+  - fzf
+  - htop
+  - ripgrep
+  - eza
+  - cloc
+
+# 4. Linters & Build Engines
+devtools:
+  linters: [eslint, flake8]
+  build_tools: [gradle, webpack]
+
+# 5. Developer Applications & Casks
+applications:
+  - visual-studio-code
+  - docker
+  - google-chrome`;
 
   const features = [
     {
       num: "01",
-      title: t("coffee_bun.f1_title", "One-Shot Automation"),
+      title: t("coffee_bun.f1_title", "Declarative bundle.yml"),
       desc: t("coffee_bun.f1_desc"),
     },
     {
       num: "02",
-      title: t("coffee_bun.f2_title", "Concurrent Execution"),
+      title: t("coffee_bun.f2_title", "Interactive CLI Selection"),
       desc: t("coffee_bun.f2_desc"),
     },
     {
       num: "03",
-      title: t("coffee_bun.f3_title", "Curated UX (≤ 5 Choices)"),
+      title: t("coffee_bun.f3_title", "Environment Freeze"),
       desc: t("coffee_bun.f3_desc"),
     },
     {
       num: "04",
-      title: t("coffee_bun.f4_title", "Shell Configuration"),
+      title: t("coffee_bun.f4_title", "Versioned Updates"),
       desc: t("coffee_bun.f4_desc"),
     },
     {
       num: "05",
-      title: t("coffee_bun.f5_title", "Dev Runtimes"),
+      title: t("coffee_bun.f5_title", "Polyglot Language Support"),
       desc: t("coffee_bun.f5_desc"),
     },
     {
       num: "06",
-      title: t("coffee_bun.f6_title", "Modern CLI Suite"),
+      title: t("coffee_bun.f6_title", "Full-Stack Toolchains & Apps"),
       desc: t("coffee_bun.f6_desc"),
-    },
-    {
-      num: "07",
-      title: t("coffee_bun.f7_title", "Apps & CLI Link"),
-      desc: t("coffee_bun.f7_desc"),
-    },
-    {
-      num: "08",
-      title: t("coffee_bun.f8_title", "Diagnostic & Updater"),
-      desc: t("coffee_bun.f8_desc"),
     },
   ];
 
-  const packages = [
+  const ecosystemCategories = [
     {
-      category: t("coffee_bun.packages_cat_shell", "Shell & Theme"),
-      items: [
-        {
-          name: "Oh My Zsh",
-          desc: t("coffee_bun.pkg_omz_desc", "Zsh community framework"),
-        },
-        {
-          name: "Powerlevel10k",
-          desc: t("coffee_bun.pkg_p10k_desc", "Fast, flexible prompt theme"),
-        },
-        {
-          name: "zsh-autosuggestions",
-          desc: t(
-            "coffee_bun.pkg_autosuggest_desc",
-            "Fish-style command autocompletion"
-          ),
-        },
-        {
-          name: "zsh-syntax-highlighting",
-          desc: t(
-            "coffee_bun.pkg_highlight_desc",
-            "Realtime terminal syntax highlighting"
-          ),
-        },
+      title: isKo ? "프로그래밍 언어 & 런타임" : "Programming Languages & Runtimes",
+      desc: isKo
+        ? "다양한 개발 환경을 위한 언어 엔진 및 패키지 매니저"
+        : "Language runtimes with package manager integrations",
+      tags: [
+        "Golang",
+        "Python (PIP/Conda)",
+        "Node.js (npm)",
+        "Rust (Cargo)",
+        "Java (JDK)",
+        "Scala",
+        "Kotlin",
+        "Ruby (gem/bundler)",
+        "C / C++ (gcc/gdb)",
+        "C# .NET Core",
+        "PHP",
+        "Haskell",
+        "Clojure",
       ],
     },
     {
-      category: t("coffee_bun.packages_cat_runtimes", "Dev Runtimes"),
-      items: [
-        {
-          name: "Go (Golang)",
-          desc: t("coffee_bun.pkg_go_desc", "1.22+ runtime engine"),
-        },
-        {
-          name: "Node.js",
-          desc: t(
-            "coffee_bun.pkg_node_desc",
-            "LTS JavaScript runtime bundled with npm"
-          ),
-        },
-        {
-          name: "Python 3",
-          desc: t(
-            "coffee_bun.pkg_python_desc",
-            "Python 3 interpreter bundled with pip"
-          ),
-        },
+      title: isKo ? "쉘, Vim & 터미널 환경" : "Shell, Vim & Terminal Environment",
+      desc: isKo
+        ? "생산성을 극대화하는 프롬프트 및 테마 세팅"
+        : "Productive prompt, theme, and terminal configurations",
+      tags: [
+        "Oh My ZSH",
+        "Powerlevel 9k / 10k",
+        "vimrc + themes",
+        "iTerm2",
+        "brogrammer theme",
       ],
     },
     {
-      category: t("coffee_bun.packages_cat_cli", "Modern CLI Tools"),
-      items: [
-        {
-          name: "zoxide",
-          desc: t("coffee_bun.pkg_zoxide_desc", "Frecency-based cd alternative"),
-        },
-        {
-          name: "fzf",
-          desc: t("coffee_bun.pkg_fzf_desc", "Fuzzy finder utility"),
-        },
-        {
-          name: "ripgrep",
-          desc: t(
-            "coffee_bun.pkg_ripgrep_desc",
-            "High-performance grep replacement"
-          ),
-        },
-        {
-          name: "eza",
-          desc: t(
-            "coffee_bun.pkg_eza_desc",
-            "Modern ls replacement with colors"
-          ),
-        },
-        {
-          name: "htop",
-          desc: t("coffee_bun.pkg_htop_desc", "Interactive process viewer"),
-        },
-        {
-          name: "git",
-          desc: t("coffee_bun.pkg_git_desc", "Version control engine"),
-        },
+      title: isKo ? "개발 툴체인 & CLI 유틸리티" : "Developer Toolchains & CLI Utilities",
+      desc: isKo
+        ? "신속한 파일 탐색 및 시스템 모니터링 필수 도구"
+        : "High-speed navigation, search, and system monitoring",
+      tags: [
+        "git",
+        "zoxide",
+        "fzf",
+        "ripgrep",
+        "eza",
+        "htop",
+        "cloc",
+        "asciinema",
+        "curl / wget",
+        "ssh",
       ],
     },
     {
-      category: t("coffee_bun.packages_cat_apps", "Applications"),
-      items: [
-        {
-          name: "Visual Studio Code",
-          desc: t(
-            "coffee_bun.pkg_vscode_desc",
-            "Code editor with automated PATH linking"
-          ),
-        },
-        {
-          name: "Google Chrome",
-          desc: t("coffee_bun.pkg_chrome_desc", "Web browser"),
-        },
+      title: isKo ? "린터 & 빌드 도구" : "Linters & Build Engines",
+      desc: isKo
+        ? "코드 품질 관리 및 빌드 파이프라인"
+        : "Code quality linters and build automation tools",
+      tags: [
+        "ESLint",
+        "TSLint",
+        "Pylint",
+        "Flake8",
+        "Scalastyle",
+        "Gradle",
+        "Webpack",
+        "Grunt",
+        "Rollup",
+        "Composer",
+      ],
+    },
+    {
+      title: isKo ? "웹 & 백엔드 프레임워크" : "Frameworks Ecosystem",
+      desc: isKo
+        ? "주요 웹 프레임워크 및 개발 스택 연동"
+        : "Standard frameworks for rapid project bootstrapping",
+      tags: [
+        "Gin (Go)",
+        "Django / Flask",
+        "Spring / Spring Boot",
+        "Rails",
+        "Express",
+        "Laravel",
+        ".NET MVC",
+        "Rocket (Rust)",
+      ],
+    },
+    {
+      title: isKo ? "IDE, 개발 앱 & 브라우저" : "IDEs, Developer Apps & Browsers",
+      desc: isKo
+        ? "공식 GUI 도구 및 개발 전용 데스크톱 애플리케이션"
+        : "Desktop applications and development browsers",
+      tags: [
+        "Visual Studio Code",
+        "Sublime Text",
+        "Docker Desktop",
+        "Google Chrome",
+        "Mozilla Firefox",
+        "Insomnia",
+        "VirtualBox",
+        "KeyCastr",
       ],
     },
   ];
@@ -527,40 +626,38 @@ export default function CoffeeBunPage() {
       cmd: "bun",
       action: t(
         "coffee_bun.cmd_bun_desc",
-        "Launch interactive terminal interface (TUI) with ≤ 5 presets"
+        "Launch interactive terminal interface to select and configure packages"
       ),
     },
     {
-      cmd: "bun check",
-      action: t(
-        "coffee_bun.cmd_check_desc",
-        "Inspect system environment and report missing tools"
-      ),
-    },
-    {
-      cmd: "bun install all",
+      cmd: "bun install",
       action: t(
         "coffee_bun.cmd_install_desc",
-        "Non-interactive batch provisioning for all missing packages"
+        "Install all packages declared in bundle.yml"
       ),
     },
     {
-      cmd: "bun doctor",
+      cmd: "bun install <package>",
       action: t(
-        "coffee_bun.cmd_doctor_desc",
-        "Verify environment diagnostics, ~/.zshrc hooks, and CLI links"
+        "coffee_bun.cmd_pkg_desc",
+        "Install a specific package or toolchain (e.g. `bun install golang`)"
+      ),
+    },
+    {
+      cmd: "bun freeze",
+      action: t(
+        "coffee_bun.cmd_freeze_desc",
+        "Snapshot currently installed environment and versions into bundle.yml"
       ),
     },
     {
       cmd: "bun update",
       action: t(
         "coffee_bun.cmd_update_desc",
-        "Upgrade formulae, casks, and pull fresh Oh My Zsh themes"
+        "Update packages and shell themes to latest or specified versions"
       ),
     },
   ];
-
-  const readmeContent = getCoffeeBunReadme(lang);
 
   return (
     <PageWrapper>
@@ -575,10 +672,10 @@ export default function CoffeeBunPage() {
         {/* Hero Section */}
         <HeroSection>
           <BadgeRow>
-            <Badge>{t("coffee_bun.badge_go", "Go 1.22+")}</Badge>
-            <Badge>{t("coffee_bun.badge_macos", "macOS")}</Badge>
-            <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
-            <Badge>{t("coffee_bun.badge_cmd", "Command: bun")}</Badge>
+            <Badge>{t("coffee_bun.badge_status", "v0.0.1 (WIP)")}</Badge>
+            <Badge>{t("coffee_bun.badge_platform", "macOS")}</Badge>
+            <Badge>{t("coffee_bun.badge_cmd", "CLI: bun")}</Badge>
+            <Badge>{t("coffee_bun.badge_config", "Config: bundle.yml")}</Badge>
           </BadgeRow>
 
           <Title>{t("coffee_bun.title", "coffee-bun")}</Title>
@@ -596,10 +693,10 @@ export default function CoffeeBunPage() {
           <ButtonGroup>
             <PrimaryButton href="#install">
               <RiDownload2Line />
-              <span>{t("coffee_bun.action_install", "Install")}</span>
+              <span>{t("coffee_bun.action_install", "Get Started")}</span>
             </PrimaryButton>
             <SecondaryButton
-              href="https://github.com/KennethanCeyer/coffee-bun"
+              href="https://github.com/KennethanCeyer/bundle"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -607,9 +704,9 @@ export default function CoffeeBunPage() {
               <span>{t("coffee_bun.action_github", "GitHub")}</span>
               <RiExternalLinkLine style={{ opacity: 0.5 }} />
             </SecondaryButton>
-            <SecondaryButton href="#docs">
-              <RiFileTextLine />
-              <span>{t("coffee_bun.action_docs", "Documentation")}</span>
+            <SecondaryButton href="#spec">
+              <RiCodeSSlashLine />
+              <span>{t("coffee_bun.action_spec", "bundle.yml Spec")}</span>
             </SecondaryButton>
           </ButtonGroup>
         </HeroSection>
@@ -617,18 +714,16 @@ export default function CoffeeBunPage() {
         {/* Terminal Simulator */}
         <Section id="tui">
           <SectionHeader>
-            <h2>
-              {t("coffee_bun.tui_preview_title", "Terminal Interface Preview")}
-            </h2>
-            <p>{t("coffee_bun.tui_preview_subtitle")}</p>
+            <h2>{t("coffee_bun.tui_title", "CLI Workflow Preview (`bun`)")}</h2>
+            <p>{t("coffee_bun.tui_subtitle")}</p>
           </SectionHeader>
           <TerminalSimulator />
         </Section>
 
-        {/* Core Features */}
+        {/* Core Capabilities */}
         <Section id="features">
           <SectionHeader>
-            <h2>{t("coffee_bun.features_title", "Key Capabilities")}</h2>
+            <h2>{t("coffee_bun.features_title", "Core Capabilities")}</h2>
             <p>{t("coffee_bun.features_subtitle")}</p>
           </SectionHeader>
 
@@ -643,77 +738,46 @@ export default function CoffeeBunPage() {
           </FeaturesGrid>
         </Section>
 
-        {/* Components Included */}
-        <Section id="packages">
+        {/* Declarative Manifest Preview (bundle.yml) */}
+        <Section id="spec">
           <SectionHeader>
-            <h2>{t("coffee_bun.packages_title", "Included Components")}</h2>
-            <p>{t("coffee_bun.packages_subtitle")}</p>
+            <h2>{t("coffee_bun.spec_title", "Declarative Manifest Preview (`bundle.yml`)")}</h2>
+            <p>{t("coffee_bun.spec_subtitle")}</p>
           </SectionHeader>
 
-          <FeaturesGrid>
-            {packages.map((group, i) => (
-              <FeatureCard key={i}>
-                <div className="feature-num">{`CAT-0${i + 1}`}</div>
-                <h3 style={{ marginBottom: "0.85rem" }}>{group.category}</h3>
-                <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
-                  {group.items.map((it, j) => (
-                    <li key={j} style={{ marginBottom: "0.5rem" }}>
-                      <span style={{ fontWeight: 500 }}>{it.name}</span>
-                      <div style={{ fontSize: "0.82rem", opacity: 0.7 }}>
-                        {it.desc}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </FeatureCard>
-            ))}
-          </FeaturesGrid>
+          <SpecCard>
+            <div className="spec-header">
+              <span>bundle.yml</span>
+              <span>YAML Manifest</span>
+            </div>
+            <pre>
+              <code>{sampleBundleYaml}</code>
+            </pre>
+          </SpecCard>
         </Section>
 
-        {/* Installation Methods */}
-        <Section id="install">
+        {/* Supported Ecosystem & Roadmap */}
+        <Section id="ecosystem">
           <SectionHeader>
-            <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
-            <p>{t("coffee_bun.install_subheading")}</p>
+            <h2>{t("coffee_bun.eco_title", "Supported Ecosystem & Roadmap")}</h2>
+            <p>{t("coffee_bun.eco_subtitle")}</p>
           </SectionHeader>
 
-          <InstallList>
-            <InstallItem>
-              <h3>
-                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap")}
-              </h3>
-              <p>{t("coffee_bun.install_desc_curl")}</p>
-              <CodeBlock rawCode={installCmd}>
-                <pre style={{ margin: 0, padding: "0.85rem" }}>
-                  <code>{installCmd}</code>
-                </pre>
-              </CodeBlock>
-            </InstallItem>
-
-            <InstallItem>
-              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew Tap")}</h3>
-              <p>{t("coffee_bun.install_desc_brew")}</p>
-              <CodeBlock rawCode="brew install KennethanCeyer/coffee-bun/bun">
-                <pre style={{ margin: 0, padding: "0.85rem" }}>
-                  <code>brew install KennethanCeyer/coffee-bun/bun</code>
-                </pre>
-              </CodeBlock>
-            </InstallItem>
-
-            <InstallItem>
-              <h3>
-                3. {t("coffee_bun.install_method_source", "Build from Source")}
-              </h3>
-              <p>{t("coffee_bun.install_desc_source")}</p>
-              <CodeBlock
-                rawCode={`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}
-              >
-                <pre style={{ margin: 0, padding: "0.85rem" }}>
-                  <code>{`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}</code>
-                </pre>
-              </CodeBlock>
-            </InstallItem>
-          </InstallList>
+          <EcosystemGrid>
+            {ecosystemCategories.map((cat, idx) => (
+              <EcosystemCard key={idx}>
+                <h3>{cat.title}</h3>
+                <div className="eco-desc">{cat.desc}</div>
+                <div className="tag-container">
+                  {cat.tags.map((tag, tIdx) => (
+                    <span key={tIdx} className="eco-tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </EcosystemCard>
+            ))}
+          </EcosystemGrid>
         </Section>
 
         {/* CLI Command Reference (bun) */}
@@ -749,16 +813,50 @@ export default function CoffeeBunPage() {
           </TableContainer>
         </Section>
 
-        {/* Documentation Section */}
-        <Section id="docs">
+        {/* Installation & Getting Started */}
+        <Section id="install">
           <SectionHeader>
-            <h2>{t("coffee_bun.docs_title", "Documentation")}</h2>
-            <p>{t("coffee_bun.docs_subtitle")}</p>
+            <h2>{t("coffee_bun.install_heading", "Installation & Getting Started")}</h2>
+            <p>{t("coffee_bun.install_subheading")}</p>
           </SectionHeader>
 
-          <DocsCard>
-            <MarkdownRenderer content={readmeContent} />
-          </DocsCard>
+          <InstallList>
+            <InstallItem>
+              <h3>
+                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap")}
+              </h3>
+              <p>{t("coffee_bun.install_desc_curl")}</p>
+              <CodeBlock rawCode={installCmd}>
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>{installCmd}</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+
+            <InstallItem>
+              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew Tap")}</h3>
+              <p>{t("coffee_bun.install_desc_brew")}</p>
+              <CodeBlock rawCode="brew install KennethanCeyer/bundle/bun">
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>brew install KennethanCeyer/bundle/bun</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+
+            <InstallItem>
+              <h3>
+                3. {t("coffee_bun.install_method_source", "Build from Source")}
+              </h3>
+              <p>{t("coffee_bun.install_desc_source")}</p>
+              <CodeBlock
+                rawCode={`git clone https://github.com/KennethanCeyer/bundle.git\ncd bundle\nmake install`}
+              >
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>{`git clone https://github.com/KennethanCeyer/bundle.git\ncd bundle\nmake install`}</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+          </InstallList>
         </Section>
       </MainContainer>
     </PageWrapper>

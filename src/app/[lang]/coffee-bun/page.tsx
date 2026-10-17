@@ -4,9 +4,10 @@ import CodeBlock from "@/components/CodeBlock";
 import CopyButton from "@/components/CopyButton";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TerminalSimulator from "@/components/TerminalSimulator";
-import { coffeeBunReadmeContent } from "@/data/coffeeBunReadme";
+import { getCoffeeBunReadme } from "@/data/coffeeBunReadme";
 import styled from "@emotion/styled";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
@@ -21,20 +22,30 @@ const PageWrapper = styled.div`
   overflow: hidden;
 `;
 
-const BackNav = styled.div`
+const MainContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 0;
+  padding: 0 40px;
+  min-width: 0;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
+`;
+
+const BackNav = styled.div`
+  padding: 2.25rem 0 1rem;
   position: relative;
   z-index: 2;
 
   a {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.88rem;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    font-weight: 500;
     color: ${({ theme }) => theme.text};
-    opacity: 0.7;
+    opacity: 0.75;
     transition: opacity 0.2s ease;
 
     &:hover {
@@ -45,14 +56,13 @@ const BackNav = styled.div`
 
 const HeroSection = styled.section`
   position: relative;
-  padding: 3rem 1.5rem 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 3.5rem 0 4rem;
   text-align: center;
   z-index: 1;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 768px) {
-    padding: 2.5rem 1rem 1.5rem;
+    padding: 2.5rem 0 3rem;
   }
 `;
 
@@ -62,66 +72,67 @@ const BadgeRow = styled.div`
   justify-content: center;
   gap: 0.6rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 `;
 
 const Badge = styled.span`
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 500;
   font-family: var(--font-roboto-mono), monospace;
-  padding: 0.25rem 0.65rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  background-color: ${({ theme }) => theme.background};
+  background-color: transparent;
   color: ${({ theme }) => theme.text};
   border: 1px solid ${({ theme }) => theme.border};
+  opacity: 0.85;
 `;
 
 const Title = styled.h1`
-  font-size: 3.2rem;
+  font-size: 3.8rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin: 0 0 0.75rem;
+  margin: 0 0 1rem;
   line-height: 1.15;
   color: ${({ theme }) => theme.text};
   border: none;
   padding: 0;
 
   @media (max-width: 768px) {
-    font-size: 2.4rem;
+    font-size: 2.6rem;
   }
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 400;
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto 1.25rem;
   color: ${({ theme }) => theme.text};
   line-height: 1.5;
 
   @media (max-width: 768px) {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
   }
 `;
 
 const Description = styled.p`
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: ${({ theme }) => theme.text};
   opacity: 0.75;
-  max-width: 700px;
-  margin: 0 auto 2.25rem;
+  max-width: 780px;
+  margin: 0 auto 2.5rem;
   line-height: 1.65;
 `;
 
 const QuickInstallBox = styled.div`
-  max-width: 680px;
-  margin: 0 auto 2rem;
+  max-width: 780px;
+  margin: 0 auto 2.25rem;
   background-color: var(--code-block-bg);
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -138,7 +149,7 @@ const QuickInstallBox = styled.div`
     gap: 0.6rem;
     overflow-x: auto;
     font-family: var(--font-roboto-mono), monospace;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     color: ${({ theme }) => theme.text};
 
     .prompt-symbol {
@@ -156,20 +167,21 @@ const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
+  gap: 1rem;
   flex-wrap: wrap;
 `;
 
 const PrimaryButton = styled.a`
   background-color: ${({ theme }) => theme.text};
   color: ${({ theme }) => theme.body};
-  padding: 0.65rem 1.35rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  text-decoration: none;
   transition: opacity 0.2s ease;
 
   &:hover {
@@ -181,13 +193,14 @@ const SecondaryButton = styled.a`
   background-color: transparent;
   color: ${({ theme }) => theme.text};
   border: 1px solid ${({ theme }) => theme.border};
-  padding: 0.65rem 1.35rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 6px;
-  font-weight: 400;
-  font-size: 0.9rem;
+  font-weight: 500;
+  font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  text-decoration: none;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &:hover {
@@ -197,120 +210,168 @@ const SecondaryButton = styled.a`
 `;
 
 const Section = styled.section`
-  padding: 3.5rem 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 4.5rem 0;
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   position: relative;
   z-index: 1;
 
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 6rem;
+  }
+
   @media (max-width: 768px) {
-    padding: 2.5rem 1rem;
+    padding: 3rem 0;
   }
 `;
 
 const SectionHeader = styled.div`
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 
   h2 {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 600;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.6rem;
     letter-spacing: -0.02em;
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 0.98rem;
+    font-size: 1.05rem;
     color: ${({ theme }) => theme.text};
     opacity: 0.7;
-    max-width: 550px;
+    max-width: 680px;
     margin: 0 auto;
+    line-height: 1.6;
   }
 `;
 
 const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
+  gap: 1.5rem;
+  width: 100%;
 `;
 
 const FeatureCard = styled.div`
   background-color: ${({ theme }) => theme.background};
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  padding: 1.5rem;
-  transition: border-color 0.2s ease;
+  padding: 1.75rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
     border-color: ${({ theme }) => theme.text};
+    transform: translateY(-2px);
   }
 
   .feature-num {
     font-size: 0.75rem;
     font-family: var(--font-roboto-mono), monospace;
     opacity: 0.5;
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.75rem;
   }
 
   h3 {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.5rem;
     border: none;
     padding: 0;
   }
 
   p {
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     color: ${({ theme }) => theme.text};
-    opacity: 0.7;
-    line-height: 1.55;
+    opacity: 0.75;
+    line-height: 1.6;
     margin: 0;
   }
 `;
 
+const InstallList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+`;
+
+const InstallItem = styled.div`
+  background-color: ${({ theme }) => theme.background};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  padding: 1.75rem 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1.25rem 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    border: none;
+    padding: 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: ${({ theme }) => theme.text};
+    opacity: 0.75;
+    margin: 0 0 1rem;
+    line-height: 1.6;
+  }
+`;
+
 const TableContainer = styled.div`
-  background-color: ${({ theme }) => theme.body};
+  background-color: ${({ theme }) => theme.background};
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   overflow: hidden;
-  margin-top: 1.5rem;
+  width: 100%;
 
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
   }
 
   th {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     text-align: left;
-    background-color: ${({ theme }) => theme.background};
+    background-color: ${({ theme }) => theme.body};
     font-weight: 600;
+    border-bottom: 1px solid ${({ theme }) => theme.border};
   }
 
   td {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid ${({ theme }) => theme.border};
+    line-height: 1.6;
   }
 `;
 
 const DocsCard = styled.div`
-  background-color: ${({ theme }) => theme.body};
+  background-color: ${({ theme }) => theme.background};
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  padding: 2.25rem;
+  padding: 3rem 3.5rem;
+  width: 100%;
 
   @media (max-width: 768px) {
-    padding: 1.25rem;
+    padding: 1.75rem 1.25rem;
   }
 `;
 
 export default function CoffeeBunPage() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language.startsWith("ko") ? "ko" : "en";
+  const { t } = useTranslation();
+  const params = useParams();
+  const urlLang = typeof params?.lang === "string" ? params.lang : "en";
+  const lang = urlLang.startsWith("ko") ? "ko" : "en";
+
   const installCmd =
     "curl -fsSL https://raw.githubusercontent.com/KennethanCeyer/coffee-bun/master/install.sh | bash";
 
@@ -359,267 +420,347 @@ export default function CoffeeBunPage() {
 
   const packages = [
     {
-      category: "Shell & Theme",
+      category: t("coffee_bun.packages_cat_shell", "Shell & Theme"),
       items: [
-        { name: "Oh My Zsh", desc: "Zsh community framework" },
-        { name: "Powerlevel10k", desc: "Fast, flexible prompt theme" },
-        { name: "zsh-autosuggestions", desc: "Fish-style command autocompletion" },
-        { name: "zsh-syntax-highlighting", desc: "Realtime terminal syntax highlighting" },
+        {
+          name: "Oh My Zsh",
+          desc: t("coffee_bun.pkg_omz_desc", "Zsh community framework"),
+        },
+        {
+          name: "Powerlevel10k",
+          desc: t("coffee_bun.pkg_p10k_desc", "Fast, flexible prompt theme"),
+        },
+        {
+          name: "zsh-autosuggestions",
+          desc: t(
+            "coffee_bun.pkg_autosuggest_desc",
+            "Fish-style command autocompletion"
+          ),
+        },
+        {
+          name: "zsh-syntax-highlighting",
+          desc: t(
+            "coffee_bun.pkg_highlight_desc",
+            "Realtime terminal syntax highlighting"
+          ),
+        },
       ],
     },
     {
-      category: "Dev Runtimes",
+      category: t("coffee_bun.packages_cat_runtimes", "Dev Runtimes"),
       items: [
-        { name: "Go (Golang)", desc: "1.22+ runtime engine" },
-        { name: "Node.js", desc: "LTS JavaScript runtime bundled with npm" },
-        { name: "Python 3", desc: "Python 3 interpreter bundled with pip" },
+        {
+          name: "Go (Golang)",
+          desc: t("coffee_bun.pkg_go_desc", "1.22+ runtime engine"),
+        },
+        {
+          name: "Node.js",
+          desc: t(
+            "coffee_bun.pkg_node_desc",
+            "LTS JavaScript runtime bundled with npm"
+          ),
+        },
+        {
+          name: "Python 3",
+          desc: t(
+            "coffee_bun.pkg_python_desc",
+            "Python 3 interpreter bundled with pip"
+          ),
+        },
       ],
     },
     {
-      category: "Modern CLI Tools",
+      category: t("coffee_bun.packages_cat_cli", "Modern CLI Tools"),
       items: [
-        { name: "zoxide", desc: "Frecency-based cd alternative" },
-        { name: "fzf", desc: "Fuzzy finder utility" },
-        { name: "ripgrep", desc: "High-performance grep replacement" },
-        { name: "eza", desc: "Modern ls replacement with colors" },
-        { name: "htop", desc: "Interactive process viewer" },
-        { name: "git", desc: "Version control engine" },
+        {
+          name: "zoxide",
+          desc: t("coffee_bun.pkg_zoxide_desc", "Frecency-based cd alternative"),
+        },
+        {
+          name: "fzf",
+          desc: t("coffee_bun.pkg_fzf_desc", "Fuzzy finder utility"),
+        },
+        {
+          name: "ripgrep",
+          desc: t(
+            "coffee_bun.pkg_ripgrep_desc",
+            "High-performance grep replacement"
+          ),
+        },
+        {
+          name: "eza",
+          desc: t(
+            "coffee_bun.pkg_eza_desc",
+            "Modern ls replacement with colors"
+          ),
+        },
+        {
+          name: "htop",
+          desc: t("coffee_bun.pkg_htop_desc", "Interactive process viewer"),
+        },
+        {
+          name: "git",
+          desc: t("coffee_bun.pkg_git_desc", "Version control engine"),
+        },
       ],
     },
     {
-      category: "Applications",
+      category: t("coffee_bun.packages_cat_apps", "Applications"),
       items: [
-        { name: "Visual Studio Code", desc: "Code editor with automated PATH linking" },
-        { name: "Google Chrome", desc: "Web browser" },
+        {
+          name: "Visual Studio Code",
+          desc: t(
+            "coffee_bun.pkg_vscode_desc",
+            "Code editor with automated PATH linking"
+          ),
+        },
+        {
+          name: "Google Chrome",
+          desc: t("coffee_bun.pkg_chrome_desc", "Web browser"),
+        },
       ],
     },
   ];
 
+  const commands = [
+    {
+      cmd: "bun",
+      action: t(
+        "coffee_bun.cmd_bun_desc",
+        "Launch interactive terminal interface (TUI) with ≤ 5 presets"
+      ),
+    },
+    {
+      cmd: "bun check",
+      action: t(
+        "coffee_bun.cmd_check_desc",
+        "Inspect system environment and report missing tools"
+      ),
+    },
+    {
+      cmd: "bun install all",
+      action: t(
+        "coffee_bun.cmd_install_desc",
+        "Non-interactive batch provisioning for all missing packages"
+      ),
+    },
+    {
+      cmd: "bun doctor",
+      action: t(
+        "coffee_bun.cmd_doctor_desc",
+        "Verify environment diagnostics, ~/.zshrc hooks, and CLI links"
+      ),
+    },
+    {
+      cmd: "bun update",
+      action: t(
+        "coffee_bun.cmd_update_desc",
+        "Upgrade formulae, casks, and pull fresh Oh My Zsh themes"
+      ),
+    },
+  ];
+
+  const readmeContent = getCoffeeBunReadme(lang);
+
   return (
     <PageWrapper>
-      <BackNav>
-        <Link href={`/${lang}`}>
-          <RiArrowLeftLine />
-          <span>Projects</span>
-        </Link>
-      </BackNav>
+      <MainContainer>
+        <BackNav>
+          <Link href={`/${lang}`}>
+            <RiArrowLeftLine />
+            <span>{t("coffee_bun.back_to_projects", "Projects")}</span>
+          </Link>
+        </BackNav>
 
-      {/* Hero Section */}
-      <HeroSection>
-        <BadgeRow>
-          <Badge>Go 1.22+</Badge>
-          <Badge>macOS</Badge>
-          <Badge>MIT License</Badge>
-          <Badge>Command: bun</Badge>
-        </BadgeRow>
+        {/* Hero Section */}
+        <HeroSection>
+          <BadgeRow>
+            <Badge>{t("coffee_bun.badge_go", "Go 1.22+")}</Badge>
+            <Badge>{t("coffee_bun.badge_macos", "macOS")}</Badge>
+            <Badge>{t("coffee_bun.badge_license", "MIT License")}</Badge>
+            <Badge>{t("coffee_bun.badge_cmd", "Command: bun")}</Badge>
+          </BadgeRow>
 
-        <Title>coffee-bun</Title>
-        <Subtitle>{t("coffee_bun.tagline")}</Subtitle>
-        <Description>{t("coffee_bun.description")}</Description>
+          <Title>{t("coffee_bun.title", "coffee-bun")}</Title>
+          <Subtitle>{t("coffee_bun.tagline")}</Subtitle>
+          <Description>{t("coffee_bun.description")}</Description>
 
-        <QuickInstallBox>
-          <div className="cmd-wrapper">
-            <span className="prompt-symbol">$</span>
-            <code>{installCmd}</code>
-          </div>
-          <CopyButton text={installCmd} label="Copy" />
-        </QuickInstallBox>
+          <QuickInstallBox>
+            <div className="cmd-wrapper">
+              <span className="prompt-symbol">$</span>
+              <code>{installCmd}</code>
+            </div>
+            <CopyButton text={installCmd} label="Copy" />
+          </QuickInstallBox>
 
-        <ButtonGroup>
-          <PrimaryButton href="#install">
-            <RiDownload2Line />
-            <span>Install</span>
-          </PrimaryButton>
-          <SecondaryButton
-            href="https://github.com/KennethanCeyer/coffee-bun"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <RiGithubFill />
-            <span>GitHub</span>
-            <RiExternalLinkLine style={{ opacity: 0.5 }} />
-          </SecondaryButton>
-          <SecondaryButton href="#docs">
-            <RiFileTextLine />
-            <span>Documentation</span>
-          </SecondaryButton>
-        </ButtonGroup>
-      </HeroSection>
-
-      {/* Terminal Simulator */}
-      <Section id="tui">
-        <SectionHeader>
-          <h2>{t("coffee_bun.tui_preview_title", "Terminal Interface Preview")}</h2>
-          <p>{t("coffee_bun.tui_preview_subtitle")}</p>
-        </SectionHeader>
-        <TerminalSimulator />
-      </Section>
-
-      {/* Core Features */}
-      <Section id="features">
-        <SectionHeader>
-          <h2>{t("coffee_bun.features_title", "Key Capabilities")}</h2>
-          <p>{t("coffee_bun.features_subtitle")}</p>
-        </SectionHeader>
-
-        <FeaturesGrid>
-          {features.map((feat, idx) => (
-            <FeatureCard key={idx}>
-              <div className="feature-num">{feat.num}</div>
-              <h3>{feat.title}</h3>
-              <p>{feat.desc}</p>
-            </FeatureCard>
-          ))}
-        </FeaturesGrid>
-      </Section>
-
-      {/* Components Included */}
-      <Section id="packages">
-        <SectionHeader>
-          <h2>{t("coffee_bun.packages_title", "Included Components")}</h2>
-          <p>{t("coffee_bun.packages_subtitle")}</p>
-        </SectionHeader>
-
-        <FeaturesGrid>
-          {packages.map((group, i) => (
-            <FeatureCard key={i}>
-              <div className="feature-num">{`CAT-0${i + 1}`}</div>
-              <h3 style={{ marginBottom: "0.85rem" }}>{group.category}</h3>
-              <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
-                {group.items.map((it, j) => (
-                  <li key={j} style={{ marginBottom: "0.5rem" }}>
-                    <span style={{ fontWeight: 500 }}>{it.name}</span>
-                    <div style={{ fontSize: "0.8rem", opacity: 0.65 }}>
-                      {it.desc}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </FeatureCard>
-          ))}
-        </FeaturesGrid>
-      </Section>
-
-      {/* Installation Methods */}
-      <Section id="install">
-        <SectionHeader>
-          <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
-          <p>Execute via single-command bootstrap or compile from source.</p>
-        </SectionHeader>
-
-        <div style={{ maxWidth: 820, margin: "0 auto" }}>
-          <div style={{ marginBottom: "2rem" }}>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "0.4rem" }}>
-              1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap")}
-            </h3>
-            <p style={{ opacity: 0.7, fontSize: "0.9rem", marginBottom: "0.5rem" }}>
-              {t("coffee_bun.install_desc_curl")}
-            </p>
-            <CodeBlock rawCode={installCmd}>
-              <pre style={{ margin: 0, padding: "0.85rem" }}>
-                <code>{installCmd}</code>
-              </pre>
-            </CodeBlock>
-          </div>
-
-          <div style={{ marginBottom: "2rem" }}>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "0.4rem" }}>
-              2. {t("coffee_bun.install_method_brew", "Homebrew Tap")}
-            </h3>
-            <p style={{ opacity: 0.7, fontSize: "0.9rem", marginBottom: "0.5rem" }}>
-              {t("coffee_bun.install_desc_brew")}
-            </p>
-            <CodeBlock rawCode="brew install KennethanCeyer/coffee-bun/bun">
-              <pre style={{ margin: 0, padding: "0.85rem" }}>
-                <code>brew install KennethanCeyer/coffee-bun/bun</code>
-              </pre>
-            </CodeBlock>
-          </div>
-
-          <div style={{ marginBottom: "2rem" }}>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "0.4rem" }}>
-              3. {t("coffee_bun.install_method_source", "Build from Source")}
-            </h3>
-            <p style={{ opacity: 0.7, fontSize: "0.9rem", marginBottom: "0.5rem" }}>
-              {t("coffee_bun.install_desc_source")}
-            </p>
-            <CodeBlock
-              rawCode={`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}
+          <ButtonGroup>
+            <PrimaryButton href="#install">
+              <RiDownload2Line />
+              <span>{t("coffee_bun.action_install", "Install")}</span>
+            </PrimaryButton>
+            <SecondaryButton
+              href="https://github.com/KennethanCeyer/coffee-bun"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <pre style={{ margin: 0, padding: "0.85rem" }}>
-                <code>{`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}</code>
-              </pre>
-            </CodeBlock>
-          </div>
-        </div>
-      </Section>
+              <RiGithubFill />
+              <span>{t("coffee_bun.action_github", "GitHub")}</span>
+              <RiExternalLinkLine style={{ opacity: 0.5 }} />
+            </SecondaryButton>
+            <SecondaryButton href="#docs">
+              <RiFileTextLine />
+              <span>{t("coffee_bun.action_docs", "Documentation")}</span>
+            </SecondaryButton>
+          </ButtonGroup>
+        </HeroSection>
 
-      {/* CLI Command Reference (bun) */}
-      <Section id="commands">
-        <SectionHeader>
-          <h2>{t("coffee_bun.commands_title", "CLI Command Reference (`bun`)")}</h2>
-          <p>{t("coffee_bun.commands_subtitle")}</p>
-        </SectionHeader>
+        {/* Terminal Simulator */}
+        <Section id="tui">
+          <SectionHeader>
+            <h2>
+              {t("coffee_bun.tui_preview_title", "Terminal Interface Preview")}
+            </h2>
+            <p>{t("coffee_bun.tui_preview_subtitle")}</p>
+          </SectionHeader>
+          <TerminalSimulator />
+        </Section>
 
-        <div style={{ maxWidth: 820, margin: "0 auto" }}>
+        {/* Core Features */}
+        <Section id="features">
+          <SectionHeader>
+            <h2>{t("coffee_bun.features_title", "Key Capabilities")}</h2>
+            <p>{t("coffee_bun.features_subtitle")}</p>
+          </SectionHeader>
+
+          <FeaturesGrid>
+            {features.map((feat, idx) => (
+              <FeatureCard key={idx}>
+                <div className="feature-num">{feat.num}</div>
+                <h3>{feat.title}</h3>
+                <p>{feat.desc}</p>
+              </FeatureCard>
+            ))}
+          </FeaturesGrid>
+        </Section>
+
+        {/* Components Included */}
+        <Section id="packages">
+          <SectionHeader>
+            <h2>{t("coffee_bun.packages_title", "Included Components")}</h2>
+            <p>{t("coffee_bun.packages_subtitle")}</p>
+          </SectionHeader>
+
+          <FeaturesGrid>
+            {packages.map((group, i) => (
+              <FeatureCard key={i}>
+                <div className="feature-num">{`CAT-0${i + 1}`}</div>
+                <h3 style={{ marginBottom: "0.85rem" }}>{group.category}</h3>
+                <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+                  {group.items.map((it, j) => (
+                    <li key={j} style={{ marginBottom: "0.5rem" }}>
+                      <span style={{ fontWeight: 500 }}>{it.name}</span>
+                      <div style={{ fontSize: "0.82rem", opacity: 0.7 }}>
+                        {it.desc}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </FeatureCard>
+            ))}
+          </FeaturesGrid>
+        </Section>
+
+        {/* Installation Methods */}
+        <Section id="install">
+          <SectionHeader>
+            <h2>{t("coffee_bun.install_heading", "Installation")}</h2>
+            <p>{t("coffee_bun.install_subheading")}</p>
+          </SectionHeader>
+
+          <InstallList>
+            <InstallItem>
+              <h3>
+                1. {t("coffee_bun.install_method_curl", "One-Line Bootstrap")}
+              </h3>
+              <p>{t("coffee_bun.install_desc_curl")}</p>
+              <CodeBlock rawCode={installCmd}>
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>{installCmd}</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+
+            <InstallItem>
+              <h3>2. {t("coffee_bun.install_method_brew", "Homebrew Tap")}</h3>
+              <p>{t("coffee_bun.install_desc_brew")}</p>
+              <CodeBlock rawCode="brew install KennethanCeyer/coffee-bun/bun">
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>brew install KennethanCeyer/coffee-bun/bun</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+
+            <InstallItem>
+              <h3>
+                3. {t("coffee_bun.install_method_source", "Build from Source")}
+              </h3>
+              <p>{t("coffee_bun.install_desc_source")}</p>
+              <CodeBlock
+                rawCode={`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}
+              >
+                <pre style={{ margin: 0, padding: "0.85rem" }}>
+                  <code>{`git clone https://github.com/KennethanCeyer/coffee-bun.git\ncd coffee-bun\nmake install`}</code>
+                </pre>
+              </CodeBlock>
+            </InstallItem>
+          </InstallList>
+        </Section>
+
+        {/* CLI Command Reference (bun) */}
+        <Section id="commands">
+          <SectionHeader>
+            <h2>
+              {t("coffee_bun.commands_title", "CLI Command Reference (`bun`)")}
+            </h2>
+            <p>{t("coffee_bun.commands_subtitle")}</p>
+          </SectionHeader>
+
           <TableContainer>
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: "35%" }}>Command</th>
-                  <th>Action</th>
+                  <th style={{ width: "32%" }}>
+                    {t("coffee_bun.th_command", "Command")}
+                  </th>
+                  <th>{t("coffee_bun.th_action", "Action")}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
-                    <code>bun</code>
-                  </td>
-                  <td>Launch interactive terminal interface (TUI) with ≤ 5 presets</td>
-                </tr>
-                <tr>
-                  <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
-                    <code>bun check</code>
-                  </td>
-                  <td>Inspect system environment and report missing tools</td>
-                </tr>
-                <tr>
-                  <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
-                    <code>bun install all</code>
-                  </td>
-                  <td>Non-interactive batch provisioning for all missing packages</td>
-                </tr>
-                <tr>
-                  <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
-                    <code>bun doctor</code>
-                  </td>
-                  <td>Verify environment diagnostics, ~/.zshrc hooks, and CLI links</td>
-                </tr>
-                <tr>
-                  <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
-                    <code>bun update</code>
-                  </td>
-                  <td>Upgrade formulae, casks, and pull fresh Oh My Zsh themes</td>
-                </tr>
+                {commands.map((cmd) => (
+                  <tr key={cmd.cmd}>
+                    <td style={{ fontFamily: "var(--font-roboto-mono)" }}>
+                      <code>{cmd.cmd}</code>
+                    </td>
+                    <td>{cmd.action}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </TableContainer>
-        </div>
-      </Section>
+        </Section>
 
-      {/* Documentation Section */}
-      <Section id="docs">
-        <SectionHeader>
-          <h2>{t("coffee_bun.docs_title", "Documentation")}</h2>
-          <p>{t("coffee_bun.docs_subtitle")}</p>
-        </SectionHeader>
+        {/* Documentation Section */}
+        <Section id="docs">
+          <SectionHeader>
+            <h2>{t("coffee_bun.docs_title", "Documentation")}</h2>
+            <p>{t("coffee_bun.docs_subtitle")}</p>
+          </SectionHeader>
 
-        <div style={{ maxWidth: 860, margin: "0 auto" }}>
           <DocsCard>
-            <MarkdownRenderer content={coffeeBunReadmeContent} />
+            <MarkdownRenderer content={readmeContent} />
           </DocsCard>
-        </div>
-      </Section>
+        </Section>
+      </MainContainer>
     </PageWrapper>
   );
 }

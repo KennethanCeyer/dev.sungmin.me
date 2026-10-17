@@ -6,6 +6,7 @@ import { projectsData } from "@/data/projects";
 import { generatePattern } from "@/lib/pattern";
 import styled from "@emotion/styled";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiArrowRightLine } from "react-icons/ri";
@@ -86,14 +87,14 @@ const Subtitle = styled.p`
 `;
 
 const Section = styled.section`
-  padding: 2rem 1.5rem 5rem;
-  max-width: 900px;
+  padding: 3.5rem 40px 6rem;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 
   @media (max-width: 768px) {
-    padding: 1.5rem 1rem 3.5rem;
+    padding: 2.5rem 20px 4rem;
   }
 `;
 
@@ -232,9 +233,11 @@ const CardLink = styled.span`
 `;
 
 export default function HomePage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { theme } = useTheme();
-  const lang = i18n.language.startsWith("ko") ? "ko" : "en";
+  const params = useParams();
+  const urlLang = typeof params?.lang === "string" ? params.lang : "en";
+  const lang = urlLang.startsWith("ko") ? "ko" : "en";
 
   const patterns = useMemo(
     () => projectsData.map((project) => generatePattern(theme, project.id)),
@@ -286,7 +289,7 @@ export default function HomePage() {
                         ))}
                       </TagsContainer>
                       <CardLink>
-                        <span>Explore</span>
+                        <span>{t("hub.explore", "Explore")}</span>
                         <RiArrowRightLine />
                       </CardLink>
                     </CardFooter>

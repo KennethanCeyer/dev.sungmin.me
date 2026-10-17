@@ -9,6 +9,7 @@ import {
   RiArrowRightLine,
   RiCodeBoxLine,
   RiCpuLine,
+  RiCupLine,
   RiExternalLinkLine,
   RiFlashlightFill,
   RiGithubFill,
@@ -361,9 +362,9 @@ export default function HomePage({
         <Subtitle>{t("hero.subtitle")}</Subtitle>
 
         <HeroActions>
-          <PrimaryLink href="/bundle">
-            <RiFlashlightFill />
-            <span>{t("hero.explore_bundle", "Explore bundle")}</span>
+          <PrimaryLink href="/coffee-bun">
+            <RiCupLine />
+            <span>{t("hero.explore_bundle", "Explore coffee-bun")}</span>
           </PrimaryLink>
           <SecondaryLink href="#projects">
             <RiCodeBoxLine />
@@ -381,31 +382,31 @@ export default function HomePage({
         </HeroActions>
       </HeroSection>
 
-      {/* Featured Showcase: bundle */}
+      {/* Featured Showcase: coffee-bun */}
       <Section id="featured">
         <FeaturedCard>
           <div className="glow" />
-          <div className="badge-tag">⭐ Featured Open-Source</div>
-          <h3>⚡ bundle — macOS MacBook Setup & Maintenance</h3>
+          <div className="badge-tag">⭐ Featured Open-Source • CLI: bun</div>
+          <h3>☕ coffee-bun — macOS MacBook Setup & Maintenance</h3>
           <p>
             {t(
-              "bundle.description",
-              "Zero to fully configured dev environment in one shot. Installs Oh My Zsh, Powerlevel10k, Dev Runtimes (Go, Node, Python), Modern CLI utilities, and Essential Apps with automatic symlinks."
+              "coffee_bun.description",
+              "Zero to fully configured dev environment in one shot with the `bun` CLI. Installs Oh My Zsh, Powerlevel10k, Dev Runtimes (Go, Node, Python), Modern CLI utilities, and Essential Apps with automatic symlinks."
             )}
           </p>
 
           <CardActions>
-            <PrimaryLink href="/bundle">
-              <span>Launch bundle.dev.sungmin.me</span>
+            <PrimaryLink href="/coffee-bun">
+              <span>Launch coffee-bun Showcase</span>
               <RiArrowRightLine />
             </PrimaryLink>
             <SecondaryLink
-              href="https://github.com/KennethanCeyer/bundle"
+              href="https://github.com/KennethanCeyer/coffee-bun"
               target="_blank"
               rel="noopener noreferrer"
             >
               <RiGithubFill />
-              <span>GitHub (KennethanCeyer/bundle)</span>
+              <span>GitHub (KennethanCeyer/coffee-bun)</span>
               <RiExternalLinkLine style={{ opacity: 0.6 }} />
             </SecondaryLink>
           </CardActions>
@@ -421,16 +422,16 @@ export default function HomePage({
           <ProjectsGrid>
             <ProjectCard>
               <div className="card-top">
-                <span className="icon">⚡</span>
-                <span className="category">CLI & System Tool</span>
+                <span className="icon">☕</span>
+                <span className="category">CLI & System Tool (bun)</span>
               </div>
-              <h3>bundle</h3>
+              <h3>coffee-bun</h3>
               <p>
                 Automated macOS MacBook Setup & Maintenance Tool written in Go.
-                Concurrently configures shell, runtimes, and apps in one shot.
+                Run <code>bun</code> to concurrently configure shell, runtimes, and apps in one shot.
               </p>
-              <Link className="link" href="/bundle">
-                <span>View bundle landing</span>
+              <Link className="link" href="/coffee-bun">
+                <span>View coffee-bun landing</span>
                 <RiArrowRightLine />
               </Link>
             </ProjectCard>

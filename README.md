@@ -4,7 +4,7 @@ Official Developer Hub & Project Showcase Portal for **Sungmin Han ([@KennethanC
 
 This repository hosts:
 - **`dev.sungmin.me`**: Central portal for developer infrastructure, open-source projects, and engineering tools.
-- **`bundle.dev.sungmin.me`** (`/bundle`): Official landing and one-page documentation website for [**⚡ bundle**](https://github.com/KennethanCeyer/bundle) (Automated macOS MacBook Setup & Maintenance Tool).
+- **`coffee-bun.dev.sungmin.me`** (`/coffee-bun`): Official landing and one-page documentation website for [**☕ coffee-bun**](https://github.com/KennethanCeyer/coffee-bun) (Automated macOS MacBook Setup & Maintenance Tool, command: `bun`).
 
 ---
 
@@ -16,7 +16,7 @@ Shared and aligned with [sungmin.me](https://github.com/KennethanCeyer/sungmin.m
 - **Theme**: Instant, flicker-free Light & Dark mode support with CSS custom properties
 - **Interactive Background**: Pointer-reactive particle grid canvas (`InteractiveGrid`)
 - **Markdown & Code**: GitHub-flavored markdown rendering (`react-markdown` + `remark-gfm` + syntax highlighting + one-click copy)
-- **Interactive TUI**: Live browser simulator for `bundle`'s ≤ 5 choice terminal UI
+- **Interactive TUI**: Live browser simulator for `coffee-bun`'s ≤ 5 choice terminal UI (`bun`)
 - **i18n**: Bilingual support (English & 한국어) with seamless language switching
 
 ---
@@ -43,7 +43,7 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the portal.
-To preview the `bundle` showcase directly, open [http://localhost:3000/bundle](http://localhost:3000/bundle).
+To preview the `coffee-bun` showcase directly, open [http://localhost:3000/coffee-bun](http://localhost:3000/coffee-bun).
 
 ---
 
@@ -55,7 +55,8 @@ dev.sungmin.me/
 ├── src/
 │   ├── app/
 │   │   ├── [lang]/
-│   │   │   ├── bundle/     # bundle.dev.sungmin.me showcase page
+│   │   │   ├── coffee-bun/ # coffee-bun showcase page (CLI: bun)
+│   │   │   ├── bundle/     # Legacy redirect to coffee-bun
 │   │   │   ├── layout.tsx  # Typography, emotion registry & root layout
 │   │   │   └── page.tsx    # dev.sungmin.me intro hub page
 │   │   └── page.tsx        # Locale redirect
@@ -74,11 +75,11 @@ dev.sungmin.me/
 │   │   ├── TerminalSimulator.tsx
 │   │   └── ThemeSwitcher.tsx
 │   ├── contexts/           # ThemeContext (light/dark state)
-│   ├── data/               # Project data & bundle documentation
+│   ├── data/               # Project data & coffee-bun documentation
 │   ├── fonts/              # PretendardVariable font
 │   ├── lib/                # Emotion cache & i18n initialization
 │   ├── styles/             # Global styles and theme tokens
-│   └── middleware.ts       # Subdomain & locale routing
+│   └── proxy.ts            # Subdomain & locale routing
 └── next.config.mjs         # Next.js configuration & optimizations
 ```
 

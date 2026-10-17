@@ -102,15 +102,14 @@ export default function MobileMenu({
   lang,
 }: MobileMenuProps) {
   const { t } = useTranslation();
-  const pathname = usePathname();
 
   const links = [
     { href: `/${lang}`, label: t("nav.dev_home", "Dev Portal") },
-    { href: `/${lang}/bundle`, label: "⚡ bundle" },
+    { href: `/${lang}/coffee-bun`, label: "☕ coffee-bun" },
     { href: `/${lang}#projects`, label: t("hub.projects_title", "Projects") },
     {
-      href: "https://github.com/KennethanCeyer/bundle",
-      label: "bundle GitHub",
+      href: "https://github.com/KennethanCeyer/coffee-bun",
+      label: "coffee-bun GitHub",
       isExternal: true,
     },
     {

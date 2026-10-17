@@ -16,8 +16,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if current hostname is bundle.dev.sungmin.me or bundle.localhost
-  const isBundleSubdomain =
+  // Check if current hostname is coffee-bun or bundle subdomain
+  const isCoffeeBunSubdomain =
+    hostname.startsWith("coffee-bun.dev.sungmin.me") ||
+    hostname.startsWith("coffee-bun.localhost") ||
     hostname.startsWith("bundle.dev.sungmin.me") ||
     hostname.startsWith("bundle.localhost");
 
@@ -30,17 +32,21 @@ export function proxy(request: NextRequest) {
     ? pathname.split("/")[1]
     : i18n.defaultLocale;
 
-  if (isBundleSubdomain) {
-    // If request is to bundle.dev.sungmin.me/
-    // rewrite internally to /[locale]/bundle
+  if (isCoffeeBunSubdomain) {
+    // If request is to coffee-bun.dev.sungmin.me/
+    // rewrite internally to /[locale]/coffee-bun
     if (pathname === "/" || pathname === `/${locale}`) {
       const url = request.nextUrl.clone();
-      url.pathname = `/${locale}/bundle`;
+      url.pathname = `/${locale}/coffee-bun`;
       return NextResponse.rewrite(url);
     }
     if (!pathnameHasLocale) {
       const url = request.nextUrl.clone();
-      url.pathname = `/${locale}${pathname === "/bundle" ? "/bundle" : pathname}`;
+      url.pathname = `/${locale}${
+        pathname === "/coffee-bun" || pathname === "/bundle"
+          ? "/coffee-bun"
+          : pathname
+      }`;
       return NextResponse.rewrite(url);
     }
   }
@@ -48,8 +54,8 @@ export function proxy(request: NextRequest) {
   // If path doesn't have locale on main domain
   if (!pathnameHasLocale) {
     const url = request.nextUrl.clone();
-    if (pathname === "/bundle") {
-      url.pathname = `/${locale}/bundle`;
+    if (pathname === "/coffee-bun" || pathname === "/bundle") {
+      url.pathname = `/${locale}/coffee-bun`;
       return NextResponse.redirect(url);
     }
     url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;

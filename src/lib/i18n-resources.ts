@@ -3,7 +3,8 @@ export const resources = {
     translation: {
       nav: {
         dev_home: "Dev Portal",
-        bundle: "bundle",
+        bundle: "coffee-bun",
+        coffee_bun: "coffee-bun",
         github: "GitHub",
         blog: "Blog",
         profile: "sungmin.me",
@@ -13,16 +14,17 @@ export const resources = {
         title: "Building Tools for Developers",
         subtitle:
           "High-performance CLI tools, developer infrastructure, and open-source ecosystems designed with elegance and zero friction.",
-        explore_bundle: "Explore bundle",
+        explore_bundle: "Explore coffee-bun",
         all_projects: "Browse Projects",
         quick_install: "Quick Install",
       },
-      bundle: {
-        title: "bundle",
+      coffee_bun: {
+        title: "coffee-bun",
+        cmd: "bun",
         tagline: "Automated macOS MacBook Setup & Maintenance Tool",
         description:
-          "Zero to fully configured dev environment in one shot. Installs Oh My Zsh, Powerlevel10k, Dev Runtimes (Go, Node, Python), Modern CLI utilities (zoxide, fzf, eza, ripgrep), and Essential Apps with automatic symlinks.",
-        features_title: "Why bundle?",
+          "Zero to fully configured dev environment in one shot with the `bun` CLI. Installs Oh My Zsh, Powerlevel10k, Dev Runtimes (Go, Node, Python), Modern CLI utilities (zoxide, fzf, eza, ripgrep), and Essential Apps with automatic symlinks.",
+        features_title: "Why coffee-bun?",
         features_subtitle:
           "Setting up a fresh Mac shouldn't take hours of manual brew installs and broken PATH configurations.",
         f1_title: "One-Shot Automated Setup",
@@ -48,9 +50,9 @@ export const resources = {
           "Installs Visual Studio Code and Google Chrome, and automatically symlinks the `code` CLI directly to your PATH.",
         f8_title: "Doctor & Maintenance",
         f8_desc:
-          "Built-in diagnostics via `bundle doctor` and one-stop ecosystem upgrades via `bundle update`.",
+          "Built-in diagnostics via `bun doctor` and one-stop ecosystem upgrades via `bun update`.",
         install_heading: "Get Started in Seconds",
-        install_method_curl: "One-Line Install",
+        install_method_curl: "One-Line Install (Recommended)",
         install_method_brew: "Homebrew",
         install_method_source: "Build from Source",
         install_desc_curl: "Run the bootstrap installer directly in your terminal:",
@@ -60,7 +62,7 @@ export const resources = {
         tui_preview_subtitle: "Clean, responsive, and minimalist terminal interface.",
         packages_title: "What's Included",
         packages_subtitle: "Essential tools curated for modern software engineering.",
-        commands_title: "Command Reference",
+        commands_title: "CLI Command Reference (`bun`)",
         commands_subtitle: "Simple, predictable CLI commands for every maintenance stage.",
         docs_title: "Complete Documentation",
         docs_subtitle: "Explore the full architecture, CLI commands, and Go implementation.",
@@ -94,7 +96,8 @@ export const resources = {
     translation: {
       nav: {
         dev_home: "개발 포털",
-        bundle: "bundle",
+        bundle: "coffee-bun",
+        coffee_bun: "coffee-bun",
         github: "깃허브",
         blog: "블로그",
         profile: "sungmin.me",
@@ -104,16 +107,17 @@ export const resources = {
         title: "개발자를 위한 도구를 만듭니다",
         subtitle:
           "반복적인 수작업을 없애고 엔지니어링 생산성을 극대화하는 고성능 CLI 및 개발자 인프라 도구들을 제공합니다.",
-        explore_bundle: "bundle 살펴보기",
+        explore_bundle: "coffee-bun 살펴보기",
         all_projects: "프로젝트 둘러보기",
         quick_install: "원클릭 설치",
       },
-      bundle: {
-        title: "bundle",
+      coffee_bun: {
+        title: "coffee-bun",
+        cmd: "bun",
         tagline: "Go 언어로 제작된 macOS 맥북 자동 셋업 & 유지보수 도구",
         description:
-          "새 맥북 세팅부터 개발 환경 동기화까지 한 번에. Oh My Zsh, Powerlevel10k, 런타임(Go, Node, Python), 모던 CLI 도구(zoxide, fzf, eza, ripgrep), 필수 앱 및 `code` CLI 심링크까지 완전 자동 구성합니다.",
-        features_title: "왜 bundle 인가요?",
+          "새 맥북 세팅부터 개발 환경 동기화까지 한 번에. `bun` 명령어로 Oh My Zsh, Powerlevel10k, 런타임(Go, Node, Python), 모던 CLI 도구(zoxide, fzf, eza, ripgrep), 필수 앱 및 `code` CLI 심링크까지 완전 자동 구성합니다.",
+        features_title: "왜 coffee-bun 인가요?",
         features_subtitle:
           "새 맥북을 맞이할 때마다 수십 개의 brew 설치와 꼬여버린 PATH 설정으로 몇 시간씩 낭비하지 마세요.",
         f1_title: "원샷 자동 셋업",
@@ -139,7 +143,7 @@ export const resources = {
           "VS Code와 Google Chrome을 설치하고, 터미널에서 즉시 쓸 수 있도록 `code` 명령어를 PATH에 자동 연결합니다.",
         f8_title: "시스템 닥터 & 통합 업데이터",
         f8_desc:
-          "`bundle doctor`로 환경 설정 무결성을 검증하고, `bundle update`로 툴과 테마를 최신 상태로 유지합니다.",
+          "`bun doctor`로 환경 설정 무결성을 검증하고, `bun update`로 툴과 테마를 최신 상태로 유지합니다.",
         install_heading: "단 1초 만에 시작하기",
         install_method_curl: "원라인 설치 (추천)",
         install_method_brew: "Homebrew",
@@ -151,8 +155,8 @@ export const resources = {
         tui_preview_subtitle: "직관적이고 미려한 터미널 인터페이스를 웹에서 먼저 경험해보세요.",
         packages_title: "포함된 도구 및 런타임",
         packages_subtitle: "현업 개발자에게 꼭 필요한 정예 도구들만 엄선했습니다.",
-        commands_title: "CLI 명령어 가이드",
-        commands_subtitle: "직관적인 CLI 명령어로 모든 셋업과 유지보수를 간결하게 실행합니다.",
+        commands_title: "CLI 명령어 가이드 (`bun`)",
+        commands_subtitle: "직관적인 bun 명령어로 모든 셋업과 유지보수를 간결하게 실행합니다.",
         docs_title: "전체 문서 및 아키텍처",
         docs_subtitle: "프로젝트 상세 README와 아키텍처 다이어그램을 확인하세요.",
       },

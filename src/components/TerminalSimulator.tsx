@@ -184,12 +184,12 @@ export default function TerminalSimulator() {
       badgeType: "missing",
       desc: "Scan and install all missing recommended tools in one shot with parallel workers.",
       steps: [
-        "🔍 Scanning macOS system environment...",
+        "🔍 [bun] Scanning macOS system environment...",
         "⚡ Spawning 3 concurrent goroutine workers...",
         "🐚 [Worker 1] Cloning Oh My Zsh & Powerlevel10k theme (simultaneous)...",
         "🍺 [Worker 2] Brew installing zoxide, fzf, ripgrep, eza...",
         "🖥️ [Worker 3] Linking /usr/local/bin/code -> VS Code CLI...",
-        "📄 Generating ~/.zshrc.bundle.bak backup and configuring prompt...",
+        "📄 Generating ~/.zshrc.bun.bak backup and configuring prompt...",
         "✨ All tasks completed successfully in 4.2s!",
       ],
     },
@@ -241,9 +241,9 @@ export default function TerminalSimulator() {
       title: "Check Status & Updates",
       badge: "Diagnostic",
       badgeType: "ready",
-      desc: "Inspect installed tools and upgrade outdated packages & themes (`bundle check` / `bundle doctor`)",
+      desc: "Inspect installed tools and upgrade outdated packages & themes (`bun check` / `bun doctor`)",
       steps: [
-        "🩺 bundle doctor running...",
+        "🩺 bun doctor running...",
         "✓ OS: macOS darwin/arm64",
         "✓ Homebrew: Health OK",
         "✓ Shell hook: zoxide init zsh registered in ~/.zshrc",
@@ -278,16 +278,16 @@ export default function TerminalSimulator() {
         </WindowButtons>
         <TerminalTitle>
           <RiTerminalBoxLine />
-          <span>bundle — terminal preview (TUI)</span>
+          <span>bun — terminal preview (TUI)</span>
         </TerminalTitle>
         <div style={{ width: 40 }} />
       </TerminalTitleBar>
 
       <TerminalBody>
         <MenuHeader>
-          <div className="brand">⚡ bundle • macOS MacBook Setup & Maintenance</div>
+          <div className="brand">☕ coffee-bun • macOS MacBook Setup & Maintenance</div>
           <div className="subtitle">
-            Choose a preset to run (Max 5 curated choices, one-click install)
+            Choose a preset to run with <code>bun</code> (Max 5 curated choices, one-click install)
           </div>
         </MenuHeader>
 
@@ -327,7 +327,7 @@ export default function TerminalSimulator() {
             }}
           >
             <div style={{ color: "#29d0f5", fontWeight: 600, marginBottom: "0.5rem" }}>
-              ⚡ Running: {presets[selectedIndex].title}...
+              ⚡ Running: bun ({presets[selectedIndex].title})...
             </div>
             {progress.map((msg, i) => (
               <div
@@ -354,7 +354,7 @@ export default function TerminalSimulator() {
         )}
 
         <TerminalFooter>
-          <div>[↑/↓] Navigate • [Click] Select • [Run] Simulate Exec</div>
+          <div>[↑/↓] Navigate • [Click] Select • [Run] Simulate <code>bun</code></div>
           <div style={{ display: "flex", gap: "0.6rem" }}>
             {progress.length > 0 && !simulating && (
               <button

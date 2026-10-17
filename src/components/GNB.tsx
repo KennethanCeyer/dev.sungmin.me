@@ -85,16 +85,16 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
     isActiveMatch?: string;
   }[] = [
     {
-      href: `/${lang}/bundle`,
-      label: "⚡ bundle",
-      isActiveMatch: `/${lang}/bundle`,
+      href: `/${lang}/coffee-bun`,
+      label: "☕ coffee-bun",
+      isActiveMatch: `/${lang}/coffee-bun`,
     },
     {
       href: `/${lang}#projects`,
       label: t("hub.projects_title", "Projects"),
     },
     {
-      href: "https://github.com/KennethanCeyer/bundle",
+      href: "https://github.com/KennethanCeyer/coffee-bun",
       label: "GitHub",
       isExternal: true,
     },
@@ -128,7 +128,7 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
             key={link.href}
             href={link.href}
             data-active={
-              link.isActiveMatch ? pathname === link.isActiveMatch : false
+              link.isActiveMatch ? pathname.startsWith(link.isActiveMatch) : false
             }
           >
             {link.label}

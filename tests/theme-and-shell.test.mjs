@@ -10,8 +10,8 @@ const rootDir = path.resolve(__dirname, "..");
 const readProjectFile = (relPath) =>
   fs.readFileSync(path.join(rootDir, relPath), "utf8");
 
-describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Integrity", () => {
-  it("TerminalSimulator.tsx uses dark terminal background and authentic Soft Coffee Pastel palette from coffee-bun", () => {
+describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & Equal-Width Support Matrix", () => {
+  it("TerminalSimulator.tsx uses dark terminal background and the full Soft Coffee Pastel palette from coffee-bun", () => {
     const content = readProjectFile("src/components/TerminalSimulator.tsx");
 
     // Dark terminal background + Soft Coffee Pastel Lipgloss palette from styles.go
@@ -20,6 +20,9 @@ describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Int
     assert.match(content, /secondary:\s*"#D4A373"/);
     assert.match(content, /success:\s*"#84A98C"/);
     assert.match(content, /warning:\s*"#E9C46A"/);
+    assert.match(content, /danger:\s*"#E07A5F"/);
+    assert.match(content, /muted:\s*"#9C8F84"/);
+    assert.match(content, /highlight:\s*"#E6CCB2"/);
     assert.match(content, /logoBun:\s*"#C68B59"/);
     assert.match(content, /normal:\s*"#EDE0D4"/);
   });
@@ -43,16 +46,25 @@ describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Int
     assert.match(content, /Checking for updates and running maintenance\.\.\./);
   });
 
-  it("coffee-bun/page.tsx renders ASCII logo and merged-row (rowSpan) matrix table with equal-width check columns", () => {
+  it("coffee-bun/page.tsx renders 2-tone ASCII logo (#C68B59 & #EDE0D4), PagePreviewCard without redundant #demo button, and equal-width check columns", () => {
     const content = readProjectFile("src/app/[lang]/coffee-bun/page.tsx");
 
     // FullWidthInstallBanner must use var(--code-block-bg) and var(--code-block-fg)
     assert.match(content, /background-color:\s*var\(--code-block-bg\)/);
     assert.match(content, /color:\s*var\(--code-block-fg\)/);
 
-    // Coffee Bun ASCII Art Logo must be present
-    assert.match(content, /COFFEE_BUN_ASCII/);
-    assert.match(content, /▄▄██████▄▄\s+▄▀▀▀ ▄▀▀▄ █▀▀▀/);
+    // Coffee Bun 2-tone ASCII Art Logo (#C68B59 warm cinnamon brown + #EDE0D4 cream latte foam)
+    assert.match(content, /COFFEE_BUN_ASCII_LINES/);
+    assert.match(content, /\.bun-icon\s*\{\s*color:\s*#C68B59;/);
+    assert.match(content, /\.bun-text\s*\{\s*color:\s*#EDE0D4;/);
+
+    // Hero section should use PagePreviewCard for GitHub and NOT have a redundant href="#demo" button
+    assert.match(content, /<PagePreviewCard/);
+    assert.equal(
+      content.includes('href="#demo"'),
+      false,
+      "Hero section should not have a redundant Interactive TUI (#demo) button"
+    );
 
     // Merged-row matrix table with rowSpan, RiCheckLine, table-layout: fixed, and 4 identical col widths
     assert.match(content, /table-layout:\s*fixed/);
@@ -67,6 +79,14 @@ describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Int
       4,
       `Expected 4 identical 10.5% check columns in colgroup, found ${equalCols.length}`
     );
+  });
+
+  it("PagePreviewCard.tsx matches blog.sungmin.me preview card structure", () => {
+    const content = readProjectFile("src/components/PagePreviewCard.tsx");
+    assert.match(content, /PagePreviewContainer/);
+    assert.match(content, /className="url-container"/);
+    assert.match(content, /className="url-icon"/);
+    assert.match(content, /className="url-text"/);
   });
 
   it("loads RobotoMonoVariable.woff2 with block elements and adjustFontFallback: false so ASCII art never squishes", () => {
@@ -100,8 +120,20 @@ describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Int
     );
   });
 
-  it("i18n-resources.ts has matching EN/KO keys and avoids marketing hyperbole", () => {
+  it("i18n-resources.ts uses 'GitHub' in both EN and KO GNB and avoids marketing hyperbole", () => {
     const content = readProjectFile("src/lib/i18n-resources.ts");
+
+    assert.equal(
+      content.includes('github: "깃허브"'),
+      false,
+      'Korean GNB should use "GitHub" instead of "깃허브"'
+    );
+    const githubNavMatches = content.match(/github:\s*"GitHub"/g) || [];
+    assert.equal(
+      githubNavMatches.length,
+      2,
+      'Both EN and KO nav.github should be "GitHub"'
+    );
 
     const forbiddenMarketingPhrases = [
       "4 Hours → 30 Seconds",

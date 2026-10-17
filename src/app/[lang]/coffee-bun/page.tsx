@@ -1,6 +1,7 @@
 "use client";
 
 import CopyButton from "@/components/CopyButton";
+import PagePreviewCard from "@/components/PagePreviewCard";
 import TerminalSimulator from "@/components/TerminalSimulator";
 import styled from "@emotion/styled";
 import Link from "next/link";
@@ -9,20 +10,39 @@ import { useTranslation } from "react-i18next";
 import {
   RiArrowLeftLine,
   RiCheckLine,
-  RiExternalLinkLine,
-  RiGithubFill,
-  RiPlayCircleLine,
   RiSubtractLine,
 } from "react-icons/ri";
 
-export const COFFEE_BUN_ASCII = [
-  "      ▄▄██████▄▄         ▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
-  "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      █    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
-  "  ██▀ ▄▄██████▄▄ ▀██     ▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
-  " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    █▀▀▄ █  █ █▄ █",
-  "▄██▄▄████████████▄▄██▄   █▀▀▄ █  █ █ ▀█",
-  " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ▀▀▀   ▀▀  ▀  ▀",
-].join("\n");
+export const COFFEE_BUN_ASCII_LINES = [
+  {
+    icon: "      ▄▄██████▄▄         ",
+    text: "▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
+  },
+  {
+    icon: "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      ",
+    text: "█    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
+  },
+  {
+    icon: "  ██▀ ▄▄██████▄▄ ▀██     ",
+    text: "▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
+  },
+  {
+    icon: " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    ",
+    text: "█▀▀▄ █  █ █▄ █",
+  },
+  {
+    icon: "▄██▄▄████████████▄▄██▄   ",
+    text: "█▀▀▄ █  █ █ ▀█",
+  },
+  {
+    icon: " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ",
+    text: "▀▀▀   ▀▀  ▀  ▀",
+  },
+];
+
+export const COFFEE_BUN_ASCII = COFFEE_BUN_ASCII_LINES.map(
+  (l) => `${l.icon}${l.text}`
+).join("\n");
 
 const PageWrapper = styled.div`
   position: relative;
@@ -108,13 +128,22 @@ const AsciiLogoPre = styled.pre`
   letter-spacing: 0;
   text-align: left;
   white-space: pre;
-  color: ${({ theme }) => theme.text};
-  background-color: var(--code-block-bg);
-  border: 1px solid ${({ theme }) => theme.border};
+  font-weight: 700;
+  color: #EDE0D4;
+  background-color: #0B0A09;
+  border: 1px solid rgba(166, 123, 91, 0.35);
   border-radius: 8px;
   overflow-x: auto;
   max-width: 100%;
   user-select: none;
+
+  .bun-icon {
+    color: #C68B59;
+  }
+
+  .bun-text {
+    color: #EDE0D4;
+  }
 
   @media (max-width: 768px) {
     font-size: 0.56rem;
@@ -232,44 +261,9 @@ const FullWidthInstallBanner = styled.div`
   }
 `;
 
-const ActionRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const ActionBtn = styled.a<{ primary?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.6rem;
-  border-radius: 6px;
-  font-size: 0.92rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  cursor: pointer;
-
-  ${({ primary, theme }) =>
-    primary
-      ? `
-    background-color: ${theme.text};
-    color: ${theme.body};
-    border: 1px solid ${theme.text};
-    &:hover {
-      opacity: 0.88;
-    }
-  `
-      : `
-    background-color: transparent;
-    color: ${theme.text};
-    border: 1px solid ${theme.border};
-    &:hover {
-      background-color: ${theme.border};
-    }
-  `}
+const PreviewCardWrapper = styled.div`
+  width: 100%;
+  margin: 0 auto;
 `;
 
 const Section = styled.section`
@@ -889,7 +883,12 @@ export default function CoffeeBunDetailPage() {
           </BadgeRow>
 
           <AsciiLogoPre aria-label="Coffee Bun ASCII Logo">
-            {COFFEE_BUN_ASCII}
+            {COFFEE_BUN_ASCII_LINES.map((line, idx) => (
+              <div key={idx}>
+                <span className="bun-icon">{line.icon}</span>
+                <span className="bun-text">{line.text}</span>
+              </div>
+            ))}
           </AsciiLogoPre>
 
           <Title>{t("coffee_bun.title", "coffee-bun")}</Title>
@@ -917,21 +916,18 @@ export default function CoffeeBunDetailPage() {
             </div>
           </FullWidthInstallBanner>
 
-          <ActionRow>
-            <ActionBtn primary href="#demo">
-              <RiPlayCircleLine />
-              {t("coffee_bun.action_demo", "Interactive TUI")}
-            </ActionBtn>
-            <ActionBtn
-              href={repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <RiGithubFill />
-              {t("coffee_bun.action_github", "GitHub Repository")}
-              <RiExternalLinkLine size={13} style={{ opacity: 0.6 }} />
-            </ActionBtn>
-          </ActionRow>
+          <PreviewCardWrapper>
+            <PagePreviewCard
+              data={{
+                title: "KennethanCeyer/bundle (coffee-bun)",
+                description:
+                  "Automated macOS development environment setup and maintenance CLI written in Go (`bun`).",
+                url: repoUrl,
+                image: "https://avatars.githubusercontent.com/u/7090315?v=4",
+                type: "github",
+              }}
+            />
+          </PreviewCardWrapper>
         </HeroSection>
 
         {/* Interactive CLI & Subcommand Simulation Section */}

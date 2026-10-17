@@ -104,7 +104,7 @@ export const resources = {
       nav: {
         dev_home: "Developer Hub",
         projects: "프로젝트",
-        github: "깃허브",
+        github: "GitHub",
       },
       hero: {
         badge: "Developer Infrastructure & Open Source",

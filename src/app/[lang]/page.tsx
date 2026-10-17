@@ -165,11 +165,20 @@ const ThumbnailAscii = styled.pre`
   line-height: 1.18;
   letter-spacing: 0;
   white-space: pre;
-  color: ${({ theme }) => theme.text};
-  background-color: ${({ theme }) => theme.body};
-  border: 1px solid ${({ theme }) => theme.border};
+  font-weight: 700;
+  color: #EDE0D4;
+  background-color: #0B0A09;
+  border: 1px solid rgba(166, 123, 91, 0.35);
   border-radius: 6px;
   user-select: none;
+
+  .bun-icon {
+    color: #C68B59;
+  }
+
+  .bun-text {
+    color: #EDE0D4;
+  }
 
   @media (max-width: 768px) {
     font-size: 0.52rem;
@@ -177,14 +186,32 @@ const ThumbnailAscii = styled.pre`
   }
 `;
 
-const COFFEE_BUN_ASCII = [
-  "      ▄▄██████▄▄         ▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
-  "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      █    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
-  "  ██▀ ▄▄██████▄▄ ▀██     ▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
-  " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    █▀▀▄ █  █ █▄ █",
-  "▄██▄▄████████████▄▄██▄   █▀▀▄ █  █ █ ▀█",
-  " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ▀▀▀   ▀▀  ▀  ▀",
-].join("\n");
+const COFFEE_BUN_ASCII_LINES = [
+  {
+    icon: "      ▄▄██████▄▄         ",
+    text: "▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
+  },
+  {
+    icon: "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      ",
+    text: "█    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
+  },
+  {
+    icon: "  ██▀ ▄▄██████▄▄ ▀██     ",
+    text: "▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
+  },
+  {
+    icon: " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    ",
+    text: "█▀▀▄ █  █ █▄ █",
+  },
+  {
+    icon: "▄██▄▄████████████▄▄██▄   ",
+    text: "█▀▀▄ █  █ █ ▀█",
+  },
+  {
+    icon: " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ",
+    text: "▀▀▀   ▀▀  ▀  ▀",
+  },
+];
 
 const CardContent = styled.div`
   padding: 1.75rem;
@@ -314,7 +341,12 @@ export default function HomePage() {
                   <Thumbnail data-pattern={patterns[index]}>
                     {project.id === "coffee-bun" && (
                       <ThumbnailAscii aria-hidden="true">
-                        {COFFEE_BUN_ASCII}
+                        {COFFEE_BUN_ASCII_LINES.map((line, lineIdx) => (
+                          <div key={lineIdx}>
+                            <span className="bun-icon">{line.icon}</span>
+                            <span className="bun-text">{line.text}</span>
+                          </div>
+                        ))}
                       </ThumbnailAscii>
                     )}
                   </Thumbnail>

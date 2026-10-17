@@ -28,10 +28,15 @@ const PALETTE = {
   titleBg: "#4A3525", // TitleStyle Background
   btnNormalFg: "#D6CCC2",
   btnNormalBg: "#2C221E",
+  btnFocusedFg: "#FFF8F0",
+  btnFocusedBg: "#A67B5B",
   btnSuccessFg: "#FFF8F0",
   btnSuccessBg: "#6B9080",
   logStream: "#8A7968",
 };
+
+// Exact Braille spinner frames from coffee-bun/internal/ui/tui.go
+const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 const ASCII_BUN_LINES = [
   {
@@ -206,6 +211,19 @@ const PlaybackStatus = styled.div`
     background-color: ${PALETTE.success};
     display: inline-block;
   }
+  .spin-char {
+    color: ${PALETTE.highlight};
+    font-weight: 700;
+    display: inline-block;
+    min-width: 3ch;
+    text-align: center;
+  }
+`;
+
+const SpinnerGlyph = styled.span`
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
 `;
 
 const TerminalScreen = styled.div`
@@ -284,6 +302,10 @@ const StatusSummaryLine = styled.div`
   }
   .selected {
     color: ${PALETTE.highlight};
+    font-weight: 700;
+  }
+  .error {
+    color: ${PALETTE.danger};
     font-weight: 700;
   }
 `;
@@ -377,6 +399,11 @@ const TUIExitBtn = styled.button`
   border: none;
   padding: 0.15rem 0.6rem;
   cursor: pointer;
+
+  &:hover {
+    background-color: ${PALETTE.btnFocusedBg};
+    color: ${PALETTE.btnFocusedFg};
+  }
 `;
 
 const TUIStartBtn = styled.button`
@@ -694,15 +721,140 @@ const TUI_GROUPS: TUIGroupSpec[] = [
 ];
 
 type SubcommandType = "bun" | "install" | "check" | "doctor" | "update";
+type TUIStateType = "scanning" | "tree" | "installing" | "complete";
 
 interface StyledSpan {
   text: string;
   color?: string;
   bg?: string;
   bold?: boolean;
+  isSpinner?: boolean;
 }
 
 type FrameLine = StyledSpan[];
+
+interface InstallTaskStep {
+  id: string;
+  name: string;
+  status: "pending" | "installing" | "ok";
+  message: string;
+  logLine?: string;
+}
+
+// Multi-step concurrent installation timeline matching renderInstallingView() in views.go
+const TUI_INSTALL_STEPS: InstallTaskStep[][] = [
+  [
+    {
+      id: "iterm2-font-config",
+      name: "iTerm2 Font Config",
+      status: "installing",
+      message: "Configuring iTerm2 default profile to use MesloLGS NF...",
+      logLine: "Updating ~/Library/Preferences/com.googlecode.iterm2.plist",
+    },
+    {
+      id: "vim-runtime",
+      name: "Ultimate Vim Runtime",
+      status: "installing",
+      message: "Cloning https://github.com/amix/vimrc.git...",
+      logLine: "Cloning into '/Users/dev/.vim_runtime'... (38%)",
+    },
+    {
+      id: "azure",
+      name: "Azure CLI",
+      status: "installing",
+      message: "Installing formula via Homebrew...",
+      logLine: "==> Downloading https://ghcr.io/v2/homebrew/core/azure-cli/manifests/2.67.0",
+    },
+    {
+      id: "java",
+      name: "Java (OpenJDK)",
+      status: "pending",
+      message: "Queued for installation",
+    },
+  ],
+  [
+    {
+      id: "iterm2-font-config",
+      name: "iTerm2 Font Config",
+      status: "ok",
+      message: "Configured MesloLGS-NF-Regular 14 in iTerm2 plist",
+    },
+    {
+      id: "vim-runtime",
+      name: "Ultimate Vim Runtime",
+      status: "installing",
+      message: "Running install_awesome_vimrc.sh...",
+      logLine: "Installed the Ultimate Vim configuration successfully!",
+    },
+    {
+      id: "azure",
+      name: "Azure CLI",
+      status: "installing",
+      message: "Installing formula via Homebrew...",
+      logLine: "==> Pouring azure-cli--2.67.0.arm64_sequoia.bottle.tar.gz",
+    },
+    {
+      id: "java",
+      name: "Java (OpenJDK)",
+      status: "installing",
+      message: "Installing formula via Homebrew...",
+      logLine: "==> Downloading https://ghcr.io/v2/homebrew/core/openjdk/blobs/sha256:9f8e...",
+    },
+  ],
+  [
+    {
+      id: "iterm2-font-config",
+      name: "iTerm2 Font Config",
+      status: "ok",
+      message: "Configured MesloLGS-NF-Regular 14 in iTerm2 plist",
+    },
+    {
+      id: "vim-runtime",
+      name: "Ultimate Vim Runtime",
+      status: "ok",
+      message: "Installed Ultimate Vim Runtime in ~/.vim_runtime",
+    },
+    {
+      id: "azure",
+      name: "Azure CLI",
+      status: "ok",
+      message: "Installed successfully via Homebrew",
+    },
+    {
+      id: "java",
+      name: "Java (OpenJDK)",
+      status: "installing",
+      message: "Installing formula via Homebrew...",
+      logLine: "==> Pouring openjdk--21.0.5.arm64_sequoia.bottle.tar.gz",
+    },
+  ],
+  [
+    {
+      id: "iterm2-font-config",
+      name: "iTerm2 Font Config",
+      status: "ok",
+      message: "Configured MesloLGS-NF-Regular 14 in iTerm2 plist",
+    },
+    {
+      id: "vim-runtime",
+      name: "Ultimate Vim Runtime",
+      status: "ok",
+      message: "Installed Ultimate Vim Runtime in ~/.vim_runtime",
+    },
+    {
+      id: "azure",
+      name: "Azure CLI",
+      status: "ok",
+      message: "Installed successfully via Homebrew",
+    },
+    {
+      id: "java",
+      name: "Java (OpenJDK)",
+      status: "ok",
+      message: "Installed successfully via Homebrew",
+    },
+  ],
+];
 
 function renderAsciiHeader() {
   return (
@@ -721,9 +873,13 @@ function renderAsciiHeader() {
 export default function TerminalSimulator() {
   const [activeSubcommand, setActiveSubcommand] =
     useState<SubcommandType>("bun");
+  const [tuiState, setTuiState] = useState<TUIStateType>("scanning");
+  const [tuiInstallStep, setTuiInstallStep] = useState<number>(0);
+
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [currentFrameIndex, setCurrentFrameIndex] = useState<number>(0);
   const [speed, setSpeed] = useState<number>(1);
+  const [spinnerIdx, setSpinnerIdx] = useState<number>(0);
 
   const [foldedGroups, setFoldedGroups] = useState<Record<string, boolean>>({
     system: true,
@@ -741,6 +897,40 @@ export default function TerminalSimulator() {
     "vim-runtime": true,
     java: true,
   });
+
+  // 120ms Braille spinner ticker matching tickCmd() in coffee-bun/internal/ui/tui.go
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSpinnerIdx((prev) => (prev + 1) % SPINNER_FRAMES.length);
+    }, 120);
+    return () => clearInterval(interval);
+  }, []);
+
+  // TUI state machine transitions (scanning -> tree, installing -> complete)
+  useEffect(() => {
+    if (activeSubcommand !== "bun" || !isPlaying) return;
+
+    if (tuiState === "scanning") {
+      const delay = Math.max(400, Math.floor(950 / speed));
+      const timer = setTimeout(() => {
+        setTuiState("tree");
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+
+    if (tuiState === "installing") {
+      const delay = Math.max(350, Math.floor(850 / speed));
+      const timer = setTimeout(() => {
+        if (tuiInstallStep < TUI_INSTALL_STEPS.length - 1) {
+          setTuiInstallStep((prev) => prev + 1);
+        } else {
+          setTuiState("complete");
+          setIsPlaying(false);
+        }
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+  }, [activeSubcommand, tuiState, tuiInstallStep, isPlaying, speed]);
 
   const toggleGroupFold = (groupKey: string) => {
     setFoldedGroups((prev) => ({
@@ -764,14 +954,16 @@ export default function TerminalSimulator() {
   // Exact CLI command output scripts matching /Users/pignose/bundle/internal/cli/*.go
   const scriptMap: Record<
     Exclude<SubcommandType, "bun">,
-    { cmd: string; frames: FrameLine[] }
+    { cmd: string; hasScanPhase?: boolean; frames: FrameLine[] }
   > = {
     install: {
       cmd: "bun install all",
       frames: [
         [{ text: "  Installing 4 missing package(s)...\n", color: PALETTE.normal }],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "iTerm2 Font Config", color: PALETTE.normal, bold: true },
           {
             text: ": Configuring iTerm2 default profile to use MesloLGS NF...",
@@ -779,15 +971,19 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Azure CLI", color: PALETTE.normal, bold: true },
           {
-            text: ": Installing via Homebrew (brew install azure-cli)...",
+            text: ": Installing formula via Homebrew...",
             color: PALETTE.normal,
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Ultimate Vim Runtime", color: PALETTE.normal, bold: true },
           {
             text: ": Cloning https://github.com/amix/vimrc.git into ~/.vim_runtime...",
@@ -795,10 +991,12 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Java (OpenJDK)", color: PALETTE.normal, bold: true },
           {
-            text: ": Installing via Homebrew (brew install openjdk)...",
+            text: ": Installing formula via Homebrew...",
             color: PALETTE.normal,
           },
         ],
@@ -822,7 +1020,7 @@ export default function TerminalSimulator() {
           { text: "  [OK] ", color: PALETTE.success, bold: true },
           { text: "Azure CLI", color: PALETTE.normal, bold: true },
           {
-            text: ": Installed azure-cli (2.67.0)",
+            text: ": Installed successfully via Homebrew",
             color: PALETTE.normal,
           },
         ],
@@ -830,7 +1028,7 @@ export default function TerminalSimulator() {
           { text: "  [OK] ", color: PALETTE.success, bold: true },
           { text: "Java (OpenJDK)", color: PALETTE.normal, bold: true },
           {
-            text: ": Installed openjdk (21.0.5) and verified JVM symlink",
+            text: ": Installed successfully via Homebrew",
             color: PALETTE.normal,
           },
         ],
@@ -845,6 +1043,7 @@ export default function TerminalSimulator() {
     },
     check: {
       cmd: "bun check",
+      hasScanPhase: true,
       frames: [
         [{ text: "  [System & Toolchains]", color: PALETTE.secondary, bold: true }],
         [{ text: "  " + "-".repeat(68), color: PALETTE.muted }],
@@ -958,11 +1157,15 @@ export default function TerminalSimulator() {
         ],
         [
           { text: "  [OK] ", color: PALETTE.success, bold: true },
-          { text: "OS: macOS (darwin/arm64)", color: PALETTE.normal },
+          { text: "OS: darwin (arm64)", color: PALETTE.normal },
         ],
         [
           { text: "  [OK] ", color: PALETTE.success, bold: true },
           { text: "Homebrew: Installed and in PATH", color: PALETTE.normal },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Git: Installed and accessible in PATH", color: PALETTE.normal },
         ],
         [
           { text: "  [OK] ", color: PALETTE.success, bold: true },
@@ -997,7 +1200,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Homebrew", color: PALETTE.normal, bold: true },
           {
             text: ": Updating Homebrew package index...",
@@ -1005,7 +1210,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Oh My Zsh", color: PALETTE.normal, bold: true },
           {
             text: ": Pulling latest changes for Oh My Zsh...",
@@ -1013,7 +1220,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Powerlevel10k", color: PALETTE.normal, bold: true },
           {
             text: ": Pulling latest changes for Powerlevel10k...",
@@ -1021,7 +1230,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Zsh Autosuggestions", color: PALETTE.normal, bold: true },
           {
             text: ": Pulling latest changes for Zsh Autosuggestions...",
@@ -1029,7 +1240,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Zsh Syntax Highlighting", color: PALETTE.normal, bold: true },
           {
             text: ": Pulling latest changes for Zsh Syntax Highlighting...",
@@ -1069,7 +1282,9 @@ export default function TerminalSimulator() {
           },
         ],
         [
-          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "  ", color: PALETTE.normal },
+          { text: "[..]", color: PALETTE.warning, bold: true, isSpinner: true },
+          { text: " ", color: PALETTE.normal },
           { text: "Homebrew Packages", color: PALETTE.normal, bold: true },
           {
             text: ": Upgrading outdated formulae and casks...",
@@ -1097,15 +1312,55 @@ export default function TerminalSimulator() {
 
   const handleSelectSubcommand = (sub: SubcommandType) => {
     setActiveSubcommand(sub);
-    if (sub !== "bun") {
+    if (sub === "bun") {
+      setTuiState("scanning");
+      setTuiInstallStep(0);
+      setIsPlaying(true);
+    } else {
       setCurrentFrameIndex(0);
       setIsPlaying(true);
     }
   };
 
-  const handleRestart = () => {
-    setCurrentFrameIndex(0);
+  const handleStartTuiInstall = () => {
+    setTuiInstallStep(0);
+    setTuiState("installing");
     setIsPlaying(true);
+  };
+
+  const handlePrimaryPlayAction = () => {
+    if (activeSubcommand === "bun") {
+      if (tuiState === "complete") {
+        setTuiInstallStep(0);
+        setTuiState("scanning");
+        setIsPlaying(true);
+      } else if (tuiState === "tree") {
+        handleStartTuiInstall();
+      } else {
+        setIsPlaying((prev) => !prev);
+      }
+      return;
+    }
+
+    const script = scriptMap[activeSubcommand];
+    const isFinished = currentFrameIndex >= script.frames.length;
+    if (isFinished) {
+      setCurrentFrameIndex(0);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying((prev) => !prev);
+    }
+  };
+
+  const handleRestart = () => {
+    if (activeSubcommand === "bun") {
+      setTuiInstallStep(0);
+      setTuiState("scanning");
+      setIsPlaying(true);
+    } else {
+      setCurrentFrameIndex(0);
+      setIsPlaying(true);
+    }
   };
 
   const activeScript =
@@ -1119,7 +1374,11 @@ export default function TerminalSimulator() {
       return;
     }
 
-    const delay = Math.max(60, Math.floor(150 / speed));
+    const delay =
+      currentFrameIndex === 0 && activeScript.hasScanPhase
+        ? Math.max(350, Math.floor(650 / speed))
+        : Math.max(80, Math.floor(210 / speed));
+
     const timer = setTimeout(() => {
       setCurrentFrameIndex((prev) => prev + 1);
     }, delay);
@@ -1130,6 +1389,31 @@ export default function TerminalSimulator() {
   const displayedFrames = activeScript
     ? activeScript.frames.slice(0, currentFrameIndex)
     : [];
+
+  const isSubcommandCompleted =
+    activeSubcommand === "bun"
+      ? tuiState === "complete"
+      : !!activeScript && currentFrameIndex >= activeScript.frames.length;
+
+  const isAnimationActive =
+    activeSubcommand === "bun"
+      ? isPlaying && (tuiState === "scanning" || tuiState === "installing")
+      : isPlaying && !isSubcommandCompleted;
+
+  const currentSpinnerChar = SPINNER_FRAMES[spinnerIdx];
+  const currentInstallList =
+    TUI_INSTALL_STEPS[
+      Math.min(tuiInstallStep, TUI_INSTALL_STEPS.length - 1)
+    ];
+  const completedInStep = currentInstallList.filter(
+    (t) => t.status === "ok"
+  ).length;
+  const activeInStep = currentInstallList.filter(
+    (t) => t.status === "installing"
+  ).length;
+  const queuedInStep = currentInstallList.filter(
+    (t) => t.status === "pending"
+  ).length;
 
   return (
     <TerminalWrapper>
@@ -1185,159 +1469,371 @@ export default function TerminalSimulator() {
           </SubcommandTab>
         </SubcommandBar>
 
-        {activeSubcommand !== "bun" && (
-          <PlayerControlBar>
-            <PlayerControls>
-              <ControlBtn onClick={() => setIsPlaying(!isPlaying)}>
-                {isPlaying ? (
-                  <>
-                    <RiPauseLine />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <RiPlayLine />
-                    Play
-                  </>
-                )}
-              </ControlBtn>
+        <PlayerControlBar>
+          <PlayerControls>
+            <ControlBtn onClick={handlePrimaryPlayAction}>
+              {isSubcommandCompleted ? (
+                <>
+                  <RiRestartLine />
+                  Replay
+                </>
+              ) : isAnimationActive ? (
+                <>
+                  <RiPauseLine />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <RiPlayLine />
+                  Play
+                </>
+              )}
+            </ControlBtn>
+            {!isSubcommandCompleted && (
               <ControlBtn onClick={handleRestart}>
                 <RiRestartLine />
-                Replay
+                Reset
               </ControlBtn>
-              <ControlBtn
-                onClick={() => setSpeed((prev) => (prev === 1 ? 2 : 1))}
-                style={{ minWidth: 46 }}
-              >
-                {speed}x
-              </ControlBtn>
-            </PlayerControls>
+            )}
+            <ControlBtn
+              onClick={() => setSpeed((prev) => (prev === 1 ? 2 : 1))}
+              style={{ minWidth: 46 }}
+            >
+              {speed}x
+            </ControlBtn>
+          </PlayerControls>
 
-            <PlaybackStatus>
-              <span className="rec-dot" />
-              <span>
-                {isPlaying
-                  ? `Running: $ ${activeScript?.cmd}`
-                  : `Completed: $ ${activeScript?.cmd}`}
+          <PlaybackStatus>
+            {isAnimationActive ? (
+              <span className="spin-char">
+                [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
               </span>
-            </PlaybackStatus>
-          </PlayerControlBar>
-        )}
+            ) : (
+              <span className="rec-dot" />
+            )}
+            <span>
+              {activeSubcommand === "bun"
+                ? tuiState === "scanning"
+                  ? "Scanning: $ bun"
+                  : tuiState === "installing"
+                    ? "Installing: $ bun (Goroutine Workers)"
+                    : tuiState === "complete"
+                      ? "Completed: $ bun"
+                      : "Interactive: $ bun (Click Start Install or Play)"
+                : isSubcommandCompleted
+                  ? `Completed: $ ${activeScript?.cmd}`
+                  : isPlaying
+                    ? `Running: $ ${activeScript?.cmd}`
+                    : `Paused: $ ${activeScript?.cmd}`}
+            </span>
+          </PlaybackStatus>
+        </PlayerControlBar>
 
         <TerminalScreen>
           {activeSubcommand === "bun" ? (
-            <div>
-              {renderAsciiHeader()}
+            tuiState === "scanning" ? (
+              <div>
+                {renderAsciiHeader()}
+                <div style={{ whiteSpace: "pre", marginTop: "0.75rem" }}>
+                  {"  "}
+                  <span style={{ color: PALETTE.highlight, fontWeight: 700 }}>
+                    [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
+                  </span>{" "}
+                  <span style={{ color: PALETTE.normal }}>
+                    Checking environment and installed tools...
+                  </span>
+                </div>
+                <div
+                  style={{
+                    whiteSpace: "pre",
+                    marginTop: "0.75rem",
+                    color: PALETTE.muted,
+                  }}
+                >
+                  {"  Please wait while components are verified..."}
+                </div>
+              </div>
+            ) : tuiState === "installing" ? (
+              <div>
+                <div style={{ whiteSpace: "pre", marginBottom: "0.25rem" }}>
+                  {" "}
+                  <span style={{ color: PALETTE.highlight, fontWeight: 700 }}>
+                    [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
+                  </span>
+                  {"  "}
+                  <span style={{ color: PALETTE.normal, fontWeight: 700 }}>
+                    Coffee Bun
+                  </span>
+                </div>
 
-              <StatusSummaryLine>
-                {"  Status: "}
-                <span className="ready">{totalReady}</span>
-                {" ready, "}
-                <span className="missing">{totalMissing}</span>
-                {" missing | "}
-                <span className="selected">{totalSelected}</span>
-                {" selected to install"}
-              </StatusSummaryLine>
+                <DividerLine>{"-".repeat(78)}</DividerLine>
 
-              <DividerLine>{"-".repeat(78)}</DividerLine>
-
-              {TUI_GROUPS.map((group, gIdx) => {
-                const isFolded = !!foldedGroups[group.key];
-                const totalInGroup = group.items.length;
-                const readyInGroup = group.items.filter(
-                  (i) => i.installed
-                ).length;
-                const missingInGroup = totalInGroup - readyInGroup;
-                const selectedInGroup = group.items.filter(
-                  (i) => selectedIds[i.id]
-                ).length;
-                const isFirstCursor = gIdx === 1;
-
-                return (
-                  <React.Fragment key={group.key}>
-                    <GroupHeaderLine
-                      isCursor={isFirstCursor}
-                      onClick={() => toggleGroupFold(group.key)}
-                    >
-                      {isFirstCursor ? "> " : "  "}
-                      {isFolded ? "[+]" : "[-]"} {group.icon} {group.title}{" "}
-                      {missingInGroup === 0 ? (
-                        <span className="badge-ready">
-                          ({readyInGroup}/{totalInGroup} ready)
-                        </span>
-                      ) : (
-                        <span className="badge-missing">
-                          ({readyInGroup}/{totalInGroup} ready, {missingInGroup}{" "}
-                          missing)
-                        </span>
-                      )}{" "}
-                      {selectedInGroup === totalInGroup && totalInGroup > 0 ? (
-                        <span className="sel-all">[All]</span>
-                      ) : selectedInGroup > 0 ? (
-                        <span className="sel-some">
-                          [{selectedInGroup} sel]
-                        </span>
-                      ) : (
-                        <span className="sel-empty">[ ]</span>
-                      )}
-                    </GroupHeaderLine>
-
-                    {!isFolded &&
-                      group.items.map((item) => {
-                        const isSel = !!selectedIds[item.id];
-                        const paddedName = item.name.padEnd(25, " ");
-                        const paddedVer = (
-                          item.installed ? item.version : "missing"
-                        ).padEnd(13, " ");
-
-                        return (
-                          <PackageItemLine
-                            key={item.id}
-                            onClick={() => toggleItemSelect(item.id)}
+                <div style={{ minHeight: "310px", padding: "0.25rem 0" }}>
+                  {currentInstallList.map((item) => {
+                    const paddedName = item.name.padEnd(22, " ");
+                    return (
+                      <React.Fragment key={item.id}>
+                        <div style={{ whiteSpace: "pre", padding: "0.1rem 0" }}>
+                          {"   "}
+                          {item.status === "installing" ? (
+                            <>
+                              <span
+                                style={{
+                                  color: PALETTE.highlight,
+                                  fontWeight: 700,
+                                }}
+                              >
+                                [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
+                              </span>{" "}
+                              <span
+                                style={{
+                                  color: PALETTE.normal,
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {paddedName}
+                              </span>
+                              {": "}
+                              <span style={{ color: PALETTE.normal }}>
+                                {item.message}
+                              </span>
+                            </>
+                          ) : item.status === "ok" ? (
+                            <>
+                              <span
+                                style={{
+                                  color: PALETTE.success,
+                                  fontWeight: 700,
+                                }}
+                              >
+                                [OK]
+                              </span>{" "}
+                              <span style={{ color: PALETTE.normal }}>
+                                {paddedName}
+                              </span>
+                              {": "}
+                              <span style={{ color: PALETTE.muted }}>
+                                {item.message}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ color: PALETTE.muted }}>[..]</span>{" "}
+                              <span style={{ color: PALETTE.muted }}>
+                                {paddedName}
+                              </span>
+                              {": "}
+                              <span style={{ color: PALETTE.muted }}>
+                                {item.message}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {item.status === "installing" && item.logLine && (
+                          <div
+                            style={{
+                              whiteSpace: "pre",
+                              padding: "0.05rem 0 0.2rem",
+                            }}
                           >
-                            {"      "}
-                            {item.installed ? (
-                              isSel ? (
-                                <span className="chk-installed-sel">[x]</span>
+                            {"       "}
+                            <span style={{ color: PALETTE.muted }}>&gt;</span>{" "}
+                            <span style={{ color: PALETTE.logStream }}>
+                              {item.logLine}
+                            </span>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+
+                <DividerLine>{"-".repeat(78)}</DividerLine>
+
+                <StatusSummaryLine>
+                  {"  Progress: "}
+                  <span className="ready">{completedInStep}</span>
+                  {" completed, "}
+                  <span className="selected">{activeInStep}</span>
+                  {" active, "}
+                  <span style={{ color: PALETTE.muted }}>{queuedInStep}</span>
+                  {` queued (Total: ${currentInstallList.length})  `}
+                  <span style={{ color: PALETTE.muted }}>
+                    [j/k/g/G] Scroll
+                  </span>
+                </StatusSummaryLine>
+              </div>
+            ) : tuiState === "complete" ? (
+              <div>
+                {renderAsciiHeader()}
+
+                <StatusSummaryLine>
+                  {"  Completed: "}
+                  <span className="ready">{currentInstallList.length}</span>
+                  {" succeeded, "}
+                  <span className="error">0</span>
+                  {` failed (Total: ${currentInstallList.length})`}
+                </StatusSummaryLine>
+
+                <DividerLine>{"-".repeat(78)}</DividerLine>
+
+                <div style={{ minHeight: "230px", padding: "0.25rem 0" }}>
+                  {TUI_INSTALL_STEPS[TUI_INSTALL_STEPS.length - 1].map(
+                    (item) => (
+                      <div
+                        key={item.id}
+                        style={{ whiteSpace: "pre", padding: "0.1rem 0" }}
+                      >
+                        {"   "}
+                        <span
+                          style={{ color: PALETTE.success, fontWeight: 700 }}
+                        >
+                          [OK]
+                        </span>{" "}
+                        <span style={{ color: PALETTE.normal }}>
+                          {item.name.padEnd(22, " ")}
+                        </span>
+                        {": "}
+                        <span style={{ color: PALETTE.normal }}>
+                          {item.message}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                <DividerLine>{"-".repeat(78)}</DividerLine>
+
+                <TUIButtonsRow>
+                  <TUIExitBtn onClick={() => setTuiState("tree")}>
+                    {"  < Back to Selection  "}
+                  </TUIExitBtn>
+                  <TUIStartBtn onClick={() => handleSelectSubcommand("check")}>
+                    {"[ Done / Exit > ]"}
+                  </TUIStartBtn>
+                </TUIButtonsRow>
+
+                <TUIHintRow>
+                  {
+                    "  [Tab/←/→] Buttons | [j/k/g/G] Scroll | [Enter] Execute | [q] Quit"
+                  }
+                </TUIHintRow>
+              </div>
+            ) : (
+              <div>
+                {renderAsciiHeader()}
+
+                <StatusSummaryLine>
+                  {"  Status: "}
+                  <span className="ready">{totalReady}</span>
+                  {" ready, "}
+                  <span className="missing">{totalMissing}</span>
+                  {" missing | "}
+                  <span className="selected">{totalSelected}</span>
+                  {" selected to install"}
+                </StatusSummaryLine>
+
+                <DividerLine>{"-".repeat(78)}</DividerLine>
+
+                {TUI_GROUPS.map((group, gIdx) => {
+                  const isFolded = !!foldedGroups[group.key];
+                  const totalInGroup = group.items.length;
+                  const readyInGroup = group.items.filter(
+                    (i) => i.installed
+                  ).length;
+                  const missingInGroup = totalInGroup - readyInGroup;
+                  const selectedInGroup = group.items.filter(
+                    (i) => selectedIds[i.id]
+                  ).length;
+                  const isFirstCursor = gIdx === 1;
+
+                  return (
+                    <React.Fragment key={group.key}>
+                      <GroupHeaderLine
+                        isCursor={isFirstCursor}
+                        onClick={() => toggleGroupFold(group.key)}
+                      >
+                        {isFirstCursor ? "> " : "  "}
+                        {isFolded ? "[+]" : "[-]"} {group.icon} {group.title}{" "}
+                        {missingInGroup === 0 ? (
+                          <span className="badge-ready">
+                            ({readyInGroup}/{totalInGroup} ready)
+                          </span>
+                        ) : (
+                          <span className="badge-missing">
+                            ({readyInGroup}/{totalInGroup} ready,{" "}
+                            {missingInGroup} missing)
+                          </span>
+                        )}{" "}
+                        {selectedInGroup === totalInGroup &&
+                        totalInGroup > 0 ? (
+                          <span className="sel-all">[All]</span>
+                        ) : selectedInGroup > 0 ? (
+                          <span className="sel-some">
+                            [{selectedInGroup} sel]
+                          </span>
+                        ) : (
+                          <span className="sel-empty">[ ]</span>
+                        )}
+                      </GroupHeaderLine>
+
+                      {!isFolded &&
+                        group.items.map((item) => {
+                          const isSel = !!selectedIds[item.id];
+                          const paddedName = item.name.padEnd(25, " ");
+                          const paddedVer = (
+                            item.installed ? item.version : "missing"
+                          ).padEnd(13, " ");
+
+                          return (
+                            <PackageItemLine
+                              key={item.id}
+                              onClick={() => toggleItemSelect(item.id)}
+                            >
+                              {"      "}
+                              {item.installed ? (
+                                isSel ? (
+                                  <span className="chk-installed-sel">[x]</span>
+                                ) : (
+                                  <span className="chk-installed">[x]</span>
+                                )
+                              ) : isSel ? (
+                                <span className="chk-missing-sel">[+]</span>
                               ) : (
-                                <span className="chk-installed">[x]</span>
-                              )
-                            ) : isSel ? (
-                              <span className="chk-missing-sel">[+]</span>
-                            ) : (
-                              <span className="chk-missing">[ ]</span>
-                            )}{" "}
-                            <span>{paddedName}</span>{" "}
-                            {item.installed ? (
-                              <span className="ver-ok">{paddedVer}</span>
-                            ) : (
-                              <span className="ver-missing">{paddedVer}</span>
-                            )}{" "}
-                            <span className="desc">- {item.desc}</span>
-                          </PackageItemLine>
-                        );
-                      })}
-                  </React.Fragment>
-                );
-              })}
+                                <span className="chk-missing">[ ]</span>
+                              )}{" "}
+                              <span>{paddedName}</span>{" "}
+                              {item.installed ? (
+                                <span className="ver-ok">{paddedVer}</span>
+                              ) : (
+                                <span className="ver-missing">{paddedVer}</span>
+                              )}{" "}
+                              <span className="desc">- {item.desc}</span>
+                            </PackageItemLine>
+                          );
+                        })}
+                    </React.Fragment>
+                  );
+                })}
 
-              <DividerLine>{"-".repeat(78)}</DividerLine>
+                <DividerLine>{"-".repeat(78)}</DividerLine>
 
-              <TUIButtonsRow>
-                <TUIExitBtn onClick={() => handleSelectSubcommand("check")}>
-                  {"  < Exit  "}
-                </TUIExitBtn>
-                <TUIStartBtn onClick={() => handleSelectSubcommand("install")}>
-                  {`[ Start Install (${totalSelected}) > ]`}
-                </TUIStartBtn>
-              </TUIButtonsRow>
+                <TUIButtonsRow>
+                  <TUIExitBtn onClick={() => handleSelectSubcommand("check")}>
+                    {"  < Exit  "}
+                  </TUIExitBtn>
+                  <TUIStartBtn onClick={handleStartTuiInstall}>
+                    {`[ Start Install (${totalSelected}) > ]`}
+                  </TUIStartBtn>
+                </TUIButtonsRow>
 
-              <TUIHintRow>
-                {
-                  "  [j/k/g/G] Move | [Space] Toggle | [a/m] All/Missing | [?] Shortcuts | [q] Quit"
-                }
-              </TUIHintRow>
-            </div>
+                <TUIHintRow>
+                  {
+                    "  [j/k/g/G] Move | [Space] Toggle | [a/m] All/Missing | [r] Rescan | [q] Quit"
+                  }
+                </TUIHintRow>
+              </div>
+            )
           ) : (
             <div>
               <PromptLine>
@@ -1345,24 +1841,48 @@ export default function TerminalSimulator() {
                 <span className="cmd">{activeScript?.cmd}</span>
               </PromptLine>
 
-              {renderAsciiHeader()}
-
-              {displayedFrames.map((line, lineIdx) => (
-                <div key={lineIdx} style={{ whiteSpace: "pre-wrap" }}>
-                  {line.map((span, sIdx) => (
-                    <span
-                      key={sIdx}
-                      style={{
-                        color: span.color || PALETTE.normal,
-                        backgroundColor: span.bg || "transparent",
-                        fontWeight: span.bold ? 700 : 400,
-                      }}
-                    >
-                      {span.text}
-                    </span>
-                  ))}
+              {activeSubcommand === "check" && currentFrameIndex === 0 ? (
+                <div style={{ whiteSpace: "pre", marginTop: "0.5rem" }}>
+                  {"  "}
+                  <span style={{ color: PALETTE.highlight, fontWeight: 700 }}>
+                    [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
+                  </span>{" "}
+                  <span style={{ color: PALETTE.normal }}>
+                    Scanning macOS developer environment...
+                  </span>
                 </div>
-              ))}
+              ) : (
+                <>
+                  {renderAsciiHeader()}
+
+                  {displayedFrames.map((line, lineIdx) => (
+                    <div key={lineIdx} style={{ whiteSpace: "pre-wrap" }}>
+                      {line.map((span, sIdx) => {
+                        const isLiveSpinner =
+                          span.isSpinner && !isSubcommandCompleted;
+                        return (
+                          <span
+                            key={sIdx}
+                            style={{
+                              color: span.color || PALETTE.normal,
+                              backgroundColor: span.bg || "transparent",
+                              fontWeight: span.bold ? 700 : 400,
+                            }}
+                          >
+                            {isLiveSpinner ? (
+                              <>
+                                [<SpinnerGlyph>{currentSpinnerChar}</SpinnerGlyph>]
+                              </>
+                            ) : (
+                              span.text
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </TerminalScreen>

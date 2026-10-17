@@ -27,7 +27,7 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
     assert.match(content, /normal:\s*"#EDE0D4"/);
   });
 
-  it("TerminalSimulator.tsx outputs 100% English CLI results matching real coffee-bun commands", () => {
+  it("TerminalSimulator.tsx outputs 100% English CLI results, Braille spinner loading animations, and Play -> Replay transition", () => {
     const content = readProjectFile("src/components/TerminalSimulator.tsx");
 
     // Must not contain any Korean characters inside the terminal simulator
@@ -36,6 +36,13 @@ describe("Terminal Simulator, Soft Coffee Pastel Palette, GitHub Preview Card & 
       false,
       "TerminalSimulator.tsx should be 100% English like the real Go CLI"
     );
+
+    // Must include Braille spinner frames from coffee-bun/internal/ui/tui.go
+    assert.match(content, /SPINNER_FRAMES\s*=\s*\["⠋",\s*"⠙",\s*"⠹"/);
+    assert.match(content, /Checking environment and installed tools\.\.\./);
+    assert.match(content, /Please wait while components are verified\.\.\./);
+    assert.match(content, /TUI_INSTALL_STEPS/);
+    assert.match(content, /isSubcommandCompleted\s*\?\s*\(/);
 
     // Must match real CLI outputs from /Users/pignose/bundle/internal/cli/*.go
     assert.match(content, /Status:/);

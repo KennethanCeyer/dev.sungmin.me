@@ -35,21 +35,10 @@ const FooterInner = styled.div`
   }
 `;
 
-const CopyrightSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
 const Copyright = styled.p`
   font-size: 0.85rem;
   margin: 0;
   opacity: 0.7;
-`;
-
-const BuiltWith = styled.span`
-  font-size: 0.75rem;
-  opacity: 0.5;
 `;
 
 const SocialLinks = styled.div`
@@ -104,12 +93,9 @@ export default function Footer() {
   return (
     <FooterContainer>
       <FooterInner>
-        <CopyrightSection>
-          <Copyright>
-            © {new Date().getFullYear()} {t("footer.copyright", "Sungmin Han. All rights reserved.")}
-          </Copyright>
-          <BuiltWith>{t("footer.built_with", "Crafted with Next.js, TypeScript & Emotion.")}</BuiltWith>
-        </CopyrightSection>
+        <Copyright>
+          © {new Date().getFullYear()} {t("footer.copyright", "Sungmin Han. All rights reserved.")}
+        </Copyright>
 
         <SocialLinks>
           {socialLinks.map((link) => (

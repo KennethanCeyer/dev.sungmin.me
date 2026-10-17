@@ -86,7 +86,6 @@ export const resources = {
       },
       footer: {
         copyright: "Sungmin Han. All rights reserved.",
-        built_with: "Aligned with sungmin.me design system.",
       },
     },
   },
@@ -177,7 +176,6 @@ export const resources = {
       },
       footer: {
         copyright: "Sungmin Han. All rights reserved.",
-        built_with: "sungmin.me 디자인 시스템 기반으로 제작되었습니다.",
       },
     },
   },

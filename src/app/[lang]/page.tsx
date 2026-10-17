@@ -17,15 +17,25 @@ const PageContainer = styled.div`
 
 const HeroSection = styled.section`
   position: relative;
-  padding: 5.5rem 1.5rem 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6.5rem 1.5rem 4.5rem;
   text-align: center;
-  z-index: 1;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+  overflow: hidden;
 
   @media (max-width: 768px) {
-    padding: 3.5rem 1rem 2rem;
+    padding: 4.5rem 1rem 3rem;
   }
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  pointer-events: none;
 `;
 
 const Badge = styled.div`
@@ -42,6 +52,7 @@ const Badge = styled.div`
   color: ${({ theme }) => theme.text};
   opacity: 0.85;
   margin-bottom: 1.25rem;
+  pointer-events: auto;
 `;
 
 const MainTitle = styled.h1`
@@ -53,6 +64,7 @@ const MainTitle = styled.h1`
   color: ${({ theme }) => theme.text};
   border: none;
   padding: 0;
+  pointer-events: auto;
 
   @media (max-width: 768px) {
     font-size: 2.4rem;
@@ -63,9 +75,10 @@ const Subtitle = styled.p`
   font-size: 1.15rem;
   line-height: 1.6;
   max-width: 680px;
-  margin: 0 auto 2.5rem;
+  margin: 0 auto;
   color: ${({ theme }) => theme.text};
   opacity: 0.75;
+  pointer-events: auto;
 
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -230,13 +243,14 @@ export default function HomePage() {
 
   return (
     <PageContainer>
-      <DevBackground />
-
       {/* Hero */}
       <HeroSection>
-        <Badge>{t("hero.badge", "Developer Infrastructure & Open Source")}</Badge>
-        <MainTitle>{t("hero.title", "Developer Hub")}</MainTitle>
-        <Subtitle>{t("hero.subtitle")}</Subtitle>
+        <DevBackground />
+        <HeroContent>
+          <Badge>{t("hero.badge", "Developer Infrastructure & Open Source")}</Badge>
+          <MainTitle>{t("hero.title", "Developer Hub")}</MainTitle>
+          <Subtitle>{t("hero.subtitle")}</Subtitle>
+        </HeroContent>
       </HeroSection>
 
       {/* Projects Gallery (Only coffee-bun) */}

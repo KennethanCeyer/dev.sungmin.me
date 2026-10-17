@@ -25,104 +25,211 @@ const DevBackground = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const mouse = { x: -1000, y: -1000 };
-    const symbols = [
-      "0x",
-      "::",
-      "//",
-      "+",
-      "fn",
-      "{}",
-      "->",
-      "01",
-      "&",
-      "~",
-      "[]",
-    ];
+    const parent = canvas.parentElement || canvas;
+    const isDark = themeName === "dark";
+    const baseRgb = isDark ? "255, 255, 255" : "0, 0, 0";
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+    const mouse = {
+      targetX: -1000,
+      targetY: -1000,
+      currentX: -1000,
+      currentY: -1000,
+      active: false,
     };
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let animId: number;
+    let isPaused = false;
 
-    const isDark = themeName === "dark";
-    const baseColor = isDark ? "255, 255, 255" : "16, 18, 22";
-    const cellWidth = 60;
-    const cellHeight = 40;
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = parent.clientWidth || window.innerWidth;
+      height = parent.clientHeight || 400;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      const rect = parent.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (x >= -50 && x <= rect.width + 50 && y >= -50 && y <= rect.height + 50) {
+        mouse.targetX = x;
+        mouse.targetY = y;
+        mouse.active = true;
+        if (mouse.currentX < -500) {
+          mouse.currentX = x;
+          mouse.currentY = y;
+        }
+      } else {
+        mouse.active = false;
+      }
+    };
+
+    const handleMouseLeave = () => {
+      mouse.active = false;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseout", handleMouseLeave);
 
-    let frame = 0;
-    let animationFrameId: number;
+    const onVisibility = () => {
+      if (document.hidden) {
+        isPaused = true;
+        cancelAnimationFrame(animId);
+      } else {
+        isPaused = false;
+        animId = requestAnimationFrame(render);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
-    const animate = () => {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      frame++;
+    const cellSize = 36;
+    const majorInterval = 4;
+    const spotlightRadius = 180;
 
-      ctx.font = '10px "Roboto Mono", monospace';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+    const render = () => {
+      if (isPaused) return;
 
-      const cols = Math.ceil(canvas.width / cellWidth) + 1;
-      const rows = Math.ceil(canvas.height / cellHeight) + 1;
+      if (mouse.active) {
+        mouse.currentX += (mouse.targetX - mouse.currentX) * 0.1;
+        mouse.currentY += (mouse.targetY - mouse.currentY) * 0.1;
+      } else {
+        mouse.currentX += (-1000 - mouse.currentX) * 0.05;
+        mouse.currentY += (-1000 - mouse.currentY) * 0.05;
+      }
 
-      // Draw subtle crosshair grid & reactive code tokens
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rows; r++) {
-          const x = c * cellWidth;
-          const y = r * cellHeight;
+      ctx.clearRect(0, 0, width, height);
 
-          const dx = x - mouse.x;
-          const dy = y - mouse.y;
+      const mx = mouse.currentX;
+      const my = mouse.currentY;
+
+      // Soft ambient spotlight glow
+      if (mx > -200 && mx < width + 200) {
+        const radial = ctx.createRadialGradient(
+          mx,
+          my,
+          0,
+          mx,
+          my,
+          spotlightRadius
+        );
+        radial.addColorStop(0, `rgba(${baseRgb}, ${isDark ? 0.035 : 0.025})`);
+        radial.addColorStop(1, `rgba(${baseRgb}, 0)`);
+        ctx.fillStyle = radial;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      const cols = Math.ceil(width / cellSize) + 1;
+      const rows = Math.ceil(height / cellSize) + 1;
+
+      // Draw vertical lines
+      for (let c = 0; c <= cols; c++) {
+        const x = Math.floor(c * cellSize) + 0.5;
+        const isMajor = c % majorInterval === 0;
+
+        const baseAlpha = isMajor
+          ? isDark
+            ? 0.045
+            : 0.04
+          : isDark
+          ? 0.02
+          : 0.018;
+
+        const distToMouse = Math.abs(x - mx);
+        let highlight = 0;
+        if (distToMouse < spotlightRadius) {
+          highlight =
+            (1 - distToMouse / spotlightRadius) * (isMajor ? 0.1 : 0.06);
+        }
+
+        ctx.strokeStyle = `rgba(${baseRgb}, ${baseAlpha + highlight})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      // Draw horizontal lines
+      for (let r = 0; r <= rows; r++) {
+        const y = Math.floor(r * cellSize) + 0.5;
+        const isMajor = r % majorInterval === 0;
+
+        const baseAlpha = isMajor
+          ? isDark
+            ? 0.045
+            : 0.04
+          : isDark
+          ? 0.02
+          : 0.018;
+
+        const distToMouse = Math.abs(y - my);
+        let highlight = 0;
+        if (distToMouse < spotlightRadius) {
+          highlight =
+            (1 - distToMouse / spotlightRadius) * (isMajor ? 0.1 : 0.06);
+        }
+
+        ctx.strokeStyle = `rgba(${baseRgb}, ${baseAlpha + highlight})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw precision micro-crosshairs at major intersections
+      const tickSize = 3;
+      for (let c = 0; c <= cols; c += majorInterval) {
+        const x = Math.floor(c * cellSize) + 0.5;
+        for (let r = 0; r <= rows; r += majorInterval) {
+          const y = Math.floor(r * cellSize) + 0.5;
+
+          const dx = x - mx;
+          const dy = y - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const maxDist = 180;
 
-          if (dist < maxDist) {
-            const proximity = 1 - dist / maxDist;
-
-            // Subtle reactive crosshair line
-            ctx.strokeStyle = `rgba(${baseColor}, ${proximity * 0.18})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(x - 5, y);
-            ctx.lineTo(x + 5, y);
-            ctx.moveTo(x, y - 5);
-            ctx.lineTo(x, y + 5);
-            ctx.stroke();
-
-            // When close to cursor, show subtle code glyph
-            if (dist < maxDist * 0.65) {
-              const symIndex = Math.abs((c * 17 + r * 31 + Math.floor(frame / 60)) % symbols.length);
-              ctx.fillStyle = `rgba(${baseColor}, ${proximity * 0.4})`;
-              ctx.fillText(symbols[symIndex], x, y - 10);
-            }
-          } else {
-            // Static faint grid dot
-            ctx.fillStyle = `rgba(${baseColor}, 0.04)`;
-            ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+          let tickAlpha = isDark ? 0.07 : 0.06;
+          if (dist < spotlightRadius) {
+            const proximity = 1 - dist / spotlightRadius;
+            tickAlpha += proximity * 0.2;
           }
+
+          ctx.strokeStyle = `rgba(${baseRgb}, ${tickAlpha})`;
+          ctx.lineWidth = 1;
+
+          ctx.beginPath();
+          ctx.moveTo(x - tickSize, y);
+          ctx.lineTo(x + tickSize, y);
+          ctx.moveTo(x, y - tickSize);
+          ctx.lineTo(x, y + tickSize);
+          ctx.stroke();
         }
       }
 
-      animationFrameId = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(render);
     };
 
-    animationFrameId = requestAnimationFrame(animate);
+    animId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("mouseout", handleMouseLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+      cancelAnimationFrame(animId);
     };
   }, [themeName]);
 

@@ -2,7 +2,6 @@
 
 import CodeBlock from "@/components/CodeBlock";
 import CopyButton from "@/components/CopyButton";
-import DevBackground from "@/components/DevBackground";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TerminalSimulator from "@/components/TerminalSimulator";
 import { coffeeBunReadmeContent } from "@/data/coffeeBunReadme";
@@ -398,8 +397,6 @@ export default function CoffeeBunPage() {
 
   return (
     <PageWrapper>
-      <DevBackground />
-
       <BackNav>
         <Link href={`/${lang}`}>
           <RiArrowLeftLine />

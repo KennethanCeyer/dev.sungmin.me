@@ -2,14 +2,63 @@
 
 import styled from "@emotion/styled";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
-  RiCheckLine,
   RiPauseLine,
   RiPlayLine,
   RiRestartLine,
   RiTerminalBoxLine,
 } from "react-icons/ri";
+
+// Exact Soft Coffee Pastel Palette from coffee-bun/internal/ui/styles.go
+const PALETTE = {
+  bg: "#0B0A09",
+  headerBg: "#141210",
+  tabBarBg: "#100E0C",
+  controlBarBg: "#0E0C0A",
+  primary: "#A67B5B", // Warm Café au Lait / Mocha Pastel
+  secondary: "#D4A373", // Soft Caramel / Latte Pastel (CategoryHeaderStyle)
+  success: "#84A98C", // Soft Matcha / Sage Pastel Green (BadgeSuccess)
+  warning: "#E9C46A", // Warm Honey / Biscuit Pastel (BadgeMissing)
+  danger: "#E07A5F", // Soft Terracotta / Rose Pastel (BadgeError)
+  muted: "#9C8F84", // Warm Taupe / Coffee Gray (MutedStyle)
+  highlight: "#E6CCB2", // Soft Vanilla / Oat Milk Cream (SelectedStyle)
+  normal: "#EDE0D4", // NormalStyle & LogoTextStyle
+  logoBun: "#C68B59", // LogoBunStyle
+  titleFg: "#F5EBE0", // TitleStyle Foreground
+  titleBg: "#4A3525", // TitleStyle Background
+  btnNormalFg: "#D6CCC2",
+  btnNormalBg: "#2C221E",
+  btnSuccessFg: "#FFF8F0",
+  btnSuccessBg: "#6B9080",
+  logStream: "#8A7968",
+};
+
+const ASCII_BUN_LINES = [
+  {
+    icon: "      ▄▄██████▄▄         ",
+    text: "▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀",
+  },
+  {
+    icon: "   ▄██▀▀▀▀▀▀▀▀▀▀██▄      ",
+    text: "█    █  █ █▀▀  █▀▀  █▀▀  █▀▀ ",
+  },
+  {
+    icon: "  ██▀ ▄▄██████▄▄ ▀██     ",
+    text: "▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄",
+  },
+  {
+    icon: " ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    ",
+    text: "█▀▀▄ █  █ █▄ █",
+  },
+  {
+    icon: "▄██▄▄████████████▄▄██▄   ",
+    text: "█▀▀▄ █  █ █ ▀█",
+  },
+  {
+    icon: " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ",
+    text: "▀▀▀   ▀▀  ▀  ▀",
+  },
+];
 
 const TerminalWrapper = styled.div`
   width: 100%;
@@ -19,37 +68,45 @@ const TerminalWrapper = styled.div`
 `;
 
 const TerminalFrame = styled.div`
-  background-color: var(--code-block-bg);
-  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${PALETTE.bg};
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   overflow: hidden;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
 `;
 
 const TerminalHeader = styled.div`
-  background-color: var(--color-background);
+  background-color: ${PALETTE.headerBg};
   padding: 0.65rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-border-weak);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 `;
 
 const WindowButtons = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 7px;
   span {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     display: inline-block;
-    background-color: var(--color-border);
+  }
+  .close {
+    background-color: #ff5f56;
+  }
+  .minimize {
+    background-color: #ffbd2e;
+  }
+  .maximize {
+    background-color: #27c93f;
   }
 `;
 
 const TerminalTitle = styled.div`
-  color: ${({ theme }) => theme.text};
-  opacity: 0.7;
+  color: ${PALETTE.normal};
+  opacity: 0.8;
   font-size: 0.78rem;
   display: flex;
   align-items: center;
@@ -59,8 +116,8 @@ const TerminalTitle = styled.div`
 
 const SubcommandBar = styled.div`
   display: flex;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border-weak);
+  background-color: ${PALETTE.tabBarBg};
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
   padding: 0 0.5rem;
 `;
@@ -68,14 +125,13 @@ const SubcommandBar = styled.div`
 const SubcommandTab = styled.button<{ isActive: boolean }>`
   background: transparent;
   border: none;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   font-family: var(--font-roboto-mono), monospace;
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.text};
-  opacity: ${({ isActive }) => (isActive ? 1 : 0.6)};
+  color: ${({ isActive }) => (isActive ? PALETTE.highlight : PALETTE.muted)};
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   border-bottom: 2px solid
-    ${({ isActive, theme }) => (isActive ? theme.text : "transparent")};
+    ${({ isActive }) => (isActive ? PALETTE.primary : "transparent")};
   cursor: pointer;
   white-space: nowrap;
   display: flex;
@@ -84,18 +140,16 @@ const SubcommandTab = styled.button<{ isActive: boolean }>`
   transition: all 0.15s ease;
 
   &:hover {
-    opacity: 1;
-    background-color: var(--color-border-weak);
+    color: ${PALETTE.normal};
+    background-color: rgba(255, 255, 255, 0.03);
   }
 
   .badge {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     padding: 0.1rem 0.38rem;
     border-radius: 3px;
-    border: 1px solid ${({ theme }) => theme.border};
-    background-color: var(--code-block-bg);
-    color: ${({ theme }) => theme.text};
-    opacity: 0.75;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: ${PALETTE.muted};
   }
 `;
 
@@ -104,11 +158,10 @@ const PlayerControlBar = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1.25rem;
-  background-color: var(--color-background);
-  border-bottom: 1px dashed var(--color-border-weak);
+  background-color: ${PALETTE.controlBarBg};
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
   font-size: 0.75rem;
-  color: ${({ theme }) => theme.text};
-  opacity: 0.85;
+  color: ${PALETTE.muted};
   flex-wrap: wrap;
   gap: 0.5rem;
 `;
@@ -120,10 +173,10 @@ const PlayerControls = styled.div`
 `;
 
 const ControlBtn = styled.button`
-  background: var(--code-block-bg);
-  border: 1px solid ${({ theme }) => theme.border};
-  color: ${({ theme }) => theme.text};
-  padding: 0.25rem 0.65rem;
+  background: ${PALETTE.btnNormalBg};
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: ${PALETTE.btnNormalFg};
+  padding: 0.22rem 0.65rem;
   border-radius: 4px;
   font-size: 0.74rem;
   font-family: inherit;
@@ -134,592 +187,910 @@ const ControlBtn = styled.button`
   transition: all 0.15s ease;
 
   &:hover {
-    background: var(--color-border-weak);
-    border-color: ${({ theme }) => theme.text};
+    border-color: ${PALETTE.primary};
+    color: ${PALETTE.normal};
   }
 `;
 
 const PlaybackStatus = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-size: 0.74rem;
-  opacity: 0.75;
+  color: ${PALETTE.muted};
 
   .rec-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background-color: ${({ theme }) => theme.text};
+    background-color: ${PALETTE.success};
     display: inline-block;
   }
 `;
 
 const TerminalScreen = styled.div`
-  padding: 1.5rem 1.75rem;
-  background-color: var(--code-block-bg);
-  color: var(--code-block-fg);
-  font-size: 0.85rem;
-  line-height: 1.55;
-  min-height: 400px;
+  padding: 1.35rem 1.5rem;
+  background-color: ${PALETTE.bg};
+  color: ${PALETTE.normal};
+  font-family: var(--font-roboto-mono), monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  min-height: 450px;
   overflow-x: auto;
 
   @media (max-width: 768px) {
-    padding: 1.15rem;
-    font-size: 0.78rem;
-    min-height: 360px;
+    padding: 1rem;
+    font-size: 0.74rem;
+    min-height: 390px;
+  }
+`;
+
+const AsciiHeaderBlock = styled.pre`
+  margin: 0 0 0.5rem;
+  font-family: var(--font-roboto-mono), monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-size: 0.78rem;
+  line-height: 1.18;
+  letter-spacing: 0;
+  white-space: pre;
+  font-weight: 700;
+  user-select: none;
+
+  .bun-icon {
+    color: ${PALETTE.logoBun};
+  }
+  .bun-text {
+    color: ${PALETTE.normal};
   }
 `;
 
 const PromptLine = styled.div`
-  color: ${({ theme }) => theme.text};
-  margin-bottom: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: ${PALETTE.normal};
+  margin-bottom: 0.75rem;
+  white-space: pre;
 
-  .host {
-    opacity: 0.65;
-  }
-  .path {
-    opacity: 0.5;
+  .prompt-char {
+    color: ${PALETTE.secondary};
+    font-weight: 700;
   }
   .cmd {
+    color: ${PALETTE.normal};
     font-weight: 600;
   }
 `;
 
-const LineText = styled.div<{ tone?: "strong" | "muted" | "normal" }>`
-  font-family: var(--font-roboto-mono), monospace;
-  white-space: pre-wrap;
-  color: ${({ theme }) => theme.text};
-  font-weight: ${({ tone }) => (tone === "strong" ? 600 : 400)};
-  opacity: ${({ tone }) =>
-    tone === "strong" ? 1 : tone === "muted" ? 0.55 : 0.85};
+const DividerLine = styled.div`
+  color: ${PALETTE.muted};
+  white-space: pre;
+  margin: 0.25rem 0;
+  overflow: hidden;
 `;
 
-const TreeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-`;
+const StatusSummaryLine = styled.div`
+  white-space: pre;
+  color: ${PALETTE.normal};
+  margin-bottom: 0.15rem;
 
-const TreeHeader = styled.div`
-  margin-bottom: 0.9rem;
-  .ascii-banner {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-roboto-mono), monospace;
-    font-variant-ligatures: none;
-    font-feature-settings: "liga" 0, "calt" 0;
-    font-size: 0.72rem;
-    line-height: 1.18;
-    letter-spacing: 0;
-    color: ${({ theme }) => theme.text};
-    opacity: 0.9;
-    white-space: pre;
-    overflow-x: auto;
+  .ready {
+    color: ${PALETTE.success};
+    font-weight: 700;
   }
-  .brand {
-    font-weight: 600;
-    color: ${({ theme }) => theme.text};
+  .missing {
+    color: ${PALETTE.warning};
+    font-weight: 700;
   }
-  .subtext {
-    font-size: 0.78rem;
-    opacity: 0.65;
-    margin-top: 0.2rem;
+  .selected {
+    color: ${PALETTE.highlight};
+    font-weight: 700;
   }
 `;
 
-const CategoryRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text};
-  padding: 0.25rem 0.4rem;
-  border-radius: 4px;
+const GroupHeaderLine = styled.div<{ isCursor?: boolean }>`
+  white-space: pre;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s ease;
+  padding: 0.08rem 0;
+  color: ${({ isCursor }) => (isCursor ? PALETTE.highlight : PALETTE.secondary)};
+  font-weight: 700;
 
   &:hover {
-    background-color: var(--color-border-weak);
+    background-color: rgba(255, 255, 255, 0.04);
   }
 
-  .toggle-icon {
-    opacity: 0.7;
-    font-family: monospace;
-    width: 22px;
-    display: inline-block;
+  .badge-ready {
+    color: ${PALETTE.success};
+    font-weight: 700;
   }
-
-  .cat-name {
-    flex: 1;
+  .badge-missing {
+    color: ${PALETTE.warning};
+    font-weight: 700;
   }
-
-  .cat-badge {
-    font-size: 0.72rem;
+  .sel-empty {
+    color: ${PALETTE.muted};
     font-weight: 400;
-    opacity: 0.65;
-    border: 1px solid ${({ theme }) => theme.border};
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
+  }
+  .sel-some {
+    color: ${PALETTE.highlight};
+    font-weight: 700;
+  }
+  .sel-all {
+    color: ${PALETTE.success};
+    font-weight: 700;
   }
 `;
 
-const ItemList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding-left: 1.8rem;
-  margin-bottom: 0.5rem;
-`;
-
-const ItemRow = styled.div<{ isSelected: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.25rem 0.4rem;
-  border-radius: 4px;
+const PackageItemLine = styled.div`
+  white-space: pre;
   cursor: pointer;
-  font-size: 0.82rem;
-  transition: background-color 0.15s ease;
+  user-select: none;
+  padding: 0.06rem 0;
+  color: ${PALETTE.normal};
 
   &:hover {
-    background-color: var(--color-border-weak);
+    background-color: rgba(255, 255, 255, 0.04);
   }
 
-  .item-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .chk-installed-sel {
+    color: ${PALETTE.success};
+    font-weight: 700;
   }
-
-  .checkbox {
-    font-family: monospace;
-    opacity: ${({ isSelected }) => (isSelected ? 1 : 0.6)};
-    font-weight: ${({ isSelected }) => (isSelected ? 700 : 400)};
+  .chk-installed {
+    color: ${PALETTE.muted};
   }
-
-  .item-name {
-    color: ${({ theme }) => theme.text};
-    font-weight: 500;
+  .chk-missing-sel {
+    color: ${PALETTE.highlight};
+    font-weight: 700;
   }
-
-  .item-right {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 0.75rem;
+  .chk-missing {
+    color: ${PALETTE.muted};
   }
-
-  .item-version {
-    opacity: 0.65;
+  .ver-ok {
+    color: ${PALETTE.success};
+    font-weight: 700;
   }
-
-  .item-status {
-    padding: 0.1rem 0.45rem;
-    border-radius: 3px;
-    border: 1px solid ${({ theme }) => theme.border};
-    font-size: 0.7rem;
-
-    &.installed {
-      opacity: 0.85;
-      color: ${({ theme }) => theme.text};
-    }
-
-    &.missing {
-      opacity: 0.55;
-      border-style: dashed;
-    }
+  .ver-missing {
+    color: ${PALETTE.warning};
+    font-weight: 700;
+  }
+  .desc {
+    color: ${PALETTE.muted};
   }
 `;
 
-const ActionBar = styled.div`
-  margin-top: 1.25rem;
-  padding-top: 0.85rem;
-  border-top: 1px dashed var(--color-border-weak);
+const TUIButtonsRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  margin-top: 0.35rem;
+  padding: 0 0.5rem;
+  white-space: pre;
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-`;
-
-const TUIButton = styled.button<{ primary?: boolean }>`
+const TUIExitBtn = styled.button`
   font-family: var(--font-roboto-mono), monospace;
-  font-size: 0.78rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 4px;
+  font-size: 0.8rem;
+  color: ${PALETTE.btnNormalFg};
+  background-color: ${PALETTE.btnNormalBg};
+  border: none;
+  padding: 0.15rem 0.6rem;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: all 0.15s ease;
-
-  ${({ primary, theme }) =>
-    primary
-      ? `
-    background-color: ${theme.text};
-    color: ${theme.body};
-    border: 1px solid ${theme.text};
-    font-weight: 600;
-    &:hover {
-      opacity: 0.85;
-    }
-  `
-      : `
-    background-color: transparent;
-    color: ${theme.text};
-    border: 1px solid ${theme.border};
-    opacity: 0.8;
-    &:hover {
-      opacity: 1;
-      background-color: var(--color-border-weak);
-    }
-  `}
 `;
 
-const TUIHelpBar = styled.div`
-  font-size: 0.72rem;
-  opacity: 0.55;
-  margin-top: 0.5rem;
+const TUIStartBtn = styled.button`
+  font-family: var(--font-roboto-mono), monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: ${PALETTE.btnSuccessFg};
+  background-color: ${PALETTE.btnSuccessBg};
+  border: none;
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
 `;
+
+const TUIHintRow = styled.div`
+  color: ${PALETTE.muted};
+  white-space: pre;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+`;
+
+interface TUIItemSpec {
+  id: string;
+  name: string;
+  installed: boolean;
+  version: string;
+  desc: string;
+}
+
+interface TUIGroupSpec {
+  key: string;
+  icon: string;
+  title: string;
+  items: TUIItemSpec[];
+}
+
+// Exact package groups from /Users/pignose/bundle/internal/packages/
+const TUI_GROUPS: TUIGroupSpec[] = [
+  {
+    key: "system",
+    icon: "[sys]",
+    title: "System & Toolchains (Xcode Tools, Brew, Git)",
+    items: [
+      {
+        id: "xcode-select",
+        name: "Xcode Command Line Tools",
+        installed: true,
+        version: "2409",
+        desc: "Core compilers, make, headers, and git toolchain",
+      },
+      {
+        id: "brew",
+        name: "Homebrew",
+        installed: true,
+        version: "4.4.1",
+        desc: "The missing package manager for macOS",
+      },
+      {
+        id: "git",
+        name: "Git",
+        installed: true,
+        version: "2.47.0",
+        desc: "Fast distributed version control system",
+      },
+    ],
+  },
+  {
+    key: "terminal",
+    icon: "[shell]",
+    title: "Terminal & Shell (iTerm2, Fonts, OMZ, p10k)",
+    items: [
+      {
+        id: "iterm2",
+        name: "iTerm2",
+        installed: true,
+        version: "3.5.10",
+        desc: "Terminal emulator for macOS with rich customization",
+      },
+      {
+        id: "meslo-font",
+        name: "MesloLGS NF Font",
+        installed: true,
+        version: "installed",
+        desc: "Nerd Font with icons for Powerlevel10k prompt",
+      },
+      {
+        id: "iterm2-font-config",
+        name: "iTerm2 Font Config",
+        installed: false,
+        version: "missing",
+        desc: "Configure iTerm2 default profile to use MesloLGS NF",
+      },
+      {
+        id: "brogrammer-theme",
+        name: "Brogrammer Theme",
+        installed: true,
+        version: "installed",
+        desc: "Brogrammer high-contrast aesthetic color theme",
+      },
+      {
+        id: "oh-my-zsh",
+        name: "Oh My Zsh",
+        installed: true,
+        version: "master",
+        desc: "Community-driven framework for managing zsh config",
+      },
+      {
+        id: "powerlevel10k",
+        name: "Powerlevel10k",
+        installed: true,
+        version: "v1.20.0",
+        desc: "Fast, flexible, and visually stunning theme for Zsh",
+      },
+      {
+        id: "zsh-autosuggestions",
+        name: "Zsh Autosuggestions",
+        installed: true,
+        version: "v0.7.1",
+        desc: "Fish-like fast autosuggestions for zsh",
+      },
+      {
+        id: "zsh-syntax-highlighting",
+        name: "Zsh Syntax Highlighting",
+        installed: true,
+        version: "0.8.0",
+        desc: "Fish shell-like syntax highlighting for zsh",
+      },
+    ],
+  },
+  {
+    key: "cloud",
+    icon: "[cloud]",
+    title: "Cloud & DevOps CLIs (AWS, Google Cloud, Azure)",
+    items: [
+      {
+        id: "aws",
+        name: "AWS CLI",
+        installed: true,
+        version: "2.22.1",
+        desc: "Unified tool to manage your AWS cloud services",
+      },
+      {
+        id: "gcloud",
+        name: "Google Cloud SDK",
+        installed: true,
+        version: "506.0.0",
+        desc: "Google Cloud CLI (gcloud) tools and libraries",
+      },
+      {
+        id: "azure",
+        name: "Azure CLI",
+        installed: false,
+        version: "missing",
+        desc: "Microsoft Azure command-line tools (az)",
+      },
+    ],
+  },
+  {
+    key: "editors",
+    icon: "[editor]",
+    title: "Editors & Vim Runtime",
+    items: [
+      {
+        id: "vim-runtime",
+        name: "Ultimate Vim Runtime",
+        installed: false,
+        version: "missing",
+        desc: "The Ultimate Vim configuration (amix/vimrc)",
+      },
+      {
+        id: "vscode",
+        name: "Visual Studio Code",
+        installed: true,
+        version: "1.96.2",
+        desc: "Code editor redefined for building modern apps",
+      },
+      {
+        id: "code-cli",
+        name: "VS Code CLI (`code`)",
+        installed: true,
+        version: "installed",
+        desc: "Symlink `code` binary into PATH for terminal access",
+      },
+    ],
+  },
+  {
+    key: "languages",
+    icon: "[lang]",
+    title: "Compilers & Languages (Go, Python, Java, GCC, Node)",
+    items: [
+      {
+        id: "go",
+        name: "Go",
+        installed: true,
+        version: "go1.23.4",
+        desc: "Open source programming language for fast software",
+      },
+      {
+        id: "python",
+        name: "Python 3",
+        installed: true,
+        version: "3.13.1",
+        desc: "Python interpreter bundled with pip",
+      },
+      {
+        id: "java",
+        name: "Java (OpenJDK)",
+        installed: false,
+        version: "missing",
+        desc: "Java Development Kit open source reference",
+      },
+      {
+        id: "gcc",
+        name: "GCC / Clang",
+        installed: true,
+        version: "16.0.0",
+        desc: "GNU Compiler Collection & Apple developer tools",
+      },
+      {
+        id: "node",
+        name: "Node.js",
+        installed: true,
+        version: "v22.12.0",
+        desc: "JavaScript runtime built on Chrome's V8 engine",
+      },
+    ],
+  },
+  {
+    key: "cli",
+    icon: "[cli]",
+    title: "Modern CLI Power Utilities",
+    items: [
+      {
+        id: "zoxide",
+        name: "Zoxide",
+        installed: true,
+        version: "0.9.6",
+        desc: "A smarter cd command that learns your habits",
+      },
+      {
+        id: "htop",
+        name: "Htop",
+        installed: true,
+        version: "3.3.0",
+        desc: "Interactive real-time process viewer",
+      },
+      {
+        id: "fzf",
+        name: "Fzf",
+        installed: true,
+        version: "0.57.0",
+        desc: "General-purpose command-line fuzzy finder",
+      },
+      {
+        id: "ripgrep",
+        name: "Ripgrep",
+        installed: true,
+        version: "14.1.1",
+        desc: "Ultra-fast line-oriented search tool (rg)",
+      },
+      {
+        id: "eza",
+        name: "Eza",
+        installed: true,
+        version: "0.20.14",
+        desc: "Modern replacement for ls with git status",
+      },
+      {
+        id: "tree",
+        name: "Tree",
+        installed: true,
+        version: "2.2.1",
+        desc: "Recursive directory listing program",
+      },
+      {
+        id: "jq",
+        name: "Jq",
+        installed: true,
+        version: "1.7.1",
+        desc: "Lightweight command-line JSON processor",
+      },
+      {
+        id: "bat",
+        name: "Bat",
+        installed: true,
+        version: "0.24.0",
+        desc: "A cat clone with syntax highlighting",
+      },
+    ],
+  },
+  {
+    key: "apps",
+    icon: "[app]",
+    title: "Essential macOS Apps & Settings",
+    items: [
+      {
+        id: "chrome",
+        name: "Google Chrome",
+        installed: true,
+        version: "131.0",
+        desc: "Fast, reliable web browser for modern web dev",
+      },
+      {
+        id: "chrome-default",
+        name: "Set Chrome as Default",
+        installed: true,
+        version: "installed",
+        desc: "Configure Google Chrome as default web browser",
+      },
+    ],
+  },
+];
 
 type SubcommandType = "bun" | "install" | "check" | "doctor" | "update";
 
-interface AnimationFrame {
+interface StyledSpan {
   text: string;
-  tone?: "strong" | "muted" | "normal";
+  color?: string;
+  bg?: string;
+  bold?: boolean;
+}
+
+type FrameLine = StyledSpan[];
+
+function renderAsciiHeader() {
+  return (
+    <AsciiHeaderBlock>
+      {ASCII_BUN_LINES.map((line, idx) => (
+        <div key={idx}>
+          {"  "}
+          <span className="bun-icon">{line.icon}</span>
+          <span className="bun-text">{line.text}</span>
+        </div>
+      ))}
+    </AsciiHeaderBlock>
+  );
 }
 
 export default function TerminalSimulator() {
-  const { i18n } = useTranslation();
-  const isKo = i18n.language.startsWith("ko");
-
   const [activeSubcommand, setActiveSubcommand] =
     useState<SubcommandType>("bun");
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [currentFrameIndex, setCurrentFrameIndex] = useState<number>(0);
   const [speed, setSpeed] = useState<number>(1);
 
-  // Interactive Tree TUI state
-  const [foldedCategories, setFoldedCategories] = useState<
-    Record<string, boolean>
-  >({
-    shell: false,
-    editor: false,
-    lang: false,
+  const [foldedGroups, setFoldedGroups] = useState<Record<string, boolean>>({
+    system: true,
+    terminal: false,
     cloud: true,
-    tools: true,
+    editors: false,
+    languages: false,
+    cli: true,
+    apps: true,
   });
 
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({
-    "iTerm2 Font Config": true,
-    "Ultimate Vim Runtime": true,
-    "Java (OpenJDK)": true,
-    "Azure CLI (az)": true,
+  const [selectedIds, setSelectedIds] = useState<Record<string, boolean>>({
+    "iterm2-font-config": true,
+    azure: true,
+    "vim-runtime": true,
+    java: true,
   });
 
-  const toggleFold = (catKey: string) => {
-    setFoldedCategories((prev) => ({
+  const toggleGroupFold = (groupKey: string) => {
+    setFoldedGroups((prev) => ({
       ...prev,
-      [catKey]: !prev[catKey],
+      [groupKey]: !prev[groupKey],
     }));
   };
 
-  const toggleItem = (itemKey: string) => {
-    setSelectedItems((prev) => ({
+  const toggleItemSelect = (id: string) => {
+    setSelectedIds((prev) => ({
       ...prev,
-      [itemKey]: !prev[itemKey],
+      [id]: !prev[id],
     }));
   };
 
-  const selectAllMissing = () => {
-    setSelectedItems({
-      "iTerm2 Font Config": true,
-      "Ultimate Vim Runtime": true,
-      "Java (OpenJDK)": true,
-      "Azure CLI (az)": true,
-    });
-  };
+  const allItems = TUI_GROUPS.flatMap((g) => g.items);
+  const totalReady = allItems.filter((i) => i.installed).length;
+  const totalMissing = allItems.filter((i) => !i.installed).length;
+  const totalSelected = allItems.filter((i) => selectedIds[i.id]).length;
 
-  const selectedCount = Object.values(selectedItems).filter(Boolean).length;
-
+  // Exact CLI command output scripts matching /Users/pignose/bundle/internal/cli/*.go
   const scriptMap: Record<
     Exclude<SubcommandType, "bun">,
-    { cmd: string; frames: AnimationFrame[] }
+    { cmd: string; frames: FrameLine[] }
   > = {
     install: {
       cmd: "bun install all",
       frames: [
-        {
-          text: "[coffee-bun] Initializing concurrent workstation provisioning...",
-          tone: "strong",
-        },
-        {
-          text: "[coffee-bun] Platform: macOS darwin/arm64 | Goroutines: 8 workers\n",
-          tone: "muted",
-        },
-        {
-          text: "[brew] Installing openjdk (Java 21)...",
-          tone: "normal",
-        },
-        {
-          text: "  ↳ Downloading bottle: 184MB / 184MB [====================] 100%",
-          tone: "muted",
-        },
-        {
-          text: "[git]  Cloning amix/vimrc (Ultimate Vim Runtime)...",
-          tone: "normal",
-        },
-        {
-          text: "  ↳ Receiving objects: 100% (1420/1420), 1.2 MiB | 5.4 MiB/s, done.",
-          tone: "muted",
-        },
-        {
-          text: "[font] Downloading MesloLGS NF fonts (Regular, Bold, Italic)...",
-          tone: "normal",
-        },
-        {
-          text: "  ↳ ~/Library/Fonts/MesloLGS-NF-Regular.ttf verified.\n",
-          tone: "muted",
-        },
-        {
-          text: "✓ [font] MesloLGS NF font suite successfully installed",
-          tone: "normal",
-        },
-        {
-          text: "✓ [iterm2] Default profile configured: MesloLGS-NF-Regular 16pt + Brogrammer",
-          tone: "normal",
-        },
-        {
-          text: "✓ [editor] Ultimate Vim Runtime configured in ~/.vim_runtime",
-          tone: "normal",
-        },
-        {
-          text: "✓ [brew] OpenJDK 21 symlinked: /Library/Java/JavaVirtualMachines/openjdk.jdk",
-          tone: "normal",
-        },
-        {
-          text: "✓ [cli] VS Code CLI linked: /usr/local/bin/code",
-          tone: "normal",
-        },
-        {
-          text: "✓ [app] Google Chrome installed & set as default system browser",
-          tone: "normal",
-        },
-        {
-          text: "✓ [shell] Verified ~/.zshrc hooks and Powerlevel10k prompt\n",
-          tone: "normal",
-        },
-        {
-          text: "------------------------------------------------------------------------",
-          tone: "muted",
-        },
-        {
-          text: isKo
-            ? "[done] 워크스테이션 구축 완료 (28.4s) — 모든 18개 패키지 및 설정 검증됨"
-            : "[done] Workstation setup complete in 28.4s — All 18 packages verified",
-          tone: "strong",
-        },
+        [{ text: "  Installing 4 missing package(s)...\n", color: PALETTE.normal }],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "iTerm2 Font Config", color: PALETTE.normal, bold: true },
+          {
+            text: ": Configuring iTerm2 default profile to use MesloLGS NF...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Azure CLI", color: PALETTE.normal, bold: true },
+          {
+            text: ": Installing via Homebrew (brew install azure-cli)...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Ultimate Vim Runtime", color: PALETTE.normal, bold: true },
+          {
+            text: ": Cloning https://github.com/amix/vimrc.git into ~/.vim_runtime...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Java (OpenJDK)", color: PALETTE.normal, bold: true },
+          {
+            text: ": Installing via Homebrew (brew install openjdk)...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "iTerm2 Font Config", color: PALETTE.normal, bold: true },
+          {
+            text: ": Configured MesloLGS-NF-Regular 14 in iTerm2 plist",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Ultimate Vim Runtime", color: PALETTE.normal, bold: true },
+          {
+            text: ": Installed Ultimate Vim Runtime in ~/.vim_runtime",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Azure CLI", color: PALETTE.normal, bold: true },
+          {
+            text: ": Installed azure-cli (2.67.0)",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Java (OpenJDK)", color: PALETTE.normal, bold: true },
+          {
+            text: ": Installed openjdk (21.0.5) and verified JVM symlink",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          {
+            text: "\n  [OK] Installation finished successfully!",
+            color: PALETTE.success,
+            bold: true,
+          },
+        ],
       ],
     },
     check: {
       cmd: "bun check",
       frames: [
-        {
-          text: "CATEGORY     PACKAGE                 VERSION         STATUS",
-          tone: "strong",
-        },
-        {
-          text: "------------------------------------------------------------------------",
-          tone: "muted",
-        },
-        {
-          text: "[shell]      iTerm2                  3.7.6           ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[shell]      MesloLGS NF Font        4 font files    ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[shell]      iTerm2 Font Plist       16pt Regular    - missing",
-          tone: "muted",
-        },
-        {
-          text: "[shell]      Brogrammer Theme        Custom Preset   ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[shell]      Oh My Zsh               master/964ddf7  ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[shell]      Powerlevel10k           v1.20.0         ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[editor]     Ultimate Vim Runtime    amix/vimrc      - missing",
-          tone: "muted",
-        },
-        {
-          text: "[editor]     Visual Studio Code      1.142.0         ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[editor]     VS Code CLI (code)      /usr/local/bin  ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[lang]       Go                      go1.27.2        ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[lang]       Python 3                Python 3.15.0   ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[lang]       Java (OpenJDK)          openjdk-21      - missing",
-          tone: "muted",
-        },
-        {
-          text: "[lang]       Node.js                 v26.12.0        ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[cloud]      AWS CLI                 v2.22.1         ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[cloud]      Google Cloud SDK        506.0.0         ✓ installed",
-          tone: "normal",
-        },
-        {
-          text: "[tools]      zoxide, fzf, rg, bat    latest          ✓ all active\n",
-          tone: "normal",
-        },
-        {
-          text: "------------------------------------------------------------------------",
-          tone: "muted",
-        },
-        {
-          text: "Summary: 15 installed, 3 missing. Run 'bun' or 'bun install all' to resolve.",
-          tone: "strong",
-        },
+        [{ text: "  [System & Toolchains]", color: PALETTE.secondary, bold: true }],
+        [{ text: "  " + "-".repeat(68), color: PALETTE.muted }],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Xcode Command Line Tools   ", color: PALETTE.normal },
+          { text: "(2409)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Homebrew                   ", color: PALETTE.normal },
+          { text: "(4.4.1)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Git                        ", color: PALETTE.normal },
+          { text: "(2.47.0)\n", color: PALETTE.muted },
+        ],
+        [{ text: "  [Terminal & Shell]", color: PALETTE.secondary, bold: true }],
+        [{ text: "  " + "-".repeat(68), color: PALETTE.muted }],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "iTerm2                     ", color: PALETTE.normal },
+          { text: "(3.5.10)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "MesloLGS NF Font           ", color: PALETTE.normal },
+          { text: "(ready)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [MISSING]  ", color: PALETTE.warning, bold: true },
+          { text: "iTerm2 Font Config         ", color: PALETTE.normal },
+          { text: "- not installed", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Brogrammer Theme           ", color: PALETTE.normal },
+          { text: "(ready)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Oh My Zsh                  ", color: PALETTE.normal },
+          { text: "(master)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Powerlevel10k              ", color: PALETTE.normal },
+          { text: "(v1.20.0)\n", color: PALETTE.muted },
+        ],
+        [{ text: "  [Editors & Vim Runtime]", color: PALETTE.secondary, bold: true }],
+        [{ text: "  " + "-".repeat(68), color: PALETTE.muted }],
+        [
+          { text: "  [MISSING]  ", color: PALETTE.warning, bold: true },
+          { text: "Ultimate Vim Runtime       ", color: PALETTE.normal },
+          { text: "- not installed", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Visual Studio Code         ", color: PALETTE.normal },
+          { text: "(1.96.2)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "VS Code CLI (`code`)       ", color: PALETTE.normal },
+          { text: "(ready)\n", color: PALETTE.muted },
+        ],
+        [{ text: "  [Compilers & Runtimes]", color: PALETTE.secondary, bold: true }],
+        [{ text: "  " + "-".repeat(68), color: PALETTE.muted }],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Go                         ", color: PALETTE.normal },
+          { text: "(go1.23.4)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Python 3                   ", color: PALETTE.normal },
+          { text: "(3.13.1)", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [MISSING]  ", color: PALETTE.warning, bold: true },
+          { text: "Java (OpenJDK)             ", color: PALETTE.normal },
+          { text: "- not installed", color: PALETTE.muted },
+        ],
+        [
+          { text: "  [OK]       ", color: PALETTE.success, bold: true },
+          { text: "Node.js                    ", color: PALETTE.normal },
+          { text: "(v22.12.0)\n", color: PALETTE.muted },
+        ],
+        [
+          { text: "  Summary: ", color: PALETTE.normal },
+          { text: "25", color: PALETTE.success, bold: true },
+          { text: " installed, ", color: PALETTE.normal },
+          { text: "4", color: PALETTE.warning, bold: true },
+          { text: " missing (Total: 29)", color: PALETTE.normal },
+        ],
       ],
     },
     doctor: {
       cmd: "bun doctor",
       frames: [
-        {
-          text: "[coffee-bun] Running workstation health diagnostics...\n",
-          tone: "strong",
-        },
-        {
-          text: "[1/7] Operating System: macOS 15.0 Sequoia (darwin/arm64)          [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[2/7] Homebrew: /opt/homebrew/bin/brew (v4.4.1)                   [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[3/7] Shell Framework: /bin/zsh with Oh My Zsh active             [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[4/7] Prompt Theme: Powerlevel10k configured in ~/.zshrc          [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[5/7] Terminal Font: MesloLGS NF detected in ~/Library/Fonts       [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[6/7] Editor CLI: /usr/local/bin/code symlinked to PATH           [ PASS ]",
-          tone: "normal",
-        },
-        {
-          text: "[7/7] Modern CLI Suite: zoxide, rg, fzf, bat, eza in PATH         [ PASS ]\n",
-          tone: "normal",
-        },
-        {
-          text: "------------------------------------------------------------------------",
-          tone: "muted",
-        },
-        {
-          text: isKo
-            ? "✓ 환경 진단 통과: 7/7 진단 항목이 모두 정상입니다."
-            : "✓ Doctor Verdict: All 7/7 diagnostics verified. Zero conflicts found.",
-          tone: "strong",
-        },
+        [
+          { text: "  ", color: PALETTE.normal },
+          {
+            text: " coffee-bun doctor - Diagnostic Report ",
+            color: PALETTE.titleFg,
+            bg: PALETTE.titleBg,
+            bold: true,
+          },
+          { text: "\n", color: PALETTE.normal },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "OS: macOS (darwin/arm64)", color: PALETTE.normal },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Homebrew: Installed and in PATH", color: PALETTE.normal },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          {
+            text: "VS Code CLI (`code`): Configured and accessible",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          {
+            text: "Powerlevel10k: Active theme configured in ~/.zshrc",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          {
+            text: "Zoxide: Shell hook configured in ~/.zshrc",
+            color: PALETTE.normal,
+          },
+        ],
       ],
     },
     update: {
       cmd: "bun update",
       frames: [
-        {
-          text: "[coffee-bun] Starting concurrent update of all packages and repositories...\n",
-          tone: "strong",
-        },
-        {
-          text: "==> [brew] Updating Homebrew formulae and casks...",
-          tone: "normal",
-        },
-        {
-          text: "    ↳ Already up-to-date.",
-          tone: "muted",
-        },
-        {
-          text: "==> [git]  Pulling latest commits for Oh My Zsh (master)...",
-          tone: "normal",
-        },
-        {
-          text: "    ↳ Current branch master is up to date.",
-          tone: "muted",
-        },
-        {
-          text: "==> [git]  Pulling latest commits for Powerlevel10k...",
-          tone: "normal",
-        },
-        {
-          text: "    ↳ Fast-forwarding: d05a1b0..e84a2f1 (2 commits)",
-          tone: "muted",
-        },
-        {
-          text: "==> [git]  Updating zsh-autosuggestions & zsh-syntax-highlighting...",
-          tone: "normal",
-        },
-        {
-          text: "    ↳ Verified latest git tags.",
-          tone: "muted",
-        },
-        {
-          text: "==> [git]  Syncing Ultimate Vim Runtime (amix/vimrc)...",
-          tone: "normal",
-        },
-        {
-          text: "    ↳ Already up-to-date.\n",
-          tone: "muted",
-        },
-        {
-          text: "------------------------------------------------------------------------",
-          tone: "muted",
-        },
-        {
-          text: isKo
-            ? "✓ 모든 14개 패키지, Formulae, Cask 및 Git 저장소가 최신 상태입니다."
-            : "✓ All 14 packages, formulae, casks, and git repos successfully up-to-date.",
-          tone: "strong",
-        },
+        [
+          {
+            text: "  Checking for updates and running maintenance...\n",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Homebrew", color: PALETTE.normal, bold: true },
+          {
+            text: ": Updating Homebrew package index...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Oh My Zsh", color: PALETTE.normal, bold: true },
+          {
+            text: ": Pulling latest changes for Oh My Zsh...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Powerlevel10k", color: PALETTE.normal, bold: true },
+          {
+            text: ": Pulling latest changes for Powerlevel10k...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Zsh Autosuggestions", color: PALETTE.normal, bold: true },
+          {
+            text: ": Pulling latest changes for Zsh Autosuggestions...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Zsh Syntax Highlighting", color: PALETTE.normal, bold: true },
+          {
+            text: ": Pulling latest changes for Zsh Syntax Highlighting...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Oh My Zsh", color: PALETTE.normal, bold: true },
+          {
+            text: ": Oh My Zsh is already up to date",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Powerlevel10k", color: PALETTE.normal, bold: true },
+          {
+            text: ": Powerlevel10k is already up to date",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Zsh Autosuggestions", color: PALETTE.normal, bold: true },
+          {
+            text: ": Zsh Autosuggestions is already up to date",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Zsh Syntax Highlighting", color: PALETTE.normal, bold: true },
+          {
+            text: ": Zsh Syntax Highlighting is already up to date",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [..] ", color: PALETTE.warning, bold: true },
+          { text: "Homebrew Packages", color: PALETTE.normal, bold: true },
+          {
+            text: ": Upgrading outdated formulae and casks...",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          { text: "  [OK] ", color: PALETTE.success, bold: true },
+          { text: "Homebrew Packages", color: PALETTE.normal, bold: true },
+          {
+            text: ": All Homebrew packages and casks upgraded to latest version",
+            color: PALETTE.normal,
+          },
+        ],
+        [
+          {
+            text: "\n  [OK] Update process completed!",
+            color: PALETTE.success,
+            bold: true,
+          },
+        ],
       ],
     },
   };
@@ -748,7 +1119,7 @@ export default function TerminalSimulator() {
       return;
     }
 
-    const delay = Math.max(60, Math.floor(140 / speed));
+    const delay = Math.max(60, Math.floor(150 / speed));
     const timer = setTimeout(() => {
       setCurrentFrameIndex((prev) => prev + 1);
     }, delay);
@@ -765,15 +1136,15 @@ export default function TerminalSimulator() {
       <TerminalFrame>
         <TerminalHeader>
           <WindowButtons>
-            <span />
-            <span />
-            <span />
+            <span className="close" />
+            <span className="minimize" />
+            <span className="maximize" />
           </WindowButtons>
           <TerminalTitle>
             <RiTerminalBoxLine />
-            coffee-bun ~ macOS MacBook Setup &amp; Maintenance (CLI: bun)
+            bun — coffee-bun (zsh)
           </TerminalTitle>
-          <div style={{ width: 40 }} />
+          <div style={{ width: 42 }} />
         </TerminalHeader>
 
         <SubcommandBar>
@@ -782,39 +1153,35 @@ export default function TerminalSimulator() {
             onClick={() => handleSelectSubcommand("bun")}
           >
             <span>1. bun</span>
-            <span className="badge">
-              {isKo ? "대화형 트리" : "Interactive Tree"}
-            </span>
+            <span className="badge">Interactive TUI</span>
           </SubcommandTab>
           <SubcommandTab
             isActive={activeSubcommand === "install"}
             onClick={() => handleSelectSubcommand("install")}
           >
             <span>2. bun install all</span>
-            <span className="badge">
-              {isKo ? "병렬 설치" : "Live Stream"}
-            </span>
+            <span className="badge">Install</span>
           </SubcommandTab>
           <SubcommandTab
             isActive={activeSubcommand === "check"}
             onClick={() => handleSelectSubcommand("check")}
           >
             <span>3. bun check</span>
-            <span className="badge">{isKo ? "버전 점검" : "Inspection"}</span>
+            <span className="badge">Status</span>
           </SubcommandTab>
           <SubcommandTab
             isActive={activeSubcommand === "doctor"}
             onClick={() => handleSelectSubcommand("doctor")}
           >
             <span>4. bun doctor</span>
-            <span className="badge">{isKo ? "환경 진단" : "Diagnostics"}</span>
+            <span className="badge">Doctor</span>
           </SubcommandTab>
           <SubcommandTab
             isActive={activeSubcommand === "update"}
             onClick={() => handleSelectSubcommand("update")}
           >
             <span>5. bun update</span>
-            <span className="badge">{isKo ? "통합 업데이트" : "Upgrader"}</span>
+            <span className="badge">Update</span>
           </SubcommandTab>
         </SubcommandBar>
 
@@ -825,18 +1192,18 @@ export default function TerminalSimulator() {
                 {isPlaying ? (
                   <>
                     <RiPauseLine />
-                    {isKo ? "일시정지" : "Pause"}
+                    Pause
                   </>
                 ) : (
                   <>
                     <RiPlayLine />
-                    {isKo ? "재생" : "Play"}
+                    Play
                   </>
                 )}
               </ControlBtn>
               <ControlBtn onClick={handleRestart}>
                 <RiRestartLine />
-                {isKo ? "다시보기" : "Replay"}
+                Replay
               </ControlBtn>
               <ControlBtn
                 onClick={() => setSpeed((prev) => (prev === 1 ? 2 : 1))}
@@ -850,12 +1217,8 @@ export default function TerminalSimulator() {
               <span className="rec-dot" />
               <span>
                 {isPlaying
-                  ? isKo
-                    ? "터미널 세션 시뮬레이션 중..."
-                    : "Simulating terminal session..."
-                  : isKo
-                  ? "출력 완료"
-                  : "Output Complete"}
+                  ? `Running: $ ${activeScript?.cmd}`
+                  : `Completed: $ ${activeScript?.cmd}`}
               </span>
             </PlaybackStatus>
           </PlayerControlBar>
@@ -863,346 +1226,144 @@ export default function TerminalSimulator() {
 
         <TerminalScreen>
           {activeSubcommand === "bun" ? (
-            <TreeContainer>
-              <TreeHeader>
-                <pre className="ascii-banner">{`      ▄▄██████▄▄         ▄▀▀▀ ▄▀▀▄ █▀▀▀ █▀▀▀ █▀▀▀ █▀▀▀
-   ▄██▀▀▀▀▀▀▀▀▀▀██▄      █    █  █ █▀▀  █▀▀  █▀▀  █▀▀ 
-  ██▀ ▄▄██████▄▄ ▀██     ▀▄▄▄ ▀▄▄▀ ▀    ▀    ▀▄▄▄ ▀▄▄▄
- ██▀ ██▀▀▀▀▀▀▀▀██ ▀██    █▀▀▄ █  █ █▄ █
-▄██▄▄████████████▄▄██▄   █▀▀▄ █  █ █ ▀█
- ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀    ▀▀▀   ▀▀  ▀  ▀`}</pre>
-                <div className="brand">
-                  coffee-bun (bun) - macOS Setup &amp; Environment Manager
-                </div>
-                <div className="subtext">
-                  {isKo
-                    ? "카테고리를 클릭해 접거나 펼치고, 누락된 패키지를 선택한 뒤 하단 버튼으로 설치를 실행해보세요."
-                    : "Fold/Unfold groups, toggle missing packages, and run installation from the action bar below."}
-                </div>
-              </TreeHeader>
+            <div>
+              {renderAsciiHeader()}
 
-              {/* [shell] Terminal & Shell */}
-              <CategoryRow onClick={() => toggleFold("shell")}>
-                <span className="toggle-icon">
-                  {foldedCategories.shell ? "[+]" : "[-]"}
-                </span>
-                <span className="cat-name">
-                  [shell] Terminal &amp; Shell (iTerm2, Fonts, OMZ, p10k)
-                </span>
-                <span className="cat-badge">6/8 installed</span>
-              </CategoryRow>
+              <StatusSummaryLine>
+                {"  Status: "}
+                <span className="ready">{totalReady}</span>
+                {" ready, "}
+                <span className="missing">{totalMissing}</span>
+                {" missing | "}
+                <span className="selected">{totalSelected}</span>
+                {" selected to install"}
+              </StatusSummaryLine>
 
-              {!foldedCategories.shell && (
-                <ItemList>
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">iTerm2</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">3.7.6</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
+              <DividerLine>{"-".repeat(78)}</DividerLine>
 
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">MesloLGS NF Font</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">~/Library/Fonts</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
+              {TUI_GROUPS.map((group, gIdx) => {
+                const isFolded = !!foldedGroups[group.key];
+                const totalInGroup = group.items.length;
+                const readyInGroup = group.items.filter(
+                  (i) => i.installed
+                ).length;
+                const missingInGroup = totalInGroup - readyInGroup;
+                const selectedInGroup = group.items.filter(
+                  (i) => selectedIds[i.id]
+                ).length;
+                const isFirstCursor = gIdx === 1;
 
-                  <ItemRow
-                    isSelected={!!selectedItems["iTerm2 Font Config"]}
-                    onClick={() => toggleItem("iTerm2 Font Config")}
-                  >
-                    <div className="item-left">
-                      <span className="checkbox">
-                        {selectedItems["iTerm2 Font Config"] ? "[+]" : "[ ]"}
-                      </span>
-                      <span className="item-name">iTerm2 Font Config</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">MesloLGS-NF-Regular 16</span>
-                      <span className="item-status missing">missing</span>
-                    </div>
-                  </ItemRow>
+                return (
+                  <React.Fragment key={group.key}>
+                    <GroupHeaderLine
+                      isCursor={isFirstCursor}
+                      onClick={() => toggleGroupFold(group.key)}
+                    >
+                      {isFirstCursor ? "> " : "  "}
+                      {isFolded ? "[+]" : "[-]"} {group.icon} {group.title}{" "}
+                      {missingInGroup === 0 ? (
+                        <span className="badge-ready">
+                          ({readyInGroup}/{totalInGroup} ready)
+                        </span>
+                      ) : (
+                        <span className="badge-missing">
+                          ({readyInGroup}/{totalInGroup} ready, {missingInGroup}{" "}
+                          missing)
+                        </span>
+                      )}{" "}
+                      {selectedInGroup === totalInGroup && totalInGroup > 0 ? (
+                        <span className="sel-all">[All]</span>
+                      ) : selectedInGroup > 0 ? (
+                        <span className="sel-some">
+                          [{selectedInGroup} sel]
+                        </span>
+                      ) : (
+                        <span className="sel-empty">[ ]</span>
+                      )}
+                    </GroupHeaderLine>
 
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Brogrammer Theme</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">iTerm2 Profile</span>
-                      <span className="item-status installed">Preset Ready</span>
-                    </div>
-                  </ItemRow>
+                    {!isFolded &&
+                      group.items.map((item) => {
+                        const isSel = !!selectedIds[item.id];
+                        const paddedName = item.name.padEnd(25, " ");
+                        const paddedVer = (
+                          item.installed ? item.version : "missing"
+                        ).padEnd(13, " ");
 
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Oh My Zsh</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">master (964ddf7)</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
+                        return (
+                          <PackageItemLine
+                            key={item.id}
+                            onClick={() => toggleItemSelect(item.id)}
+                          >
+                            {"      "}
+                            {item.installed ? (
+                              isSel ? (
+                                <span className="chk-installed-sel">[x]</span>
+                              ) : (
+                                <span className="chk-installed">[x]</span>
+                              )
+                            ) : isSel ? (
+                              <span className="chk-missing-sel">[+]</span>
+                            ) : (
+                              <span className="chk-missing">[ ]</span>
+                            )}{" "}
+                            <span>{paddedName}</span>{" "}
+                            {item.installed ? (
+                              <span className="ver-ok">{paddedVer}</span>
+                            ) : (
+                              <span className="ver-missing">{paddedVer}</span>
+                            )}{" "}
+                            <span className="desc">- {item.desc}</span>
+                          </PackageItemLine>
+                        );
+                      })}
+                  </React.Fragment>
+                );
+              })}
 
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Powerlevel10k</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">v1.20.0</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-                </ItemList>
-              )}
+              <DividerLine>{"-".repeat(78)}</DividerLine>
 
-              {/* [editor] Editors & Vim Runtime */}
-              <CategoryRow onClick={() => toggleFold("editor")}>
-                <span className="toggle-icon">
-                  {foldedCategories.editor ? "[+]" : "[-]"}
-                </span>
-                <span className="cat-name">
-                  [editor] Editors &amp; Vim Runtime (amix/vimrc, VS Code)
-                </span>
-                <span className="cat-badge">2/3 installed</span>
-              </CategoryRow>
+              <TUIButtonsRow>
+                <TUIExitBtn onClick={() => handleSelectSubcommand("check")}>
+                  {"  < Exit  "}
+                </TUIExitBtn>
+                <TUIStartBtn onClick={() => handleSelectSubcommand("install")}>
+                  {`[ Start Install (${totalSelected}) > ]`}
+                </TUIStartBtn>
+              </TUIButtonsRow>
 
-              {!foldedCategories.editor && (
-                <ItemList>
-                  <ItemRow
-                    isSelected={!!selectedItems["Ultimate Vim Runtime"]}
-                    onClick={() => toggleItem("Ultimate Vim Runtime")}
-                  >
-                    <div className="item-left">
-                      <span className="checkbox">
-                        {selectedItems["Ultimate Vim Runtime"] ? "[+]" : "[ ]"}
-                      </span>
-                      <span className="item-name">Ultimate Vim Runtime</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">amix/vimrc</span>
-                      <span className="item-status missing">missing</span>
-                    </div>
-                  </ItemRow>
-
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Visual Studio Code</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">1.142.0</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">VS Code CLI (code)</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">/usr/local/bin/code</span>
-                      <span className="item-status installed">Symlinked</span>
-                    </div>
-                  </ItemRow>
-                </ItemList>
-              )}
-
-              {/* [lang] Compilers & Languages */}
-              <CategoryRow onClick={() => toggleFold("lang")}>
-                <span className="toggle-icon">
-                  {foldedCategories.lang ? "[+]" : "[-]"}
-                </span>
-                <span className="cat-name">
-                  [lang] Compilers &amp; Languages (Go, Python, Java, Node)
-                </span>
-                <span className="cat-badge">4/5 installed</span>
-              </CategoryRow>
-
-              {!foldedCategories.lang && (
-                <ItemList>
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Go</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">go1.27.2</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Python 3</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">Python 3.15.0 (pip)</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-
-                  <ItemRow
-                    isSelected={!!selectedItems["Java (OpenJDK)"]}
-                    onClick={() => toggleItem("Java (OpenJDK)")}
-                  >
-                    <div className="item-left">
-                      <span className="checkbox">
-                        {selectedItems["Java (OpenJDK)"] ? "[+]" : "[ ]"}
-                      </span>
-                      <span className="item-name">Java (OpenJDK)</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">openjdk-21</span>
-                      <span className="item-status missing">missing</span>
-                    </div>
-                  </ItemRow>
-
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Node.js</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">v26.12.0 (npm)</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-                </ItemList>
-              )}
-
-              {/* [cloud] & [tools] Folded summaries */}
-              <CategoryRow onClick={() => toggleFold("cloud")}>
-                <span className="toggle-icon">
-                  {foldedCategories.cloud ? "[+]" : "[-]"}
-                </span>
-                <span className="cat-name">
-                  [cloud] Cloud &amp; DevOps CLIs (AWS, Google Cloud SDK, Azure)
-                </span>
-                <span className="cat-badge">2/3 installed</span>
-              </CategoryRow>
-
-              {!foldedCategories.cloud && (
-                <ItemList>
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">AWS CLI</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">2.22.1</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">Google Cloud SDK (gcloud)</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">506.0.0</span>
-                      <span className="item-status installed">Installed</span>
-                    </div>
-                  </ItemRow>
-                  <ItemRow
-                    isSelected={!!selectedItems["Azure CLI (az)"]}
-                    onClick={() => toggleItem("Azure CLI (az)")}
-                  >
-                    <div className="item-left">
-                      <span className="checkbox">
-                        {selectedItems["Azure CLI (az)"] ? "[+]" : "[ ]"}
-                      </span>
-                      <span className="item-name">Azure CLI (az)</span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-version">2.67.0</span>
-                      <span className="item-status missing">missing</span>
-                    </div>
-                  </ItemRow>
-                </ItemList>
-              )}
-
-              <CategoryRow onClick={() => toggleFold("tools")}>
-                <span className="toggle-icon">
-                  {foldedCategories.tools ? "[+]" : "[-]"}
-                </span>
-                <span className="cat-name">
-                  [tools] Modern CLI Suite (zoxide, htop, fzf, ripgrep, eza, bat)
-                </span>
-                <span className="cat-badge">8/8 installed</span>
-              </CategoryRow>
-
-              {!foldedCategories.tools && (
-                <ItemList>
-                  <ItemRow isSelected={false} onClick={() => {}}>
-                    <div className="item-left">
-                      <span className="checkbox">[x]</span>
-                      <span className="item-name">
-                        zoxide, ripgrep, fzf, bat, eza, htop, tree, jq
-                      </span>
-                    </div>
-                    <div className="item-right">
-                      <span className="item-status installed">All Active</span>
-                    </div>
-                  </ItemRow>
-                </ItemList>
-              )}
-
-              <ActionBar>
-                <ActionButtons>
-                  <TUIButton onClick={() => handleSelectSubcommand("check")}>
-                    &lt; {isKo ? "상태 점검" : "Check Status"}
-                  </TUIButton>
-                  <TUIButton onClick={selectAllMissing}>
-                    <RiCheckLine />
-                    {isKo ? "누락 항목 선택 (m)" : "Select Missing (m)"}
-                  </TUIButton>
-                </ActionButtons>
-
-                <ActionButtons>
-                  <TUIButton
-                    primary
-                    onClick={() => handleSelectSubcommand("install")}
-                  >
-                    <RiPlayLine />
-                    Start Install ({selectedCount}) &gt;
-                  </TUIButton>
-                </ActionButtons>
-              </ActionBar>
-
-              <TUIHelpBar>
-                {isKo
-                  ? "[Tab/←/→] 버튼 포커스 | [Enter] 실행 | [Space] 항목 토글 | [m] 누락 선택 | [q] 종료"
-                  : "[Tab/←/→] Buttons | [Enter] Run | [Space] Toggle | [m] Missing | [q] Quit"}
-              </TUIHelpBar>
-            </TreeContainer>
+              <TUIHintRow>
+                {
+                  "  [j/k/g/G] Move | [Space] Toggle | [a/m] All/Missing | [?] Shortcuts | [q] Quit"
+                }
+              </TUIHintRow>
+            </div>
           ) : (
-            <>
+            <div>
               <PromptLine>
-                <span className="host">macbook-pro</span>
-                <span className="path">~</span>
-                <span className="cmd">$ {activeScript?.cmd}</span>
+                <span className="prompt-char">$ </span>
+                <span className="cmd">{activeScript?.cmd}</span>
               </PromptLine>
 
-              {displayedFrames.map((frame, idx) => (
-                <LineText key={idx} tone={frame.tone}>
-                  {frame.text}
-                </LineText>
+              {renderAsciiHeader()}
+
+              {displayedFrames.map((line, lineIdx) => (
+                <div key={lineIdx} style={{ whiteSpace: "pre-wrap" }}>
+                  {line.map((span, sIdx) => (
+                    <span
+                      key={sIdx}
+                      style={{
+                        color: span.color || PALETTE.normal,
+                        backgroundColor: span.bg || "transparent",
+                        fontWeight: span.bold ? 700 : 400,
+                      }}
+                    >
+                      {span.text}
+                    </span>
+                  ))}
+                </div>
               ))}
-            </>
+            </div>
           )}
         </TerminalScreen>
       </TerminalFrame>

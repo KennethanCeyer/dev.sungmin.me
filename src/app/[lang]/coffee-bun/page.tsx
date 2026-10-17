@@ -376,6 +376,11 @@ const TableWrapper = styled.div`
     text-align: left;
     font-size: 0.88rem;
 
+    &.matrix-table {
+      table-layout: fixed;
+      min-width: 820px;
+    }
+
     th,
     td {
       padding: 0.75rem 1.1rem;
@@ -417,18 +422,25 @@ const TableWrapper = styled.div`
     td.pkg-cell {
       font-weight: 500;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     td.target-cell {
       font-family: var(--font-roboto-mono), monospace;
       font-size: 0.8rem;
       opacity: 0.65;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     th.check-col,
     td.check-cell {
       text-align: center;
-      width: 110px;
+      width: 10.5%;
+      padding-left: 0.35rem;
+      padding-right: 0.35rem;
       border-left: 1px solid var(--color-border-weak);
     }
   }
@@ -945,15 +957,20 @@ export default function CoffeeBunDetailPage() {
           </SectionHeader>
 
           <TableWrapper>
-            <table>
+            <table className="matrix-table">
+              <colgroup>
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "21%" }} />
+                <col style={{ width: "21%" }} />
+                <col style={{ width: "10.5%" }} />
+                <col style={{ width: "10.5%" }} />
+                <col style={{ width: "10.5%" }} />
+                <col style={{ width: "10.5%" }} />
+              </colgroup>
               <thead>
                 <tr>
-                  <th style={{ width: "18%" }}>
-                    {t("coffee_bun.th_section", "Section")}
-                  </th>
-                  <th style={{ width: "24%" }}>
-                    {t("coffee_bun.th_package", "Package / Tool")}
-                  </th>
+                  <th>{t("coffee_bun.th_section", "Section")}</th>
+                  <th>{t("coffee_bun.th_package", "Package / Tool")}</th>
                   <th>{t("coffee_bun.th_target", "Source / Target")}</th>
                   <th className="check-col">
                     {t("coffee_bun.th_install", "Install")}

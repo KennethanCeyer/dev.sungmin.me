@@ -10,91 +10,63 @@ const rootDir = path.resolve(__dirname, "..");
 const readProjectFile = (relPath) =>
   fs.readFileSync(path.join(rootDir, relPath), "utf8");
 
-describe("Main Shell, ASCII Logo, Support Matrix & Theme Integrity", () => {
-  it("TerminalSimulator.tsx uses theme-aware CSS variables instead of hardcoded black backgrounds", () => {
+describe("Terminal Simulator, ASCII Logo, Equal-Width Support Matrix & Theme Integrity", () => {
+  it("TerminalSimulator.tsx uses dark terminal background and authentic Soft Coffee Pastel palette from coffee-bun", () => {
     const content = readProjectFile("src/components/TerminalSimulator.tsx");
 
-    // Must use theme-aware CSS variables
-    assert.match(content, /background-color:\s*var\(--code-block-bg\)/);
-    assert.match(content, /background-color:\s*var\(--color-background\)/);
-    assert.match(content, /color:\s*var\(--code-block-fg\)/);
-
-    // Must NOT contain hardcoded pitch-black terminal backgrounds
-    const forbiddenBlackHexes = ["#05070a", "#0c1017", "#080c12", "#06090e"];
-    for (const hex of forbiddenBlackHexes) {
-      assert.equal(
-        content.toLowerCase().includes(hex),
-        false,
-        `TerminalSimulator.tsx should not contain hardcoded black background ${hex}`
-      );
-    }
-
-    // Must NOT contain hardcoded colored traffic light or ANSI rainbow hexes
-    const forbiddenColorHexes = [
-      "#ff5f56",
-      "#ffbd2e",
-      "#27c93f",
-      "#58a6ff",
-      "#3fb950",
-      "#d29922",
-      "#bc8cff",
-    ];
-    for (const hex of forbiddenColorHexes) {
-      assert.equal(
-        content.toLowerCase().includes(hex),
-        false,
-        `TerminalSimulator.tsx should not contain non-monotone color ${hex}`
-      );
-    }
+    // Dark terminal background + Soft Coffee Pastel Lipgloss palette from styles.go
+    assert.match(content, /bg:\s*"#0B0A09"/);
+    assert.match(content, /primary:\s*"#A67B5B"/);
+    assert.match(content, /secondary:\s*"#D4A373"/);
+    assert.match(content, /success:\s*"#84A98C"/);
+    assert.match(content, /warning:\s*"#E9C46A"/);
+    assert.match(content, /logoBun:\s*"#C68B59"/);
+    assert.match(content, /normal:\s*"#EDE0D4"/);
   });
 
-  it("TerminalSimulator.tsx includes interactive Tree TUI, ASCII art banner, and all 5 subcommands", () => {
+  it("TerminalSimulator.tsx outputs 100% English CLI results matching real coffee-bun commands", () => {
     const content = readProjectFile("src/components/TerminalSimulator.tsx");
 
-    // ASCII art banner present
-    assert.match(content, /▄▄██████▄▄\s+▄▀▀▀ ▄▀▀▄ █▀▀▀/);
+    // Must not contain any Korean characters inside the terminal simulator
+    assert.equal(
+      /[가-힣]/.test(content),
+      false,
+      "TerminalSimulator.tsx should be 100% English like the real Go CLI"
+    );
 
-    // Interactive Tree TUI handlers and components
-    assert.match(content, /toggleFold/);
-    assert.match(content, /toggleItem/);
-    assert.match(content, /selectAllMissing/);
-    assert.match(content, /TreeContainer/);
-    assert.match(content, /CategoryRow/);
-    assert.match(content, /ItemRow/);
-
-    // All 5 subcommands present
-    assert.match(content, /1\. bun/);
-    assert.match(content, /2\. bun install all/);
-    assert.match(content, /3\. bun check/);
-    assert.match(content, /4\. bun doctor/);
-    assert.match(content, /5\. bun update/);
+    // Must match real CLI outputs from /Users/pignose/bundle/internal/cli/*.go
+    assert.match(content, /Status:/);
+    assert.match(content, /selected to install/);
+    assert.match(content, /Installing 4 missing package\(s\)\.\.\./);
+    assert.match(content, /\[System & Toolchains\]/);
+    assert.match(content, /coffee-bun doctor - Diagnostic Report/);
+    assert.match(content, /Checking for updates and running maintenance\.\.\./);
   });
 
-  it("coffee-bun/page.tsx renders ASCII logo and merged-row (rowSpan) matrix table with RiCheckLine", () => {
+  it("coffee-bun/page.tsx renders ASCII logo and merged-row (rowSpan) matrix table with equal-width check columns", () => {
     const content = readProjectFile("src/app/[lang]/coffee-bun/page.tsx");
 
     // FullWidthInstallBanner must use var(--code-block-bg) and var(--code-block-fg)
     assert.match(content, /background-color:\s*var\(--code-block-bg\)/);
     assert.match(content, /color:\s*var\(--code-block-fg\)/);
 
-    // No hardcoded black background or colorful prompt hexes
-    for (const hex of ["#06090e", "#05070a", "#58a6ff", "#f0f6fc"]) {
-      assert.equal(
-        content.toLowerCase().includes(hex),
-        false,
-        `coffee-bun/page.tsx should not contain hardcoded hex ${hex}`
-      );
-    }
-
     // Coffee Bun ASCII Art Logo must be present
     assert.match(content, /COFFEE_BUN_ASCII/);
     assert.match(content, /▄▄██████▄▄\s+▄▀▀▀ ▄▀▀▄ █▀▀▀/);
 
-    // Merged-row matrix table with rowSpan and RiCheckLine must be present
+    // Merged-row matrix table with rowSpan, RiCheckLine, table-layout: fixed, and 4 identical col widths
+    assert.match(content, /table-layout:\s*fixed/);
     assert.match(content, /rowSpan=\{group\.items\.length\}/);
     assert.match(content, /className="section-cell"/);
     assert.match(content, /className="check-cell"/);
     assert.match(content, /<RiCheckLine\s*\/>/);
+
+    const equalCols = content.match(/<col style=\{\{ width: "10\.5%" \}\} \/>/g) || [];
+    assert.equal(
+      equalCols.length,
+      4,
+      `Expected 4 identical 10.5% check columns in colgroup, found ${equalCols.length}`
+    );
   });
 
   it("loads RobotoMonoVariable.woff2 with block elements and adjustFontFallback: false so ASCII art never squishes", () => {
@@ -132,8 +104,6 @@ describe("Main Shell, ASCII Logo, Support Matrix & Theme Integrity", () => {
     const content = readProjectFile("src/lib/i18n-resources.ts");
 
     const forbiddenMarketingPhrases = [
-      "black background",
-      "블랙 배경",
       "4 Hours → 30 Seconds",
       "Zero Configuration Errors",
       "zero-friction",
@@ -144,11 +114,10 @@ describe("Main Shell, ASCII Logo, Support Matrix & Theme Integrity", () => {
       assert.equal(
         content.includes(phrase),
         false,
-        `i18n-resources.ts should not contain marketing/stale phrase: ${phrase}`
+        `i18n-resources.ts should not contain marketing phrase: ${phrase}`
       );
     }
 
-    // Required localization keys in both EN and KO sections
     const requiredKeys = [
       "tui_title",
       "tui_subtitle",

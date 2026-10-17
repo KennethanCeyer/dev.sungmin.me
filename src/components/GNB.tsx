@@ -5,20 +5,16 @@ import styled from "@emotion/styled";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { RiExternalLinkLine } from "react-icons/ri";
 
 const linkStyles = (theme: Theme) => css`
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 400;
   color: ${theme.text};
-  opacity: 0.75;
+  opacity: 0.7;
   text-decoration: none;
-  transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
   position: relative;
   padding: 0.25rem 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
 
   &::after {
     content: "";
@@ -28,8 +24,8 @@ const linkStyles = (theme: Theme) => css`
     transform: translateX(-50%);
     width: 0;
     height: 2px;
-    background-color: var(--accent-color, ${theme.text});
-    transition: width 0.25s ease-in-out;
+    background-color: ${theme.text};
+    transition: width 0.3s ease-in-out;
   }
 
   &:hover {
@@ -40,7 +36,7 @@ const linkStyles = (theme: Theme) => css`
 const Nav = styled.nav`
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 36px;
 
   @media (max-width: 768px) {
     display: none;
@@ -67,11 +63,6 @@ const ExternalLink = styled.a`
   &:hover::after {
     width: 100%;
   }
-
-  svg {
-    font-size: 0.85em;
-    opacity: 0.6;
-  }
 `;
 
 const GNB: React.FC<{ lang: string }> = ({ lang }) => {
@@ -85,22 +76,22 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
     isActiveMatch?: string;
   }[] = [
     {
-      href: `/${lang}/coffee-bun`,
-      label: "☕ coffee-bun",
-      isActiveMatch: `/${lang}/coffee-bun`,
-    },
-    {
       href: `/${lang}#projects`,
-      label: t("hub.projects_title", "Projects"),
+      label: t("nav.projects", "Projects"),
+      isActiveMatch: `/${lang}#projects`,
     },
     {
-      href: "https://github.com/KennethanCeyer/coffee-bun",
-      label: "GitHub",
-      isExternal: true,
+      href: `/${lang}#principles`,
+      label: t("nav.principles", "Principles"),
     },
     {
       href: "https://blog.sungmin.me",
       label: "Blog",
+      isExternal: true,
+    },
+    {
+      href: "https://github.com/KennethanCeyer",
+      label: "GitHub",
       isExternal: true,
     },
     {
@@ -120,15 +111,14 @@ const GNB: React.FC<{ lang: string }> = ({ lang }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span>{link.label}</span>
-            <RiExternalLinkLine />
+            {link.label}
           </ExternalLink>
         ) : (
           <NavLink
             key={link.href}
             href={link.href}
             data-active={
-              link.isActiveMatch ? pathname.startsWith(link.isActiveMatch) : false
+              link.isActiveMatch ? pathname === link.isActiveMatch : false
             }
           >
             {link.label}

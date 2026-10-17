@@ -59,17 +59,17 @@ const MarkdownContainer = styled.div`
   }
 
   a {
-    color: var(--accent-color, #00add8);
+    color: ${({ theme }) => theme.text};
     text-decoration: underline;
     text-underline-offset: 3px;
     transition: opacity 0.2s ease;
     &:hover {
-      opacity: 0.8;
+      opacity: 0.7;
     }
   }
 
   blockquote {
-    border-left: 3px solid var(--accent-color, #00add8);
+    border-left: 3px solid ${({ theme }) => theme.text};
     padding: 0.6rem 1.2rem;
     margin: 1.5rem 0;
     background-color: var(--color-background);

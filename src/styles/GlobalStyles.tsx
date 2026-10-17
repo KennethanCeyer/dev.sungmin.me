@@ -28,13 +28,13 @@ const GlobalStyles = () => (
         box-sizing: inherit;
       }
 
-      /* Light is the base; data-theme overrides below */
+      /* Light mode base */
       :root {
         --color-text: #101216;
         --color-body: #ffffff;
         --color-background: #fafafa;
         --color-border: #eaeaea;
-        --color-border-weak: #0000001a;
+        --color-border-weak: #00000014;
         --color-primary: #101216;
         --code-block-bg: #f6f8fa;
         --code-block-fg: #24292e;
@@ -42,8 +42,6 @@ const GlobalStyles = () => (
         --color-inline-bg: #f5f5f5;
         --color-inline-text: #101216;
         --pattern-rgb: 16, 18, 22;
-        --accent-color: #00add8; /* Go cyan */
-        --accent-gradient: linear-gradient(135deg, #00add8 0%, #007d9c 100%);
 
         /* Markdown heading scale */
         --md-heading-1-size: 2.2rem;
@@ -67,16 +65,14 @@ const GlobalStyles = () => (
           --color-body: #000000;
           --color-background: #111111;
           --color-border: #333333;
-          --color-border-weak: #ffffff1a;
+          --color-border-weak: #ffffff14;
           --color-primary: #ffffff;
           --code-block-bg: #0f0f0f;
           --code-block-fg: #f8f8f2;
           --invert-if-dark: invert(1);
-          --color-inline-bg: #ffffff18;
+          --color-inline-bg: #ffffff14;
           --color-inline-text: #ffffff;
           --pattern-rgb: 255, 255, 255;
-          --accent-color: #29d0f5;
-          --accent-gradient: linear-gradient(135deg, #29d0f5 0%, #00add8 100%);
         }
       }
 
@@ -85,7 +81,7 @@ const GlobalStyles = () => (
         --color-body: #ffffff;
         --color-background: #fafafa;
         --color-border: #eaeaea;
-        --color-border-weak: #0000001a;
+        --color-border-weak: #00000014;
         --color-primary: #101216;
         --code-block-bg: #f6f8fa;
         --code-block-fg: #24292e;
@@ -93,8 +89,6 @@ const GlobalStyles = () => (
         --color-inline-bg: #f5f5f5;
         --color-inline-text: #101216;
         --pattern-rgb: 16, 18, 22;
-        --accent-color: #00add8;
-        --accent-gradient: linear-gradient(135deg, #00add8 0%, #007d9c 100%);
       }
 
       html[data-theme="dark"] {
@@ -102,16 +96,14 @@ const GlobalStyles = () => (
         --color-body: #000000;
         --color-background: #111111;
         --color-border: #333333;
-        --color-border-weak: #ffffff1a;
+        --color-border-weak: #ffffff14;
         --color-primary: #ffffff;
         --code-block-bg: #0f0f0f;
         --code-block-fg: #f8f8f2;
         --invert-if-dark: invert(1);
-        --color-inline-bg: #ffffff18;
+        --color-inline-bg: #ffffff14;
         --color-inline-text: #ffffff;
         --pattern-rgb: 255, 255, 255;
-        --accent-color: #29d0f5;
-        --accent-gradient: linear-gradient(135deg, #29d0f5 0%, #00add8 100%);
       }
 
       body {

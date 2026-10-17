@@ -47,18 +47,20 @@ const LogoContainer = styled.div`
 const LogoLink = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 `;
 
 const DevBadge = styled.span`
-  background: var(--accent-gradient, #00add8);
-  color: #ffffff;
-  font-size: 0.68rem;
-  font-weight: 700;
+  color: ${({ theme }) => theme.text};
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.background};
+  font-family: var(--font-roboto-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
 `;
 
 const RightSection = styled.div`

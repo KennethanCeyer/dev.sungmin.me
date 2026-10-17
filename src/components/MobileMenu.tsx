@@ -2,7 +2,6 @@
 
 import styled from "@emotion/styled";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { RiCloseLine, RiExternalLinkLine } from "react-icons/ri";
 
@@ -49,14 +48,15 @@ const DrawerHeader = styled.div`
 
 const DrawerTitle = styled.span`
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  font-family: var(--font-roboto-mono), monospace;
   color: ${({ theme }) => theme.text};
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   cursor: pointer;
   color: ${({ theme }) => theme.text};
   display: flex;
@@ -75,17 +75,17 @@ const NavLinksList = styled.ul`
 
 const NavItem = styled.li`
   a {
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: 1rem;
+    font-weight: 400;
     color: ${({ theme }) => theme.text};
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    transition: color 0.2s ease;
+    padding: 0.4rem 0;
+    transition: opacity 0.2s ease;
 
     &:hover {
-      color: var(--accent-color, ${({ theme }) => theme.primary});
+      opacity: 0.7;
     }
   }
 `;
@@ -104,17 +104,16 @@ export default function MobileMenu({
   const { t } = useTranslation();
 
   const links = [
-    { href: `/${lang}`, label: t("nav.dev_home", "Dev Portal") },
-    { href: `/${lang}/coffee-bun`, label: "☕ coffee-bun" },
-    { href: `/${lang}#projects`, label: t("hub.projects_title", "Projects") },
-    {
-      href: "https://github.com/KennethanCeyer/coffee-bun",
-      label: "coffee-bun GitHub",
-      isExternal: true,
-    },
+    { href: `/${lang}#projects`, label: t("nav.projects", "Projects") },
+    { href: `/${lang}#principles`, label: t("nav.principles", "Principles") },
     {
       href: "https://blog.sungmin.me",
       label: "Blog",
+      isExternal: true,
+    },
+    {
+      href: "https://github.com/KennethanCeyer",
+      label: "GitHub",
       isExternal: true,
     },
     {
@@ -145,7 +144,7 @@ export default function MobileMenu({
                   onClick={onClose}
                 >
                   <span>{link.label}</span>
-                  <RiExternalLinkLine style={{ opacity: 0.6 }} />
+                  <RiExternalLinkLine style={{ opacity: 0.5, fontSize: "0.85em" }} />
                 </a>
               ) : (
                 <Link href={link.href} onClick={onClose}>

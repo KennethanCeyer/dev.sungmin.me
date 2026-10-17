@@ -39,8 +39,8 @@ const InteractiveGrid = () => {
       themeName === "dark"
         ? "rgba(255, 255, 255, 0.08)"
         : "rgba(0, 0, 0, 0.07)";
-    const dotHighlightColor = themeName === "dark" ? "#29d0f5" : "#00add8";
-    const gridSize = 28;
+    const dotHighlightColor = themeName === "dark" ? "#ffffff" : "#101216";
+    const gridSize = 30;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();

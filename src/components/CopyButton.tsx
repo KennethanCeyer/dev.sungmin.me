@@ -53,8 +53,8 @@ export default function CopyButton({
       ? "rgba(var(--pattern-rgb), 0.1)"
       : "var(--code-block-bg)",
     opacity: copied ? 1 : 0.85,
-    borderColor: copied ? "#10b981" : "var(--color-border-weak)",
-    color: copied ? "#10b981" : "var(--color-text)",
+    borderColor: copied ? "var(--color-text)" : "var(--color-border-weak)",
+    color: "var(--color-text)",
     ...style,
   };
 

@@ -1,0 +1,116 @@
+<svg width="1000" height="480" viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg">
+    <!-- 
+      Discrete Language Diffusion Mechanism (Fluid Edition)
+      Enhanced vertical spacing and smooth fluid transitions.
+    -->
+    <defs>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+        <feOffset dx="1" dy="1" />
+        <feComponentTransfer><feFuncA type="linear" slope="0.1" /></feComponentTransfer>
+        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@800&amp;family=Inter:wght@700;900&amp;display=swap');
+        
+        .title { font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 900; fill: #1a1a1a; text-anchor: middle; }
+        .sub-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; fill: #6c757d; text-anchor: middle; }
+        .token-txt { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 800; text-anchor: middle; }
+        .legend-txt { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 700; text-anchor: middle; }
+        .t-label { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; fill: #495057; }
+        
+        /* Smooth progress bar */
+        @keyframes t-bar { 0% { width: 0; } 100% { width: 700px; } }
+        .t-progress { animation: t-bar 5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Box states with smooth transitions */
+        @keyframes box-fluid {
+          0%, 15% { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 2; }
+          20%, 45% { fill: #ffffff; stroke: #ffc107; stroke-width: 5; }
+          50%, 100% { fill: #ffffff; stroke: #20c997; stroke-width: 5; }
+        }
+        
+        /* Smooth Cross-fade */
+        @keyframes fade-in { 0%, 20% { opacity: 0; transform: translateY(8px); } 30%, 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-out { 0%, 20% { opacity: 1; transform: translateY(0); } 30%, 100% { opacity: 0; transform: translateY(-8px); } }
+        
+        .anim-fade-in { animation: fade-in 5s infinite; }
+        .anim-fade-out { animation: fade-out 5s infinite; }
+
+        /* Smooth Fluid Attention */
+        @keyframes att-fluid {
+          0%, 15% { stroke: #dee2e6; stroke-opacity: 0.1; stroke-width: 1.5; }
+          20%, 45% { stroke: #ffc107; stroke-opacity: 0.5; stroke-width: 3.5; stroke-dasharray: 6 3; }
+          50%, 100% { stroke: #0d6efd; stroke-opacity: 0.25; stroke-width: 2.5; stroke-dasharray: none; }
+        }
+      </style>
+    </defs>
+
+    <rect width="1000" height="480" fill="#ffffff" rx="24" />
+
+    <!-- 1. Header (y=50, y=85) -->
+    <text x="500" y="55" class="title">Discrete Language Diffusion Mechanism</text>
+    <text x="500" y="85" class="sub-title">Global Confidence-based Refinement in Discrete State Space</text>
+    
+    <!-- 2. Timeline (y=130, labels moved ABOVE the bar to clear space) -->
+    <g transform="translate(150, 130)">
+      <text x="0" y="-12" class="t-label" style="text-anchor: start;">Step T (Noise)</text>
+      <text x="700" y="-12" class="t-label" style="text-anchor: end;">Step 0 (Clean)</text>
+      <rect width="700" height="10" rx="5" fill="#f1f3f5" />
+      <rect height="10" rx="5" fill="#0d6efd" class="t-progress" />
+    </g>
+
+    <!-- 3. Dynamic Attention Web (Anchors y=280, peak at y=160-220) -->
+    <g fill="none">
+      <path d="M 125 280 Q 177 210 230 280" style="animation: att-fluid 5s infinite; animation-delay: 0.3s;" />
+      <path d="M 305 280 Q 357 210 410 280" style="animation: att-fluid 5s infinite; animation-delay: 0.5s;" />
+      <path d="M 485 280 Q 537 210 590 280" style="animation: att-fluid 5s infinite; animation-delay: 0.1s;" />
+      <path d="M 665 280 Q 717 210 770 280" style="animation: att-fluid 5s infinite; animation-delay: 0.7s;" />
+      <path d="M 125 280 Q 305 160 485 280" style="animation: att-fluid 5s infinite; animation-delay: 0.2s;" />
+      <path d="M 485 280 Q 665 160 845 280" style="animation: att-fluid 5s infinite; animation-delay: 0.6s;" />
+      <path d="M 125 280 Q 485 110 845 280" style="animation: att-fluid 5s infinite; animation-delay: 0.4s;" />
+    </g>
+
+    <!-- 4. Tokens Row (Shifted DOWN to y=280 to create room for curves) -->
+    <g transform="translate(50, 280)">
+      <g transform="translate(0, 0)">
+        <rect width="150" height="70" rx="15" filter="url(#shadow)" style="animation: box-fluid 5s infinite; animation-delay: 0.3s;" />
+        <text x="75" y="45" class="token-txt anim-fade-out" fill="#adb5bd" font-style="italic" style="animation-delay: 0.3s;">[MASK]</text>
+        <text x="75" y="45" class="token-txt anim-fade-in" fill="#212529" style="animation-delay: 0.3s;">Once</text>
+      </g>
+      <g transform="translate(180, 0)">
+        <rect width="150" height="70" rx="15" filter="url(#shadow)" style="animation: box-fluid 5s infinite; animation-delay: 0.7s;" />
+        <text x="75" y="45" class="token-txt anim-fade-out" fill="#adb5bd" font-style="italic" style="animation-delay: 0.7s;">[MASK]</text>
+        <text x="75" y="45" class="token-txt anim-fade-in" fill="#212529" style="animation-delay: 0.7s;">upon</text>
+      </g>
+      <g transform="translate(360, 0)">
+        <rect width="150" height="70" rx="15" filter="url(#shadow)" style="animation: box-fluid 5s infinite; animation-delay: 0.1s;" />
+        <text x="75" y="45" class="token-txt anim-fade-out" fill="#adb5bd" font-style="italic" style="animation-delay: 0.1s;">[MASK]</text>
+        <text x="75" y="45" class="token-txt anim-fade-in" fill="#212529" style="animation-delay: 0.1s;">a</text>
+      </g>
+      <g transform="translate(540, 0)">
+        <rect width="150" height="70" rx="15" filter="url(#shadow)" style="animation: box-fluid 5s infinite; animation-delay: 0.9s;" />
+        <text x="75" y="45" class="token-txt anim-fade-out" fill="#adb5bd" font-style="italic" style="animation-delay: 0.9s;">[MASK]</text>
+        <text x="75" y="45" class="token-txt anim-fade-in" fill="#212529" style="animation-delay: 0.9s;">time</text>
+      </g>
+      <g transform="translate(720, 0)">
+        <rect width="150" height="70" rx="15" filter="url(#shadow)" style="animation: box-fluid 5s infinite; animation-delay: 0.5s;" />
+        <text x="75" y="45" class="token-txt anim-fade-out" fill="#adb5bd" font-style="italic" style="animation-delay: 0.5s;">[MASK]</text>
+        <text x="75" y="45" class="token-txt anim-fade-in" fill="#212529" style="animation-delay: 0.5s;">Lily</text>
+      </g>
+    </g>
+
+    <!-- 5. Legend (y=410) -->
+    <g transform="translate(500, 420)">
+      <rect x="-350" width="25" height="25" fill="#f8f9fa" rx="7" stroke="#dee2e6" stroke-width="2.5" />
+      <text x="-260" y="20" class="legend-txt" style="text-anchor: middle; fill:#6c757d;">[MASK]</text>
+      
+      <rect x="-100" width="25" height="25" fill="#fff" rx="7" stroke="#ffc107" stroke-width="5" />
+      <text x="20" y="20" class="legend-txt" style="text-anchor: middle; fill:#ffc107;">Refining</text>
+      
+      <rect x="180" width="25" height="25" fill="#fff" rx="7" stroke="#20c997" stroke-width="5" />
+      <text x="310" y="20" class="legend-txt" style="text-anchor: middle; fill:#20c997;">Stable</text>
+    </g>
+
+</svg>

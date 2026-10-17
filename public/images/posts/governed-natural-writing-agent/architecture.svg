@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Governed natural-writing agent architecture</title>
+  <desc id="desc">A writing workflow in which an agent owns transitions between evidence, validation, approval, and storage.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202124"/>
+    </marker>
+    <style>
+      .title { font: 700 31px Arial, sans-serif; fill: #202124; }
+      .subtitle { font: 16px Arial, sans-serif; fill: #5f6368; }
+      .label { font: 700 16px Arial, sans-serif; fill: #202124; }
+      .detail { font: 14px Arial, sans-serif; fill: #5f6368; }
+      .node { fill: #ffffff; stroke: #202124; stroke-width: 2; }
+      .agent { fill: #f5f5f5; stroke: #202124; stroke-width: 2; stroke-dasharray: 8 6; }
+      .arrow { fill: none; stroke: #202124; stroke-width: 2; marker-end: url(#arrow); }
+      .audit { fill: #202124; }
+      .auditText { font: 700 15px Arial, sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#ffffff"/>
+  <text x="60" y="62" class="title">A governed writing workflow</text>
+  <text x="60" y="91" class="subtitle">The agent owns state transitions; models and rules return evidence, not final authority.</text>
+
+  <rect x="310" y="135" width="580" height="354" rx="18" class="agent"/>
+  <text x="338" y="168" class="label">Agent control plane</text>
+  <text x="338" y="192" class="detail">typed state · policy · versioned evidence</text>
+
+  <rect x="50" y="260" width="190" height="100" rx="12" class="node"/>
+  <text x="145" y="299" text-anchor="middle" class="label">Draft + context</text>
+  <text x="145" y="326" text-anchor="middle" class="detail">source, audience, intent</text>
+
+  <rect x="350" y="224" width="190" height="92" rx="12" class="node"/>
+  <text x="445" y="260" text-anchor="middle" class="label">Local signals</text>
+  <text x="445" y="286" text-anchor="middle" class="detail">repeat, format, anchors</text>
+
+  <rect x="350" y="350" width="190" height="92" rx="12" class="node"/>
+  <text x="445" y="386" text-anchor="middle" class="label">Semantic inspection</text>
+  <text x="445" y="412" text-anchor="middle" class="detail">evidence-bound PASS/FAIL/ABSTAIN</text>
+
+  <rect x="600" y="280" width="170" height="100" rx="12" class="node"/>
+  <text x="685" y="320" text-anchor="middle" class="label">Decision state</text>
+  <text x="685" y="347" text-anchor="middle" class="detail">pass, revise, abstain</text>
+
+  <rect x="815" y="224" width="190" height="92" rx="12" class="node"/>
+  <text x="910" y="260" text-anchor="middle" class="label">Candidate rewrite</text>
+  <text x="910" y="286" text-anchor="middle" class="detail">one bounded transform</text>
+
+  <rect x="815" y="350" width="190" height="92" rx="12" class="node"/>
+  <text x="910" y="386" text-anchor="middle" class="label">Independent validation</text>
+  <text x="910" y="412" text-anchor="middle" class="detail">meaning, anchors, regression</text>
+
+  <rect x="1040" y="260" width="120" height="100" rx="12" class="node"/>
+  <text x="1100" y="299" text-anchor="middle" class="label">Approve</text>
+  <text x="1100" y="326" text-anchor="middle" class="detail">then save</text>
+
+  <path d="M240 310 H350" class="arrow"/>
+  <path d="M540 270 H600" class="arrow"/>
+  <path d="M540 396 H570 V350 H600" class="arrow"/>
+  <path d="M770 320 H815" class="arrow"/>
+  <path d="M910 316 V350" class="arrow"/>
+  <path d="M1005 396 H1023 V310 H1040" class="arrow"/>
+  <path d="M685 380 V470 H445 V442" class="arrow"/>
+
+  <rect x="50" y="555" width="1110" height="66" rx="12" class="audit"/>
+  <text x="82" y="596" class="auditText">Append-only audit ledger: run ID · prompt/model/policy versions · decision · candidate hash · validation · approval</text>
+</svg>
